@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# VSR Construction Landing Page
 
-First, run the development server:
+Welcome to the landing page for **VSR Construction**, a company specializing in snow removal and expanding into general contracting services including landscaping, demolition, asphalt and concrete repair, and more.
+---
+## Changes Made
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This section tracks key environment, configuration, and design changes made during setup:
+
+-  **Installed Tailwind CSS v4** and manually configured `tailwind.config.js` and `postcss.config.js`
+-  **Fixed PostCSS plugin breaking error** (`@tailwindcss/postcss` now required in v4)
+-  **Verified Tailwind styling by adding and rendering `bg-red-500`**
+-  **Replaced background `<Image />` with CSS `background-image` for hero**
+-  **Centered motto with overlay in `Hero.tsx`**
+-  **Header navigation restructured with horizontal layout, spacing, and placeholder dropdown logic**
+-  **Added global font scaling (`font-size: 20px`) to `globals.css`**
+-  **Prepared for AI integration via `src/pages/api/ai.ts` (REST endpoint)**
+
+---
+
+## Built With
+
+- [Next.js](https://nextjs.org/) – React framework
+- [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS
+- [TypeScript](https://www.typescriptlang.org/) – Static typing
+- [Vercel](https://vercel.com/) – Optional deployment platform
+
+## Project Structure
+
+```
+vsr-landing/
+├── public/              # Static assets (logo, background images)
+├── src/
+│   ├── components/      # Reusable UI components (Hero, Header, etc.)
+│   ├── pages/           # Routing pages (index.tsx, API routes)
+│   └── styles/          # Tailwind base styles
+├── tsconfig.json        # TypeScript config
+├── tailwind.config.js   # Tailwind customization
+└── README.md            # This file
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Planned Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Responsive hero section with background image
+- Dropdown navigation menu
+- Motto display with scrollable sections
+- Future AI Assistant
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+##  AI Integration (Coming Soon)
 
-## Learn More
+We'll add an AI-powered chatbot or smart quote assistant.  
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+// src/pages/api/ai.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You can send a POST request here later using:
+```ts
+fetch('/api/ai', { method: 'POST', body: JSON.stringify({ prompt: "example" }) })
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Installation & Dev
+### Local Testing
+```bash
+git clone https://github.com/kennermatt-cmd/vsr-landing.git
+cd vsr-landing
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Visit [http://localhost:3000](http://localhost:3000) to view.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The codebase is ready for AI plugins or integrations.
+- Use `.env.local` to store API keys securely for OpenAI or other services.
+
+## Contact
+
+For business inquiries, email: [Marcus](mailto:marcus@vsrsnow.com)  
+For developer inquiries, email: [Matthew](mailto:m.kenner@outlook.com)
+
+
