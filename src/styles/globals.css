@@ -3,5 +3,11 @@
 @tailwind utilities;
 html {
     font-size: 20px;
+    scroll-behavior: smooth;
 }
-  
+:root {
+    scroll-padding-top: 100px;
+  }
+  html, body {
+    color: white; 
+  }
