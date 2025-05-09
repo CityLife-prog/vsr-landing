@@ -1,5 +1,4 @@
-// src/components/About.tsx
-import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Featured() {
     return (
@@ -17,6 +16,12 @@ export default function Featured() {
           <p className="text-lg">
           Check out our latest commercial snow removal client in Aurora Colorado.
           </p>
+          <Link href="/projects" passHref
+            className="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+
+          >
+            View All Projects
+          </Link>
         </div>
       </section>
     );

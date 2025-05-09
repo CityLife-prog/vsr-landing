@@ -11,8 +11,19 @@ export default function Contact() {
         {/* Contact Info */}
         <div className="relative z-10 text-center px-4">
           <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
+          <p className="text-lg">Founder/Ceo: Marcus Vargas</p>
           <p className="text-lg">Email: marcus@vsrsnow.com</p>
           <p className="text-lg">Phone: (720) 838-5807</p>
+          <p></p>
+
+          <p className="text-lg">Co-owner: Zach Lewis</p>
+          <p className="text-lg">Email: zach@vsrsnow.com</p>
+          <p className="text-lg">Phone: (219) 929-7783</p>
+          <p></p>
+
+          <p className="text-lg">Web-Development: Matthew Kenner</p>
+          <p className="text-lg">Email: m.kenner@outlook.com</p>
+          <p className="text-lg">Phone: (720) 525-5659</p>
         </div>
       </section>
     );

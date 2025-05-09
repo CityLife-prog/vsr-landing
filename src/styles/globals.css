@@ -8,6 +8,7 @@ html {
 :root {
     scroll-padding-top: 100px;
   }
-  html, body {
-    color: white; 
-  }
+  body {
+    background-color: #111827;
+    color: white;
+}

@@ -1,65 +1,58 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 
 export default function Header() {
+  const router = useRouter();
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const headerOffset = 60; // matches scroll-mt-16
+      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerOffset;
+  
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    } else {
+      router.push(`/#${id}`);
+    }
+  };
+  
   return (
-    <header className="w-full bg-black text-white shadow-md fixed top-0 left-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
+    <header className="w-full bg-black text-white shadow-md fixed top-0 left-0 z-50 h-12">
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+      {/* Logo */}
         <div>
-          <a href="#home">
+          <Link href="/" className = "flex items-center">
             <Image
               src="/VSR.png"
               alt="VSR Logo"
-              width={140}
-              height={50}
+              width={60}
+              height={24}
               priority
             />
-          </a>
+          </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex items-center space-x-6 text-base font-medium">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Home
-          </button>
+        {/* Full Navigation (Desktop Only) */}
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <button onClick={() => scrollTo('featured')} className="hover:text-blue-400">Projects</button>
+          <button onClick={() => scrollTo('about')} className="hover:text-blue-400">About</button>
+          <button onClick={() => scrollTo('services')} className="hover:text-blue-400">Services</button>
+          <button onClick={() => scrollTo('hiring')} className="hover:text-blue-400">Now Hiring</button>
+          <button onClick={() => scrollTo('footer')} className="hover:text-blue-400">Contact</button>
 
-          <button
-            onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            About
-          </button>
+        </nav>
 
-          
-
-          {/* Services Dropdown */}
-          <div className="relative group flex items-center">
-            <button className="px-4 py-2 rounded-md hover:bg-gray-800 transition">
-              Services
-            </button>
-            <div className="absolute right-0 mt-2 hidden group-hover:block bg-black bg-opacity-90 shadow-lg rounded-md border border-gray-700 z-50 min-w-[180px]">
-              <ul className="py-2 text-sm text-white">
-                <li
-                  className="px-4 py-2 hover:bg-gray-800 cursor-pointer"
-                  onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Snow Removal
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-800 cursor-pointer">Landscaping</li>
-                <li className="px-4 py-2 hover:bg-gray-800 cursor-pointer">Demolition</li>
-                <li className="px-4 py-2 hover:bg-gray-800 cursor-pointer">Concrete & Asphalt</li>
-              </ul>
-            </div>
-          </div>
-          <button
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Contact
-          </button>
+        {/* Mobile Navigation: Only show Contact and Hiring */}
+        <nav className="flex md:hidden items-center space-x-4 text-sm font-medium">
+          <button onClick={() => scrollTo('hiring')} className="hover:text-blue-400">Now Hiring</button>
+          <button onClick={() => scrollTo('footer')} className="hover:text-blue-400">Contact</button>
         </nav>
       </div>
     </header>

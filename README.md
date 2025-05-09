@@ -1,83 +1,119 @@
-
 # VSR Construction Landing Page
 
-Welcome to the landing page for **VSR Construction**, a company specializing in snow removal and expanding into general contracting services including landscaping, demolition, asphalt and concrete repair, and more.
----
-## Changes Made
-
-This section tracks key environment, configuration, and design changes made during setup:
-
--  **Installed Tailwind CSS v4** and manually configured `tailwind.config.js` and `postcss.config.js`
--  **Fixed PostCSS plugin breaking error** (`@tailwindcss/postcss` now required in v4)
--  **Verified Tailwind styling by adding and rendering `bg-red-500`**
--  **Replaced background `<Image />` with CSS `background-image` for hero**
--  **Centered motto with overlay in `Hero.tsx`**
--  **Header navigation restructured with horizontal layout, spacing, and placeholder dropdown logic**
--  **Added global font scaling (`font-size: 20px`) to `globals.css`**
--  **Prepared for AI integration via `src/pages/api/ai.ts` (REST endpoint)**
+This is the marketing and landing website for **VSR Construction**, a company specializing in snow removal, landscaping, hardscaping, and general contracting.
 
 ---
 
-## Built With
+## Tech Stack
 
 - [Next.js](https://nextjs.org/) – React framework
 - [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS
-- [TypeScript](https://www.typescriptlang.org/) – Static typing
-- [Vercel](https://vercel.com/) – Optional deployment platform
+- [TypeScript](https://www.typescriptlang.org/) – Optional static typing
+- [PostCSS](https://postcss.org/) – For Tailwind integration
+- [Vercel](https://vercel.com/) – Deployment (optional)
+
+---
 
 ## Project Structure
-
 ```
 vsr-landing/
-├── public/              # Static assets (logo, background images)
-├── src/
-│   ├── components/      # Reusable UI components (Hero, Header, etc.)
-│   ├── pages/           # Routing pages (index.tsx, API routes)
-│   └── styles/          # Tailwind base styles
-├── tsconfig.json        # TypeScript config
-├── tailwind.config.js   # Tailwind customization
-└── README.md            # This file
+├── README.md
+├── gitCommands.txt
+└── vsr-landing
+    ├── README.md
+    ├── eslint.config.mjs
+    ├── next-env.d.ts
+    ├── next.config.ts
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.js
+    ├── public
+    │   ├── VSR.png
+    │   ├── about.jpg
+    │   ├── contact_photo.heic
+    │   ├── contact_photo.png
+    │   ├── dump_truck.jpg
+    │   ├── featured_project.png
+    │   ├── file.svg
+    │   ├── globe.svg
+    │   ├── logo.png
+    │   ├── next.svg
+    │   ├── services.jpg
+    │   ├── sidewalk_guy.png
+    │   ├── vercel.svg
+    │   └── window.svg
+    ├── src
+    │   ├── components
+    │   │   ├── About.tsx
+    │   │   ├── Contact.tsx
+    │   │   ├── Featured.tsx
+    │   │   ├── Footer.tsx
+    │   │   ├── Header.tsx
+    │   │   ├── Hero.tsx
+    │   │   └── Services.tsx
+    │   ├── favicon.ico
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   ├── pages
+    │   │   ├── _app.tsx
+    │   │   ├── api
+    │   │   │   └── ai.ts
+    │   │   └── index.tsx
+    │   └── styles
+    │       └── globals.css
+    ├── tailwind.config.js
+    ├── tsconfig.json
+    └── vsr-test
+        ├── README.md
+        ├── eslint.config.mjs
+        ├── next-env.d.ts
+        ├── next.config.ts
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        │   ├── file.svg
+        │   ├── globe.svg
+        │   ├── next.svg
+        │   ├── vercel.svg
+        │   └── window.svg
+        ├── src
+        │   └── app
+        │       ├── favicon.ico
+        │       ├── globals.css
+        │       ├── layout.tsx
+        │       └── page.tsx
+        └── tsconfig.json
 ```
-
 ## Planned Features
-
-- Responsive hero section with background image
-- Dropdown navigation menu
-- Motto display with scrollable sections
+- Now Hiring section with backend api to email marcus
 - Future AI Assistant
+---
 
-##  AI Integration (Coming Soon)
-
-We'll add an AI-powered chatbot or smart quote assistant.  
-
-```ts
-// src/pages/api/ai.ts
-```
-
-You can send a POST request here later using:
-```ts
-fetch('/api/ai', { method: 'POST', body: JSON.stringify({ prompt: "example" }) })
-```
-
-## Installation & Dev
+## Getting Started
 ### Local Testing
 ```bash
 git clone https://github.com/kennermatt-cmd/vsr-landing.git
 cd vsr-landing
 npm install
+npm install -D tailwindcss@3.4.1 postcss autoprefixer
+npm install formidable nodemailer
 npm run dev
 ```
-
 Visit [http://localhost:3000](http://localhost:3000) to view.
-
-## Notes
-
-- The codebase is ready for AI plugins or integrations.
-- Use `.env.local` to store API keys securely for OpenAI or other services.
-
+### Docker Testing
+Include Dockerfile and .dockerignore in root.  
+Build and run the docker image
+```
+docker build -t vsr-app .
+docker run -p 3000:3000 vsr-app
+```
+---
 ## Contact
+Owner: [Marcus Vargas](mailto:marcus@vsrsnow.com)
+Co-Owner: [Zach Lewis](mailto:zach@vsrsnow.com)
+Developer: [Matthew Kenner](mailto:m.kenner@outlook.com)
 
-For business inquiries, email: [Marcus](mailto:marcus@vsrsnow.com)  
-For developer inquiries, email: [Matthew](mailto:m.kenner@outlook.com)
-
-
+## License
+This project is for internal and client use only © 2025 VSR LLC.
