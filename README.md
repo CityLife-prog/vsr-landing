@@ -100,6 +100,8 @@ npm install
 npm install -D tailwindcss@3.4.1 postcss autoprefixer
 npm install formidable nodemailer
 npm run dev
+or
+./node_modules/.bin/next dev --hostname 0.0.0.0
 ```
 Visit [http://localhost:3000](http://localhost:3000) to view.
 ### Docker Testing

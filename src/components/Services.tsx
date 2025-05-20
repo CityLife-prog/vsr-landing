@@ -1,3 +1,5 @@
+import { serviceTags } from '@/lib/serviceTags';
+import ServiceBox from '@/components/ServiceBox';
 import Link from 'next/link';
 
 export default function Services() {
@@ -15,13 +17,17 @@ export default function Services() {
         <h2 className="text-3xl font-bold mb-6">Our Services</h2>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white/10 p-4 rounded shadow">Snow & Ice Removal</div>
-          <div className="bg-white/10 p-4 rounded shadow">Landscaping, Arboring & Hardscaping</div>
-          <div className="bg-white/10 p-4 rounded shadow">Concrete & Asphalt Repairs</div>
-          <div className="bg-white/10 p-4 rounded shadow">Demolition</div>
-          <div className="bg-white/10 p-4 rounded shadow">Painting</div>
+          {serviceTags.map((tag) => (
+            <ServiceBox
+              key={tag.name}
+              name={tag.name}
+              description={tag.description}
+              link={tag.link}
+              tooltipPosition={tag.tooltipPosition}
+            />
+          ))}
 
-          {/* "Get a Quote" button styled like the others */}
+          {/* Get a Quote */}
           <Link href="/quote">
             <div className="bg-blue-600 hover:bg-blue-700 p-4 rounded shadow cursor-pointer transition font-medium">
               Get a Quote

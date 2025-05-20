@@ -38,7 +38,7 @@ export default function Footer() {
             </button>
           </Link>
           <Link href="/apply">
-            <button className="bg-blue-600 hover:bg-green-700 px-6 py-2 rounded-lg text-white font-medium transition">
+            <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-white font-medium transition">
               Apply Now
             </button>
           </Link>

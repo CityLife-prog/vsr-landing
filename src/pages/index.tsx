@@ -21,7 +21,7 @@ export default function Home() {
           <Featured />
           <About />
           <Services />       
-          
+          <Contact />
           <NowHiring />
       </main>
     </>
