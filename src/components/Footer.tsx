@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { featureFlags } from '@/lib/version';
 import { FaFacebook, FaLinkedin, FaInstagram, FaArrowUp } from 'react-icons/fa';
+import Image from 'next/image';
+
 
 export default function Footer() {
   const socialIcons = [
@@ -16,7 +18,7 @@ export default function Footer() {
     <footer id="footer" className="relative bg-black text-white py-16 px-4 overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           src="/Denver_skyline.jpg"
           alt="Denver Skyline"
           className="w-full h-full object-cover opacity-40 brightness-90"
