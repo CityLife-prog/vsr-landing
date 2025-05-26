@@ -1,7 +1,13 @@
 import Link from 'next/link';
-import { FaLinkedin, FaInstagram, FaArrowUp } from 'react-icons/fa';
+import { featureFlags } from '@/lib/version';
+import { FaFacebook, FaLinkedin, FaInstagram, FaArrowUp } from 'react-icons/fa';
 
 export default function Footer() {
+  const socialIcons = [
+    { name: 'Instagram', icon: <FaInstagram />, href: 'https://instagram.com' },
+    { name: 'Facebook', icon: <FaFacebook />, href: 'https://facebook.com' },
+    { name: 'LinkedIn', icon: <FaLinkedin />, href: 'https://linkedin.com' },
+  ];
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -55,13 +61,31 @@ export default function Footer() {
         </div>
 
         {/* Social Icons */}
-        <div className="flex justify-center gap-6 text-2xl text-gray-400">
-          <a href="https://linkedin.com/company/vsrconstruction" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-            <FaLinkedin />
-          </a>
-          <a href="https://instagram.com/vsrconstruction" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-            <FaInstagram />
-          </a>
+
+        <div className="flex justify-center gap-6">
+          {socialIcons.map((social) =>
+            featureFlags.socialsEnabled ? (
+              <a
+                key={social.name}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white text-xl hover:text-blue-400 transition"
+              >
+                {social.icon}
+              </a>
+            ) : (
+              <div
+                key={social.name}
+                className="relative group text-white text-xl cursor-not-allowed opacity-60"
+              >
+                {social.icon}
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                  Socials are not yet available.
+                </div>
+              </div>
+            )
+          )}
         </div>
 
         {/* Back to Top */}

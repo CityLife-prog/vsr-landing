@@ -50,7 +50,7 @@ export default function ApplyPage() {
         <textarea className="w-full px-4 py-2 bg-gray-800 rounded" name="experience" placeholder="Briefly describe your experience" onChange={handleChange} required />
         <input type="file" name="resume" accept=".pdf,.doc,.docx" className="block w-full text-sm text-gray-300 bg-gray-700 rounded px-4 py-2" onChange={handleFileChange} required />
 
-        <button type="submit" className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold">Submit Application</button>
+        <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Submit Application</button>
       </form>
     </div>
   );

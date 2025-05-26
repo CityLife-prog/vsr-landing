@@ -1,12 +1,18 @@
 // components/ServiceBox.tsx
 import Link from 'next/link';
 import { useState } from 'react';
+import classNames from 'classnames';
 
 interface Props {
   name: string;
   description?: string;
   link?: string;
-  tooltipPosition?: 'top' | 'bottom';
+  tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
+  toolXPosition?: 'left' | 'center' | 'right'; // 'center' may be more semantically clear than 'middle'
+  toolYPosition?: 'top' | 'center' | 'bottom';
+  variant?: 'landing' | 'sidebar'; // optional layout variant
+  icon?: React.ReactNode; // optional icon support
+  disabled?: boolean;
 }
 
 export default function ServiceBox({ name, description, link = '#', tooltipPosition = 'top' }: Props) {

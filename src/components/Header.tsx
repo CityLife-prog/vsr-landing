@@ -29,9 +29,9 @@ export default function Header() {
         <div>
           <Link href="/" className = "flex items-center">
             <Image
-              src="/VSR.png"
+              src="/VSRv2.png"
               alt="VSR Logo"
-              width={60}
+              width={100}
               height={24}
               priority
             />
