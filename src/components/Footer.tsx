@@ -21,9 +21,10 @@ export default function Footer() {
         <Image
           src="/Denver_skyline.jpg"
           alt="Denver Skyline"
-          className="w-full h-full object-cover opacity-40 brightness-90"
+          fill
+          priority
+          className="object-cover opacity-40 brightness-90"
         />
-        {/* Bottom-to-top fade */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
       </div>
 
@@ -83,7 +84,7 @@ export default function Footer() {
               >
                 {social.icon}
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                  Socials are not yet available.
+                  Socials coming in V2.
                 </div>
               </div>
             )

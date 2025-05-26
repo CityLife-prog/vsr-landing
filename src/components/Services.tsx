@@ -14,7 +14,10 @@ export default function Services() {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-6xl w-full">
-        <h2 className="text-3xl font-bold mb-6">Our Services</h2>
+        <div className=" -mt-6">
+          <h2 className="text-3xl font-bold mb-16">Our Services</h2>
+        </div>
+        
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {serviceTags.map((tag) => (
@@ -24,6 +27,7 @@ export default function Services() {
               description={tag.description}
               link={tag.link}
               tooltipPosition={tag.tooltipPosition}
+              disabled={tag.disabled}
             />
           ))}
 
