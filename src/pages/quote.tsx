@@ -3,21 +3,15 @@ import { useEffect, useState } from 'react';
 
 
 export default function QuotePage() {
-  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setShowForm(true), 100);
-    return () => clearTimeout(timeout);
-  }, []);
+  
   const [showBubble, setShowBubble] = useState(false);
-
-useEffect(() => {
-  const timeout = setTimeout(() => {
-    setShowForm(true);
-    setShowBubble(true);
-  }, 100);
-  return () => clearTimeout(timeout);
-}, []);
+    useEffect(() => {
+      const timeout = setTimeout(() => {
+        setShowBubble(true);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }, []);
 
   return (
     <>
@@ -47,7 +41,7 @@ useEffect(() => {
 >
 
                 <p className="text-sm sm:text-base leading-relaxed">
-                  Let us know what services you need and we'll get back to you with a custom quote.<br />
+                  Let us know what services you need and we&apos;ll get back to you with a custom quote.<br />
                   
                 </p>
                 <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-white"></div>

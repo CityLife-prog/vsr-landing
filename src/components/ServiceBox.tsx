@@ -1,7 +1,6 @@
 // components/ServiceBox.tsx
 import Link from 'next/link';
 import { useState } from 'react';
-import classNames from 'classnames';
 
 interface Props {
   name: string;
