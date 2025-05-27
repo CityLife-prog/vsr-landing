@@ -1,11 +1,14 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { useMobile } from '@/context/MobileContext';
 
 
 export default function QuotePage() {
 
-  
+  const { isMobile } = useMobile();
+
   const [showBubble, setShowBubble] = useState(false);
+  
     useEffect(() => {
       const timeout = setTimeout(() => {
         setShowBubble(true);
@@ -21,7 +24,11 @@ export default function QuotePage() {
 
       <section
         className="relative min-h-screen bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/contact_photo.png')" }}
+        style={{
+          backgroundImage: `url('${
+            isMobile ? '/contact_photo2.png' : '/contact_photo.png'
+          }')`,
+        }}
       >
         {/* Fullscreen overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-60 z-0" />
@@ -33,20 +40,25 @@ export default function QuotePage() {
             <h1 className="text-4xl font-bold text-center mb-6">Request a Quote</h1>
 
             {/* Chat bubble */}
-            <div className="flex mb-12">
-            <div
-  className={`relative bg-white text-gray-800 px-6 py-5 rounded-xl shadow-lg w-80 ml-auto transition-opacity duration-1000 ease-in-out ${
-    showBubble ? 'opacity-100' : 'opacity-0'
-  }`}
->
+            <div className="mb-20 flex justify-end sm:justify-center">
+  <div
+    className={`relative bg-white text-gray-800 px-6 py-5 rounded-xl shadow-lg w-80 transition-opacity duration-1000 ease-in-out ${
+      showBubble ? 'opacity-100' : 'opacity-0'
+    } ${isMobile ? 'mx-auto' : 'ml-auto'} ${isMobile ? 'pb-8' : ''}`}
+  >
+    <p className="text-sm sm:text-base leading-relaxed">
+      Let us know what services you need and we&apos;ll get back to you with a custom quote.
+    </p>
 
-                <p className="text-sm sm:text-base leading-relaxed">
-                  Let us know what services you need and we&apos;ll get back to you with a custom quote.<br />
-                  
-                </p>
-                <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-white"></div>
-              </div>
-            </div>
+    {/* Arrow */}
+    {!isMobile ? (
+      <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-white"></div>
+    ) : (
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white"></div>
+    )}
+  </div>
+</div>
+
 
 
             <form className="space-y-6 bg-gray-800 bg-opacity-90 p-6 rounded-lg shadow-md">

@@ -100,7 +100,7 @@ export default function Footer() {
         </div>
 
         <a
-          href="mailto:m.kenner@outlook.com?subject=Web%20Development%20Inquiry"
+          href="mailto:citylife32@outlook.com?subject=Web%20Development%20Inquiry"
           className="text-sm text-gray-400 hover:text-white block mt-2"
         >
           Web Development Contact
