@@ -7,7 +7,7 @@ import Image from 'next/image';
 export default function Footer() {
   const socialIcons = [
     { name: 'Instagram', icon: <FaInstagram />, href: 'https://instagram.com' },
-    { name: 'Facebook', icon: <FaFacebook />, href: 'https://facebook.com' },
+    
     { name: 'LinkedIn', icon: <FaLinkedin />, href: 'https://linkedin.com' },
   ];
   const scrollToTop = () => {
@@ -84,7 +84,7 @@ export default function Footer() {
               >
                 {social.icon}
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                  Socials coming in V2.
+                  Socials coming soon!
                 </div>
               </div>
             )

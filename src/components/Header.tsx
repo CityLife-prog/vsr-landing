@@ -7,7 +7,7 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 
 export default function Header() {
   const router = useRouter();
-  const { isMobile } = useMobile(); // use the global flag
+  const { isMobile } = useMobile(); 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const scrollTo = (id: string) => {
