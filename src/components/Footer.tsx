@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { featureFlags } from '@/lib/version';
-import { FaFacebook, FaLinkedin, FaInstagram, FaArrowUp } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram, FaArrowUp } from 'react-icons/fa';
 import Image from 'next/image';
 
 
