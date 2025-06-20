@@ -15,7 +15,7 @@ export default function AboutSection() {
           What started as a snow and ice removal service for commercial properties has rapidly grown into a full-service contracting firm. Today, VSR LLC offers a broad range of services including Landscaping, Hardscaping, Demolition, Concrete Work, Asphalt Patching, and Repairs—all delivered with the same professionalism and reliability that fueled our start.
         </p>
         <p className="mb-4">
-          At VSR, we&apos;re more than a service provider—we're a trusted partner dedicated to preserving and enhancing the value, safety, and appearance of your property in every season. Whether it’s clearing snow in winter or revitalizing your landscape in summer, we’re ready to meet any challenge.
+          At VSR, we&apos;re more than a service provider—we&pos;re a trusted partner dedicated to preserving and enhancing the value, safety, and appearance of your property in every season. Whether it’s clearing snow in winter or revitalizing your landscape in summer, we’re ready to meet any challenge.
         </p>
         <p className="text-center font-semibold mt-6 text-lg italic">
           Dependable. Professional. All-Season Ready.
