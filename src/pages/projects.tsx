@@ -8,8 +8,9 @@ export default function ProjectsPage() {
           </p>
           
           <div className="w-full h-[600px] rounded-xl overflow-hidden border border-gray-700">
+
             <iframe
-              src="https://www.google.com/maps/d/embed?mid=1hV3qtSOdDXzZuXHtS2kxCzEinQcOe0c&ehbc=2E312F"
+              src="https://www.google.com/maps/d/u/2/embed?mid=1BJDyMnTrLDz1GEWH9flRBrQxcVIa0hU&ehbc=2E312F"
               width="100%"
               height="100%"
               allowFullScreen
