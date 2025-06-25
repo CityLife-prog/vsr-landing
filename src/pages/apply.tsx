@@ -1,58 +1,136 @@
-// 1. apply.tsx (Job Application Page)
-
-import { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 export default function ApplyPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    experience: '',
-    resume: null as File | null,
-  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+    const [statusMessage, setStatusMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const formRef = useRef<HTMLFormElement>(null);
+  const [phone, setPhone] = useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, resume: e.target.files?.[0] ?? null });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const data = new FormData();
-    data.append('name', formData.name);
-    data.append('email', formData.email);
-    data.append('phone', formData.phone);
-    data.append('experience', formData.experience);
-    if (formData.resume) data.append('resume', formData.resume);
-
-    const res = await fetch('/api/apply', {
-      method: 'POST',
-      body: data,
-    });
-
-    if (res.ok) {
-      alert('Application submitted successfully!');
-    } else {
-      alert('Submission failed.');
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-12 text-white">
-      <h1 className="text-3xl font-bold mb-6">Apply for a Position</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input className="w-full px-4 py-2 bg-gray-800 rounded" name="name" placeholder="Full Name" onChange={handleChange} required />
-        <input className="w-full px-4 py-2 bg-gray-800 rounded" name="email" placeholder="Email" type="email" onChange={handleChange} required />
-        <input className="w-full px-4 py-2 bg-gray-800 rounded" name="phone" placeholder="Phone Number" onChange={handleChange} required />
-        <textarea className="w-full px-4 py-2 bg-gray-800 rounded" name="experience" placeholder="Briefly describe your experience" onChange={handleChange} required />
-        <input type="file" name="resume" accept=".pdf,.doc,.docx" className="block w-full text-sm text-gray-300 bg-gray-700 rounded px-4 py-2" onChange={handleFileChange} required />
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(formRef.current!);
 
-        <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Submit Application</button>
-      </form>
+    if (selectedFile) {
+      formData.append('resume', selectedFile);
+    }
+
+    try {
+      const res = await fetch('/api/apply', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await res.json();
+      if (result.success) {
+        setStatusMessage('Application submitted successfully!');
+        setTimeout(() => setStatusMessage(''), 5000);
+        setFormSubmitted(true);
+        formRef.current?.reset();
+        setSelectedFile(null);
+        setPhone('');
+        //alert('Application submitted successfully.');
+      } else {
+        setStatusMessage(`Submission failed: ${result.error}`);
+        setTimeout(() => setStatusMessage(''), 5000);
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      alert('An error occurred.');
+    }
+  };
+  function formatPhoneNumber(value: string): string {
+  const digits = value.replace(/\D/g, '').substring(0, 10);
+  const parts = [];
+
+  if (digits.length > 0) parts.push('(' + digits.substring(0, 3));
+  if (digits.length >= 4) parts.push(') ' + digits.substring(3, 6));
+  if (digits.length >= 7) parts.push('-' + digits.substring(6, 10));
+
+  return parts.join('');
+}
+
+
+  return (
+    <div className="w-full max-w-3xl mt-16 mx-auto">
+    <h1 className="text-4xl font-bold text-center mb-6">Apply Today</h1>
+    {statusMessage && (
+      <div className="mb-4 p-3 rounded bg-yellow-700 text-white text-sm text-center">
+        {statusMessage}
+      </div>
+    )}
+
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-gray-800 p-6 rounded-lg text-white"
+    >
+      <div>
+        <label className="block mb-2 text-sm font-medium">Full Name</label>
+        <input 
+          type="text"
+          name="name" 
+          placeholder="John Doe"
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required />
+      </div>
+      <div>
+        <label className="block mb-2 text-sm font-medium">Email Address</label>
+        <input 
+          name="email" 
+          type="email" 
+          placeholder="you@example.com"
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+      </div>
+      <div>
+        <label className="block mb-2 text-sm font-medium">Phone</label>
+        <input 
+          type="tel"
+          name="phone" 
+          value={phone}
+          onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+          placeholder="(123) 456-7890"
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required />
+      </div>
+      <div>
+        <label className="block mb-2 text-sm font-medium">Experience</label>
+        <textarea
+          name="experience"
+          rows={4}
+          placeholder="Provide a brief overview of your experience..."
+          className="w-full p-2 bg-gray-700 rounded"
+        ></textarea>
+      </div>
+      
+      <div>
+        <label className="block mb-2 text-sm font-medium">Resume</label>
+        <input
+          type="file"
+          name="resume"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          className="w-full p-2 bg-gray-700 rounded"
+          required
+        />
+        {selectedFile && (
+          <div className="mt-2 bg-gray-700 p-2 rounded">
+            <p>{selectedFile.name}</p>
+            <p className="text-xs text-gray-300">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+          </div>
+        )}
+      </div>
+      <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded">
+        Submit Application
+      </button>
+    </form>
     </div>
   );
 }
-

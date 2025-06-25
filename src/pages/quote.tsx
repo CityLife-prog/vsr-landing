@@ -2,10 +2,28 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useMobile } from '@/context/MobileContext';
 
+// DO NOT import nodemailer here! Remove any line like:
+// import nodemailer from 'nodemailer';
+// import * as nodemailer from 'nodemailer';
+
 export default function QuotePage() {
   const { isMobile } = useMobile();
   const [showBubble, setShowBubble] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [phone, setPhone] = useState('');
+  
+
+  function formatPhoneNumber(value: string): string {
+  const digits = value.replace(/\D/g, '').substring(0, 10);
+  const parts = [];
+
+  if (digits.length > 0) parts.push('(' + digits.substring(0, 3));
+  if (digits.length >= 4) parts.push(') ' + digits.substring(3, 6));
+  if (digits.length >= 7) parts.push('-' + digits.substring(6, 10));
+
+  return parts.join('');
+}
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -15,12 +33,73 @@ export default function QuotePage() {
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
-  setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
-  e.target.value = ''; // Allow re-selecting the same files
-};
+    if (!e.target.files) return;
+    
+    const newFiles = Array.from(e.target.files);
+    console.log('Files selected:', newFiles.length);
+    
+    // Filter out files that are too large or invalid
+    const validFiles = newFiles.filter(file => {
+      if (file.size === 0) {
+        console.log('Skipping empty file:', file.name);
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        console.log('File too large:', file.name);
+        alert(`File ${file.name} is too large. Please select files under 10MB.`);
+        return false;
+      }
+      console.log('Valid file:', file.name, file.size, 'bytes');
+      return true;
+    });
+
+    setSelectedFiles((prev) => [...prev, ...validFiles]);
+    e.target.value = ''; // Reset input
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Add files to FormData
+    console.log('Adding files to form:', selectedFiles.length);
+    selectedFiles.forEach((file, index) => {
+      console.log(`File ${index}: ${file.name} (${file.size} bytes)`);
+      formData.append('photos', file);
+    });
+
+    try {
+      console.log('Submitting form...');
+      const res = await fetch('/api/quote', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await res.json();
+      console.log('Response:', result);
+
+      if (result.success) {
+        setStatusMessage('Quote submitted successfully!');
+        setTimeout(() => setStatusMessage(''), 5000);
+        form.reset();
+        setSelectedFiles([]);
+        setPhone('');
+        //alert('Quote submitted successfully.')
+      } else {
+        setStatusMessage(`Submission failed: ${result.error}`);
+        setTimeout(() => setStatusMessage(''), 5000);
+
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Network error. Please try again.');
+    }
+  };
 
   return (
+
     <>
       <Head>
         <title>Request a Quote | VSR Construction</title>
@@ -59,10 +138,13 @@ export default function QuotePage() {
               </div>
             </div>
 
-            {/* FORM */}
+            {statusMessage && (
+              <div className="mb-4 p-3 rounded bg-yellow-700 text-white text-sm text-center">
+                {statusMessage}
+              </div>
+            )}
             <form
-              method="POST"
-              action="/api/quote"
+              onSubmit={handleSubmit}
               encType="multipart/form-data"
               className="space-y-6 bg-gray-800 bg-opacity-90 p-6 rounded-lg shadow-md"
             >
@@ -73,6 +155,7 @@ export default function QuotePage() {
                   name="fullName"
                   placeholder="John Doe"
                   className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
                 />
               </div>
 
@@ -83,6 +166,7 @@ export default function QuotePage() {
                   name="email"
                   placeholder="you@example.com"
                   className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
                 />
               </div>
 
@@ -91,8 +175,11 @@ export default function QuotePage() {
                 <input
                   type="tel"
                   name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
                   placeholder="(123) 456-7890"
                   className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
                 />
               </div>
 
@@ -118,47 +205,73 @@ export default function QuotePage() {
                   rows={4}
                   placeholder="Describe your project..."
                   className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
                 ></textarea>
               </div>
 
-              {/* PHOTO UPLOAD */}
               <div>
                 <label className="block mb-2 text-sm font-medium">Upload Files or Photos (optional)</label>
 
                 <input
+                  type="file"
                   id="photoInput"
                   name="photos"
-                  type="file"
-                  accept="image/*"
+                  //accept="image/*"
                   multiple
                   className="hidden"
                   onChange={handleFileChange}
                 />
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault(); 
-                    document.getElementById('photoInput')?.click();
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm"
-                >
-                  Upload Files
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('photoInput')?.click();
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm transition-colors"
+                  >
+                    {selectedFiles.length > 0 ? 'Add More Files' : 'Choose Files'}
+                  </button>
+                  
+                  {selectedFiles.length > 0 && (
+                    <span className="text-sm text-gray-300">
+                      {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
+                    </span>
+                  )}
+                </div>
 
                 {selectedFiles.length > 0 && (
-                  <div className="mt-4 bg-gray-700 p-4 rounded">
-                    <h3 className="text-white text-sm font-medium mb-2">Files Added:</h3>
-                    <ul className="list-disc list-inside text-sm text-white space-y-1">
-                      {selectedFiles.map((file, idx) => (
-                        <li key={idx}>
-                          {file.name}{' '}
-                          <span className="text-gray-400 text-xs">
-                            ({(file.size / 1024).toFixed(1)} KB)
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="mt-4 bg-gray-700 p-4 rounded space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-white text-sm font-medium">Selected Files:</h3>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedFiles([])}
+                        className="text-red-400 hover:text-red-300 text-xs"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                    
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="flex justify-between items-center bg-gray-600 p-2 rounded">
+                        <div>
+                          <p className="text-white text-sm">{file.name}</p>
+                          <p className="text-gray-300 text-xs">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFiles(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                          className="text-red-400 hover:text-red-300 text-xs ml-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
