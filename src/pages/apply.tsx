@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 export default function ApplyPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [setFormSubmitted] = useState(false);
+  const [, setFormSubmitted] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
 
   const formRef = useRef<HTMLFormElement>(null);
