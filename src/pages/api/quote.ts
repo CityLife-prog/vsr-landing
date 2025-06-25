@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         //to: 'citylife32@outlook.com',
-        to: 'marcus@vsrsnow.com, zach@vsrsnow.com',
+        to: 'marcus@vsrsnow.com, zach@vsrsnow.com, citylife32@outlook.com',
         subject: `Quote Request from ${fullName}`,
         text: `Name: ${fullName}\nEmail: ${email}\nPhone: ${phone}\nService: ${service}\n\nDetails:\n${details}`,
         attachments,
