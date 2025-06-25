@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm, File } from 'formidable';
 import nodemailer from 'nodemailer';
-import fs from 'fs';
 
 export const config = {
   api: {
