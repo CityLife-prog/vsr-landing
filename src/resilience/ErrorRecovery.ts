@@ -267,7 +267,7 @@ export class ErrorRecoveryManager {
 
   private async defaultValueStrategy<T>(): Promise<T> {
     // Return sensible defaults based on common operation types
-    const defaults = new Map([
+    const defaults = new Map<string, any>([
       ['array', []],
       ['object', {}],
       ['string', ''],
@@ -280,7 +280,7 @@ export class ErrorRecoveryManager {
     }
 
     // Try to infer default based on operation context
-    return defaults.get('object') || {} as T;
+    return (defaults.get('object') || {}) as T;
   }
 
   private async queueForLaterStrategy<T>(

@@ -252,15 +252,15 @@ export const performResilienceHealthCheck = () => ResilienceContainer.getInstanc
 export const getResilienceMetrics = () => ResilienceContainer.getInstance().getComprehensiveMetrics();
 
 // React context for resilience services
-export const ResilienceContext = React.createContext<ResilienceContainer | null>(null);
+const ResilienceContext = React.createContext<ResilienceContainer | null>(null);
 
 export function ResilienceProvider({ children }: { children: React.ReactNode }) {
   const container = React.useMemo(() => ResilienceContainer.getInstance(), []);
 
-  return (
-    <ResilienceContext.Provider value={container}>
-      {children}
-    </ResilienceContext.Provider>
+  return React.createElement(
+    ResilienceContext.Provider,
+    { value: container },
+    children
   );
 }
 

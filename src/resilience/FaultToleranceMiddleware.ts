@@ -71,10 +71,14 @@ export class FaultToleranceMiddleware {
       enableTimeout: true,
       enableBulkhead: true,
       enableMonitoring: true,
+      circuitBreakerConfig: {},
+      retryConfig: {},
+      recoveryConfig: {},
       timeoutMs: 30000,
       rateLimitWindow: 60000, // 1 minute
       rateLimitMaxRequests: 100,
       bulkheadMaxConcurrent: 10,
+      monitoringConfig: {},
       ...config
     };
   }
@@ -530,7 +534,7 @@ export function withFaultTolerance(
 }
 
 // React context for fault tolerance
-export const FaultToleranceContext = React.createContext<FaultToleranceMiddleware | null>(null);
+const FaultToleranceContext = React.createContext<FaultToleranceMiddleware | null>(null);
 
 export function FaultToleranceProvider({ 
   children, 
@@ -541,10 +545,10 @@ export function FaultToleranceProvider({
 }) {
   const middleware = React.useMemo(() => new FaultToleranceMiddleware(config), [config]);
 
-  return (
-    <FaultToleranceContext.Provider value={middleware}>
-      {children}
-    </FaultToleranceContext.Provider>
+  return React.createElement(
+    FaultToleranceContext.Provider,
+    { value: middleware },
+    children
   );
 }
 
