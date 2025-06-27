@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/classnames": "^2.3.0",
     "classnames": "^2.5.1",
     "formidable": "^3.5.4",
     "next": "^15.3.1",
