@@ -204,7 +204,7 @@ export function validateEnvironment(): { isValid: boolean; errors: string[] } {
  */
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-export function checkRateLimit(req: any): { 
+export function checkRateLimit(req: { ip?: string; headers: Record<string, string | string[] | undefined> }): { 
   allowed: boolean; 
   resetTime?: number;
   ip: string;
@@ -214,9 +214,10 @@ export function checkRateLimit(req: any): {
 } {
   // Extract IP address from request
   const forwardedFor = req.headers['x-forwarded-for'];
-  const ip = Array.isArray(forwardedFor) 
-    ? forwardedFor[0] 
-    : forwardedFor?.split(',')[0] || req.socket.remoteAddress || 'unknown';
+  const ip = req.ip || 
+    (Array.isArray(forwardedFor) 
+      ? forwardedFor[0] 
+      : forwardedFor?.split(',')[0]) || 'unknown';
 
   const now = Date.now();
   const key = `rate_limit_${ip}`;

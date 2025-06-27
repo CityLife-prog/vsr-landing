@@ -124,8 +124,8 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
           logger.logSecurityEvent('invalid_file_upload', {
             requestId,
             metadata: {
-              filename: photo.originalFilename,
-              mimetype: photo.mimetype,
+              filename: (photo as any).originalFilename || (photo as any).name,
+              mimetype: (photo as any).mimetype || (photo as any).type,
               size: photo.size,
               error: fileValidation.error
             }
@@ -139,8 +139,8 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
         }
         
         validatedPhotos.push({
-          file: photo,
-          newFilename: generateSecureFilename(photo.originalFilename || 'upload.jpg')
+          file: photo as any,
+          newFilename: generateSecureFilename((photo as any).originalFilename || (photo as any).name || 'upload.jpg')
         });
       }
     }
@@ -175,7 +175,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
         } else {
           logger.error('Failed to store quote request in database', {
             requestId,
-            error: new Error(result.error)
+            error: new Error('Database operation failed')
           });
         }
       } catch (error) {
@@ -262,7 +262,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
     if (config.features.cacheEnabled) {
       try {
         const today = new Date().toISOString().split('T')[0];
-        const cacheKey = `quotes:count:${validatedData.service}:${today}`;
+        const _cacheKey = `quotes:count:${validatedData.service}:${today}`; // eslint-disable-line @typescript-eslint/no-unused-vars
         const currentCount = Number(await cache.getCachedQuery('daily_quotes_by_service', {
           service: validatedData.service,
           date: today,

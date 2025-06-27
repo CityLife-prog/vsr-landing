@@ -153,6 +153,7 @@ export interface FileInputProps {
   maxSize?: number;
   maxFiles?: number;
   disabled?: boolean;
+  required?: boolean;
   'aria-describedby'?: string;
 }
 
@@ -196,11 +197,9 @@ export interface UseFormSubmission<T> {
  * IMPROVEMENT: Detailed file validation feedback
  */
 export interface FileValidationResult {
-  isValid: boolean;
+  valid: boolean;
   errors: string[];
   file: File;
-  size: number;
-  type: string;
 }
 
 /**
@@ -237,4 +236,25 @@ export interface AriaAttributes {
   'aria-live'?: 'polite' | 'assertive' | 'off';
   'aria-atomic'?: boolean;
   role?: string;
+}
+
+/**
+ * Google Analytics gtag types
+ * IMPROVEMENT: Type-safe analytics tracking
+ */
+declare global {
+  interface Window {
+    gtag?: (
+      command: 'config' | 'event' | 'exception' | 'page_view',
+      targetId: string,
+      config?: {
+        description?: string;
+        fatal?: boolean;
+        page_title?: string;
+        page_location?: string;
+        custom_parameter?: string;
+        [key: string]: unknown;
+      }
+    ) => void;
+  }
 }

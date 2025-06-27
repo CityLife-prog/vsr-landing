@@ -409,7 +409,22 @@ export class ApiDocumentation {
           description: 'Main API server'
         }
       ],
-      paths: {} as Record<string, unknown>,
+      paths: {} as Record<string, Record<string, {
+        summary: string;
+        description: string;
+        parameters?: Array<{
+          name: string;
+          in: string;
+          required: boolean;
+          description: string;
+          schema: { type: string };
+        }>;
+        responses: Record<string, {
+          description: string;
+          content?: Record<string, { schema: { $ref: string } }>;
+        }>;
+        deprecated?: boolean;
+      }>>,
       components: {
         schemas: {
           Error: {
@@ -432,7 +447,7 @@ export class ApiDocumentation {
     };
 
     // Convert endpoints to OpenAPI paths
-    this.endpoints.forEach((endpoint, key) => {
+    this.endpoints.forEach((endpoint) => {
       const pathKey = endpoint.path.replace('/api/v1', '');
       if (!spec.paths[pathKey]) {
         spec.paths[pathKey] = {};
@@ -577,7 +592,7 @@ export class ApiDocumentation {
             value = req.headers[param.name.toLowerCase()];
             break;
           case 'formData':
-            value = (req as any).body?.[param.name];
+            value = (req as NextApiRequest & { body: Record<string, unknown> }).body?.[param.name];
             break;
         }
 
@@ -602,7 +617,7 @@ export function withApiVersion(version: ApiVersion = 'v1') {
   return function(handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>) {
     return async (req: NextApiRequest, res: NextApiResponse) => {
       // Add version information to request
-      (req as any).apiVersion = version;
+      (req as NextApiRequest & { apiVersion: string }).apiVersion = version;
       
       // Add version headers to response
       res.setHeader('API-Version', API_VERSIONS[version]);
@@ -616,7 +631,7 @@ export function withApiVersion(version: ApiVersion = 'v1') {
           logger.warn('API request validation failed', {
             endpoint: req.url,
             method: req.method,
-            errors: validation.errors
+            metadata: { errors: validation.errors }
           });
           
           return res.status(400).json({

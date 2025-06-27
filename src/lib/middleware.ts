@@ -33,7 +33,7 @@ export function withSecurity(handler: (req: NextApiRequest, res: NextApiResponse
 
       // 4. Rate limiting
       const clientIP = getClientIP(req);
-      const rateLimitResult = checkRateLimit(clientIP);
+      const rateLimitResult = checkRateLimit({ ip: clientIP, headers: req.headers });
       
       if (!rateLimitResult.allowed) {
         secureLog('warn', 'Rate limit exceeded', { ip: clientIP });

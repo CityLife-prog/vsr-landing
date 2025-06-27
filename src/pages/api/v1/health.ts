@@ -53,7 +53,7 @@ async function healthHandler(req: NextApiRequest, res: NextApiResponse) {
     const format = query.format as string;
     const detailed = query.detailed === 'true';
 
-    let response: any;
+    let response: Record<string, unknown>;
 
     if (format === 'prometheus') {
       // Prometheus metrics format
@@ -131,7 +131,7 @@ async function healthHandler(req: NextApiRequest, res: NextApiResponse) {
         metadata: {
           status: systemHealth.status,
           unhealthyServices: Object.entries(systemHealth.services)
-            .filter(([_, service]) => service.status !== 'healthy')
+            .filter(([, service]) => service.status !== 'healthy')
             .map(([name, service]) => ({ name, status: service.status, error: service.error }))
         }
       });

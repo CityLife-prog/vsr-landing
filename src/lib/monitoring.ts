@@ -528,7 +528,7 @@ export function withMonitoring(
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     // Add request ID to request object
-    (req as any).requestId = requestId;
+    (req as NextApiRequest & { requestId: string }).requestId = requestId;
     
     // Increment request counter
     metrics.incrementCounter('http_requests_total', 1, {
@@ -599,4 +599,5 @@ export function trackBusinessMetric(event: string, metadata?: Record<string, unk
   }
 }
 
-export default { metrics, healthCheck, withMonitoring, trackBusinessMetric };
+const monitoringExports = { metrics, healthCheck, withMonitoring, trackBusinessMetric };
+export default monitoringExports;

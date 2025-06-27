@@ -21,7 +21,7 @@ export interface ApplicationData {
 export function validateApplicationData(fields: Record<string, unknown>, files: Record<string, unknown>): {
   success: boolean;
   validatedData?: ApplicationData;
-  resumeFile?: any;
+  resumeFile?: File | { filepath: string; originalFilename: string; mimetype: string; size: number };
   errors: string[];
 } {
   const errors: string[] = [];
@@ -62,7 +62,7 @@ export function validateApplicationData(fields: Record<string, unknown>, files: 
   }
 
   // Handle resume file
-  let resumeFile: any = null;
+  let resumeFile: File | { filepath: string; originalFilename: string; mimetype: string; size: number } | undefined = undefined;
   if (files.resume) {
     const resume = Array.isArray(files.resume) ? files.resume[0] : files.resume;
     resumeFile = resume;
@@ -91,7 +91,7 @@ export interface QuoteData {
 export function validateQuoteData(fields: Record<string, unknown>, files: Record<string, unknown>): {
   success: boolean;
   validatedData?: QuoteData;
-  photoFiles?: any[];
+  photoFiles?: File[] | { filepath: string; originalFilename: string; mimetype: string; size: number }[];
   errors: string[];
 } {
   const errors: string[] = [];
@@ -149,7 +149,7 @@ export function validateQuoteData(fields: Record<string, unknown>, files: Record
   }
 
   // Handle photo files
-  let photoFiles: any[] = [];
+  let photoFiles: File[] | { filepath: string; originalFilename: string; mimetype: string; size: number }[] = [];
   if (files.photos) {
     photoFiles = Array.isArray(files.photos) ? files.photos : [files.photos];
   }

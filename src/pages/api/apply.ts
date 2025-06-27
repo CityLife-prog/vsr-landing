@@ -70,8 +70,8 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Validate form data
-    const validation = validateApplicationData(fields);
-    if (!validation.isValid) {
+    const validation = validateApplicationData(fields, files);
+    if (!validation.success) {
       secureLog('warn', 'Application validation failed', { errors: validation.errors });
       return res.status(400).json({ 
         error: 'Validation failed',
@@ -79,7 +79,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    const validatedData = validation.data as ApplicationData;
+    const validatedData = validation.validatedData as ApplicationData;
 
     // Validate resume file
     const resume = files.resume;

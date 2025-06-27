@@ -637,8 +637,8 @@ export class ConfigManager {
         cacheProvider: config.cache.provider,
         storageProvider: config.storage.provider,
         featuresEnabled: Object.entries(config.features)
-          .filter(([_, enabled]) => enabled)
-          .map(([feature, _]) => feature)
+          .filter(([, enabled]) => enabled)
+          .map(([feature]) => feature)
       }
     });
 

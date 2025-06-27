@@ -275,10 +275,14 @@ class Logger {
       ...context,
       statusCode,
       duration,
-      error: error ? {
-        message: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-      } : undefined,
+      error: error || undefined,
+      metadata: {
+        ...context.metadata,
+        errorDetails: error ? {
+          message: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        } : undefined,
+      }
     });
   }
 
@@ -392,8 +396,11 @@ export function asyncErrorHandler<T extends unknown[], R>(
       return await fn(...args);
     } catch (error) {
       logger.error('Async operation failed', {
-        error: error instanceof Error ? serializeError(error) : { message: String(error) },
-        metadata: { operation: fn.name }
+        error: error instanceof Error ? error : new Error(String(error)),
+        metadata: { 
+          operation: fn.name,
+          errorDetails: error instanceof Error ? serializeError(error) : { message: String(error) }
+        }
       });
       throw error;
     }

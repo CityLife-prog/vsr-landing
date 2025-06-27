@@ -73,11 +73,9 @@ const FileUpload: React.FC<FileInputProps> = ({
       }
 
       results.push({
-        isValid: fileErrors.length === 0,
+        valid: fileErrors.length === 0,
         errors: fileErrors,
-        file,
-        size: file.size,
-        type: file.type
+        file
       });
 
       if (fileErrors.length > 0) {
@@ -118,7 +116,7 @@ const FileUpload: React.FC<FileInputProps> = ({
   const handleFileSelection = useCallback((fileList: FileList) => {
     const validationResults = validateFiles(fileList);
     const validFiles = validationResults
-      .filter(result => result.isValid)
+      .filter(result => result.valid)
       .map(result => result.file);
 
     if (validFiles.length > 0) {

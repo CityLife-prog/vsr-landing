@@ -298,7 +298,7 @@ export class EmailQueue {
     }
   }
 
-  private async sendEmail(message: EmailMessage): Promise<void> {
+  private async sendEmail(_message: EmailMessage): Promise<void> { // eslint-disable-line @typescript-eslint/no-unused-vars
     // This would delegate to the actual EmailService
     // For now, simulate email sending
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -395,7 +395,7 @@ export class EmailService {
     if (this.transporter) return;
 
     try {
-      this.transporter = nodemailer.createTransporter({
+      this.transporter = nodemailer.createTransport({
         service: 'gmail',
         secure: true,
         auth: this.config.auth,
