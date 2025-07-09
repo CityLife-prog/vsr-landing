@@ -29,7 +29,7 @@ export interface Span {
   startTime: Date;
   endTime?: Date;
   duration?: number;
-  tags: Record<string, any>;
+  tags: Record<string, unknown>;
   logs: SpanLog[];
   status: SpanStatus;
   component: string;
@@ -39,7 +39,7 @@ export interface SpanLog {
   timestamp: Date;
   level: 'debug' | 'info' | 'warn' | 'error';
   message: string;
-  fields?: Record<string, any>;
+  fields?: Record<string, unknown>;
 }
 
 export enum SpanStatus {
@@ -95,7 +95,7 @@ export class TracingService {
     };
   }
   
-  addTag(context: TraceContext, key: string, value: any): void {
+  addTag(context: TraceContext, key: string, value: unknown): void {
     const span = this.activeSpans.get(context.spanId);
     if (span) {
       span.tags[key] = value;
@@ -106,7 +106,7 @@ export class TracingService {
     context: TraceContext,
     level: SpanLog['level'],
     message: string,
-    fields?: Record<string, any>
+    fields?: Record<string, unknown>
   ): void {
     const span = this.activeSpans.get(context.spanId);
     if (span) {
@@ -378,7 +378,7 @@ export interface LogEntry {
     stack?: string;
     code?: string;
   };
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export class StructuredLogger {
@@ -390,7 +390,7 @@ export class StructuredLogger {
     private readonly logExporter?: LogExporter
   ) {}
   
-  debug(message: string, context?: Record<string, any>, traceContext?: TraceContext): void {
+  debug(message: string, context?: Record<string, unknown>, traceContext?: TraceContext): void {
     this.log(LogLevel.DEBUG, message, context, traceContext);
   }
   

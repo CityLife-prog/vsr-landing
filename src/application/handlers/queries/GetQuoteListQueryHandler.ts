@@ -36,28 +36,28 @@ export class GetQuoteListQueryHandler
         filters.priority = query.filters.priority as QuotePriority;
       }
 
-      if (query.filters?.serviceType) {
-        filters.serviceType = query.filters.serviceType as string;
+      if (query.filters?.serviceType && typeof query.filters.serviceType === 'string') {
+        filters.serviceType = query.filters.serviceType;
       }
 
-      if (query.filters?.customerName) {
-        filters.customerName = query.filters.customerName as string;
+      if (query.filters?.customerName && typeof query.filters.customerName === 'string') {
+        filters.customerName = query.filters.customerName;
       }
 
-      if (query.filters?.customerEmail) {
-        filters.email = query.filters.customerEmail as string;
+      if (query.filters?.customerEmail && typeof query.filters.customerEmail === 'string') {
+        filters.email = query.filters.customerEmail;
       }
 
-      if (query.filters?.submittedAfter) {
-        filters.submittedAfter = query.filters.submittedAfter as Date;
+      if (query.filters?.submittedAfter && query.filters.submittedAfter instanceof Date) {
+        filters.submittedAfter = query.filters.submittedAfter;
       }
 
-      if (query.filters?.submittedBefore) {
-        filters.submittedBefore = query.filters.submittedBefore as Date;
+      if (query.filters?.submittedBefore && query.filters.submittedBefore instanceof Date) {
+        filters.submittedBefore = query.filters.submittedBefore;
       }
 
-      if (query.filters?.isExpired !== undefined) {
-        filters.isExpired = query.filters.isExpired as boolean;
+      if (query.filters?.isExpired !== undefined && typeof query.filters.isExpired === 'boolean') {
+        filters.isExpired = query.filters.isExpired;
       }
 
       // Execute query using repository
@@ -66,7 +66,10 @@ export class GetQuoteListQueryHandler
 
       // Use the InMemoryQuoteRepository's findWithFilters method
       if ('findWithFilters' in this.quoteRepository) {
-        const result = await (this.quoteRepository as any).findWithFilters(filters);
+        const repositoryWithFilters = this.quoteRepository as QuoteRepository & {
+          findWithFilters(filters: QuoteQueryFilters): Promise<{ quotes: unknown[], total: number }>;
+        };
+        const result = await repositoryWithFilters.findWithFilters(filters);
         quotes = result.quotes;
         total = result.total;
       } else {
@@ -130,7 +133,8 @@ export class GetQuoteListQueryHandler
 
   private mapSortField(field?: string): 'submittedAt' | 'updatedAt' | 'customerName' {
     const validFields = ['submittedAt', 'updatedAt', 'customerName'] as const;
-    return validFields.includes(field as any) ? field as any : 'submittedAt';
+    type ValidField = typeof validFields[number];
+    return validFields.includes(field as ValidField) ? field as ValidField : 'submittedAt';
   }
 
   private generateConfirmationNumber(quoteId: string): string {

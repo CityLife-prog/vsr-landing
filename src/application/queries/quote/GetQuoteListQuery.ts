@@ -5,7 +5,7 @@
 
 import { BaseQuery, PaginationOptions, SortingOptions, PaginatedResult } from '../../cqrs/Query';
 
-export class GetQuoteListQuery extends BaseQuery<GetQuoteListResult> {
+export class GetQuoteListQuery extends BaseQuery {
   constructor(
     public readonly status?: string,
     public readonly priority?: string,

@@ -5,7 +5,7 @@
 
 import { BaseQuery } from '../../cqrs/Query';
 
-export class GetQuoteDetailsQuery extends BaseQuery<GetQuoteDetailsResult> {
+export class GetQuoteDetailsQuery extends BaseQuery {
   constructor(
     public readonly quoteId: string,
     correlationId?: string,

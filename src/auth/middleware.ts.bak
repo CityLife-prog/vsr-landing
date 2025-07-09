@@ -1,0 +1,680 @@
+/**
+ * Authentication & Authorization Middleware
+ * Security middleware and guards for protecting routes and resources
+ */
+
+import { NextApiRequest, NextApiResponse } from 'next';
+import {
+  AuthContext,
+  User,
+  DecodedToken,
+  AuthenticationError,
+  AuthorizationError,
+  SecurityError,
+  AuthErrorCode,
+  SecurityEventType,
+  SecuritySeverity,
+  RateLimitConfig,
+  AuthMiddleware,
+  AuthGuard,
+  DeviceInfo
+} from './types';
+// import { JWTManager, JWTUtils } from './jwt'; // Would be in implementation
+// import { RBACManager } from './rbac'; // Would be in implementation
+// import { SecurityServiceImpl } from './security'; // Would be in implementation
+
+// Extended request interface with auth context
+export interface AuthenticatedRequest extends NextApiRequest {
+  user?: User;
+  authContext?: AuthContext;
+  token?: DecodedToken;
+  permissions?: string[];
+  roles?: string[];
+}
+
+export type AuthenticatedHandler = (
+  req: AuthenticatedRequest,
+  res: NextApiResponse
+) => Promise<void> | void;
+
+export type MiddlewareFunction = (
+  req: AuthenticatedRequest,
+  res: NextApiResponse,
+  next: () => void
+) => Promise<void> | void;
+
+// Authentication Middleware
+// Note: This would be in implementation files with actual service dependencies
+/*
+export class AuthenticationMiddleware {
+  constructor(
+    private jwtManager: JWTManager,
+    private rbacManager: RBACManager,
+    private securityService: SecurityServiceImpl
+  ) {}
+*/
+
+  /**
+   * Authenticate request and populate auth context
+   */
+  authenticate(): MiddlewareFunction {
+    return async (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      try {
+        // Extract token from request
+        const token = this.extractToken(req);
+        if (!token) {
+          throw new AuthenticationError(
+            'No authentication token provided',
+            AuthErrorCode.TOKEN_INVALID
+          );
+        }
+
+        // Validate token
+        const decodedToken = await this.jwtManager.validateToken(token);
+        
+        // Get user information (would typically fetch from database)
+        const user = await this.getUserFromToken(decodedToken);
+        if (!user) {
+          throw new AuthenticationError(
+            'User not found',
+            AuthErrorCode.INVALID_CREDENTIALS
+          );
+        }
+
+        // Check if user is active
+        if (!user.isActive) {
+          throw new AuthenticationError(
+            'Account is disabled',
+            AuthErrorCode.ACCOUNT_DISABLED
+          );
+        }
+
+        // Get user permissions and roles
+        const permissions = await this.rbacManager.getEffectivePermissions(user.id);
+        const roles = await this.rbacManager.getEffectiveRoles(user.id);
+
+        // Create auth context
+        const authContext: AuthContext = {
+          user,
+          session: null, // Would be populated if session management is needed
+          token: decodedToken,
+          permissions,
+          roles,
+          isAuthenticated: true,
+          deviceInfo: this.extractDeviceInfo(req)
+        };
+
+        // Populate request with auth data
+        req.user = user;
+        req.authContext = authContext;
+        req.token = decodedToken;
+        req.permissions = permissions.map(p => p.name);
+        req.roles = roles.map(r => r.name);
+
+        // Log successful authentication
+        await this.securityService.logEvent({
+          type: SecurityEventType.LOGIN_SUCCESS,
+          userId: user.id,
+          sessionId: decodedToken.payload.sessionId,
+          ip: this.getClientIP(req),
+          userAgent: req.headers['user-agent'] || 'unknown',
+          timestamp: new Date(),
+          details: { method: 'jwt_token' },
+          severity: SecuritySeverity.LOW
+        });
+
+        next();
+
+      } catch (error) {
+        await this.handleAuthenticationError(req, res, error);
+      }
+    };
+  }
+
+  /**
+   * Optional authentication (doesn't fail if no token)
+   */
+  optionalAuthenticate(): MiddlewareFunction {
+    return async (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      try {
+        const token = this.extractToken(req);
+        if (token) {
+          // If token exists, authenticate normally
+          return this.authenticate()(req, res, next);
+        } else {
+          // No token, continue without authentication
+          req.authContext = {
+            user: null,
+            session: null,
+            token: null,
+            permissions: [],
+            roles: [],
+            isAuthenticated: false
+          };
+          next();
+        }
+      } catch (error) {
+        // For optional auth, continue even if authentication fails
+        req.authContext = {
+          user: null,
+          session: null,
+          token: null,
+          permissions: [],
+          roles: [],
+          isAuthenticated: false
+        };
+        next();
+      }
+    };
+  }
+
+  /**
+   * Authorize user for specific permissions
+   */
+  authorize(requiredPermissions: string[]): MiddlewareFunction {
+    return async (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      try {
+        if (!req.authContext?.isAuthenticated) {
+          throw new AuthenticationError(
+            'Authentication required',
+            AuthErrorCode.TOKEN_INVALID
+          );
+        }
+
+        const authResult = await this.rbacManager.checkPermissions(
+          req.authContext.user,
+          requiredPermissions,
+          this.createAuthorizationContext(req)
+        );
+
+        if (!authResult.granted) {
+          // Log permission denied
+          await this.securityService.logEvent({
+            type: SecurityEventType.PERMISSION_DENIED,
+            userId: req.authContext.user.id,
+            ip: this.getClientIP(req),
+            userAgent: req.headers['user-agent'] || 'unknown',
+            timestamp: new Date(),
+            details: {
+              requiredPermissions,
+              missingPermissions: authResult.missingPermissions,
+              resource: req.url
+            },
+            severity: SecuritySeverity.MEDIUM
+          });
+
+          throw new AuthorizationError(
+            'Insufficient permissions',
+            requiredPermissions,
+            authResult.missingPermissions || []
+          );
+        }
+
+        next();
+
+      } catch (error) {
+        await this.handleAuthorizationError(req, res, error);
+      }
+    };
+  }
+
+  /**
+   * Require specific roles
+   */
+  requireRole(requiredRoles: string[]): MiddlewareFunction {
+    return async (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      try {
+        if (!req.authContext?.isAuthenticated) {
+          throw new AuthenticationError(
+            'Authentication required',
+            AuthErrorCode.TOKEN_INVALID
+          );
+        }
+
+        const hasRole = await Promise.all(
+          requiredRoles.map(role => this.rbacManager.hasRole(req.authContext!.user, role))
+        );
+
+        if (!hasRole.some(Boolean)) {
+          // Log role access denied
+          await this.securityService.logEvent({
+            type: SecurityEventType.PERMISSION_DENIED,
+            userId: req.authContext.user.id,
+            ip: this.getClientIP(req),
+            userAgent: req.headers['user-agent'] || 'unknown',
+            timestamp: new Date(),
+            details: {
+              requiredRoles,
+              userRoles: req.roles,
+              resource: req.url
+            },
+            severity: SecuritySeverity.MEDIUM
+          });
+
+          throw new AuthorizationError(
+            'Insufficient role permissions',
+            requiredRoles,
+            requiredRoles
+          );
+        }
+
+        next();
+
+      } catch (error) {
+        await this.handleAuthorizationError(req, res, error);
+      }
+    };
+  }
+
+  /**
+   * Rate limiting middleware
+   */
+  rateLimit(options: RateLimitConfig): MiddlewareFunction {
+    return async (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      try {
+        const key = options.keyGenerator
+          ? options.keyGenerator(req)
+          : this.generateRateLimitKey(req);
+
+        if (await this.securityService.isRateLimited(key)) {
+          // Log rate limit exceeded
+          await this.securityService.logEvent({
+            type: SecurityEventType.RATE_LIMIT_EXCEEDED,
+            userId: req.authContext?.user?.id,
+            ip: this.getClientIP(req),
+            userAgent: req.headers['user-agent'] || 'unknown',
+            timestamp: new Date(),
+            details: { rateLimitKey: key, resource: req.url },
+            severity: SecuritySeverity.MEDIUM
+          });
+
+          throw new SecurityError(
+            'Rate limit exceeded',
+            SecurityEventType.RATE_LIMIT_EXCEEDED,
+            SecuritySeverity.MEDIUM
+          );
+        }
+
+        // Increment rate limit counter
+        await this.securityService.incrementRateLimit(key);
+
+        next();
+
+      } catch (error) {
+        await this.handleSecurityError(req, res, error);
+      }
+    };
+  }
+
+  /**
+   * CORS middleware
+   */
+  cors(allowedOrigins: string[] = ['*']): MiddlewareFunction {
+    return (req: AuthenticatedRequest, res: NextApiResponse, next: () => void) => {
+      const origin = req.headers.origin;
+      
+      if (allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin))) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
+      }
+      
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+      if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+      }
+
+      next();
+    };
+  }
+
+  /**
+   * Extract token from request
+   */
+  private extractToken(req: NextApiRequest): string | null {
+    // Try Authorization header first
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      return JWTUtils.extractTokenFromHeader(authHeader);
+    }
+
+    // Try cookies
+    const cookies = req.cookies;
+    return JWTUtils.extractTokenFromCookie(cookies);
+  }
+
+  /**
+   * Extract device information from request
+   */
+  private extractDeviceInfo(req: NextApiRequest): DeviceInfo {
+    return {
+      userAgent: req.headers['user-agent'] || 'unknown',
+      ip: this.getClientIP(req),
+      fingerprint: req.headers['x-fingerprint'] as string,
+      platform: req.headers['x-platform'] as string,
+      browser: req.headers['x-browser'] as string
+    };
+  }
+
+  /**
+   * Get client IP address
+   */
+  private getClientIP(req: NextApiRequest): string {
+    const forwarded = req.headers['x-forwarded-for'];
+    const realIP = req.headers['x-real-ip'];
+    
+    if (typeof forwarded === 'string') {
+      return forwarded.split(',')[0].trim();
+    }
+    
+    if (typeof realIP === 'string') {
+      return realIP;
+    }
+    
+    return req.socket?.remoteAddress || 'unknown';
+  }
+
+  /**
+   * Generate rate limit key
+   */
+  private generateRateLimitKey(req: NextApiRequest): string {
+    const ip = this.getClientIP(req);
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    return `ratelimit:${ip}:${userAgent}`;
+  }
+
+  /**
+   * Create authorization context
+   */
+  private createAuthorizationContext(req: AuthenticatedRequest): Record<string, any> {
+    return {
+      user: req.authContext?.user,
+      ip: this.getClientIP(req),
+      userAgent: req.headers['user-agent'],
+      path: req.url,
+      method: req.method,
+      query: req.query,
+      body: req.body
+    };
+  }
+
+  /**
+   * Get user from token (placeholder - would fetch from database)
+   */
+  private async getUserFromToken(token: DecodedToken): Promise<User | null> {
+    // This would typically fetch user from database
+    // For now, create a minimal user object from token
+    return {
+      id: token.payload.sub,
+      email: token.payload.email,
+      roles: [], // Would be fetched from DB
+      permissions: [], // Would be fetched from DB
+      isActive: true,
+      isEmailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  /**
+   * Handle authentication errors
+   */
+  private async handleAuthenticationError(
+    req: AuthenticatedRequest,
+    res: NextApiResponse,
+    error: any
+  ): Promise<void> {
+    let statusCode = 401;
+    let message = 'Authentication failed';
+    let code = 'AUTHENTICATION_FAILED';
+
+    if (error instanceof AuthenticationError) {
+      message = error.message;
+      code = error.code;
+      
+      switch (error.code) {
+        case AuthErrorCode.TOKEN_EXPIRED:
+          statusCode = 401;
+          break;
+        case AuthErrorCode.TOKEN_INVALID:
+          statusCode = 401;
+          break;
+        case AuthErrorCode.ACCOUNT_LOCKED:
+          statusCode = 423;
+          break;
+        case AuthErrorCode.ACCOUNT_DISABLED:
+          statusCode = 403;
+          break;
+        default:
+          statusCode = 401;
+      }
+    }
+
+    // Log authentication failure
+    await this.securityService.logEvent({
+      type: SecurityEventType.LOGIN_FAILURE,
+      ip: this.getClientIP(req),
+      userAgent: req.headers['user-agent'] || 'unknown',
+      timestamp: new Date(),
+      details: { error: message, code, path: req.url },
+      severity: SecuritySeverity.MEDIUM
+    });
+
+    res.status(statusCode).json({
+      error: true,
+      message,
+      code,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Handle authorization errors
+   */
+  private async handleAuthorizationError(
+    req: AuthenticatedRequest,
+    res: NextApiResponse,
+    error: any
+  ): Promise<void> {
+    let statusCode = 403;
+    let message = 'Authorization failed';
+    let details = {};
+
+    if (error instanceof AuthorizationError) {
+      message = error.message;
+      details = {
+        requiredPermissions: error.requiredPermissions,
+        missingPermissions: error.missingPermissions
+      };
+    }
+
+    res.status(statusCode).json({
+      error: true,
+      message,
+      code: 'AUTHORIZATION_FAILED',
+      details,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Handle security errors
+   */
+  private async handleSecurityError(
+    req: AuthenticatedRequest,
+    res: NextApiResponse,
+    error: any
+  ): Promise<void> {
+    let statusCode = 429;
+    let message = 'Security policy violation';
+
+    if (error instanceof SecurityError) {
+      message = error.message;
+      
+      switch (error.eventType) {
+        case SecurityEventType.RATE_LIMIT_EXCEEDED:
+          statusCode = 429;
+          break;
+        case SecurityEventType.BRUTE_FORCE_DETECTED:
+          statusCode = 429;
+          break;
+        default:
+          statusCode = 403;
+      }
+    }
+
+    res.status(statusCode).json({
+      error: true,
+      message,
+      code: 'SECURITY_VIOLATION',
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// Higher-order function for protecting API routes
+export function withAuth(
+  handler: AuthenticatedHandler,
+  options: {
+    permissions?: string[];
+    roles?: string[];
+    optional?: boolean;
+    rateLimit?: RateLimitConfig;
+  } = {}
+) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    // This would be initialized with actual services
+    const jwtManager = new JWTManager({} as any);
+    const rbacManager = new RBACManager();
+    const securityService = new SecurityServiceImpl({} as any);
+    
+    const authMiddleware = new AuthenticationMiddleware(
+      jwtManager,
+      rbacManager,
+      securityService
+    );
+
+    const middlewares: MiddlewareFunction[] = [];
+
+    // Add CORS
+    middlewares.push(authMiddleware.cors());
+
+    // Add rate limiting if specified
+    if (options.rateLimit) {
+      middlewares.push(authMiddleware.rateLimit(options.rateLimit));
+    }
+
+    // Add authentication
+    if (options.optional) {
+      middlewares.push(authMiddleware.optionalAuthenticate());
+    } else {
+      middlewares.push(authMiddleware.authenticate());
+    }
+
+    // Add authorization if specified
+    if (options.permissions && options.permissions.length > 0) {
+      middlewares.push(authMiddleware.authorize(options.permissions));
+    }
+
+    if (options.roles && options.roles.length > 0) {
+      middlewares.push(authMiddleware.requireRole(options.roles));
+    }
+
+    // Execute middleware chain
+    let currentIndex = 0;
+    
+    const next = () => {
+      if (currentIndex < middlewares.length) {
+        const middleware = middlewares[currentIndex++];
+        middleware(req as AuthenticatedRequest, res, next);
+      } else {
+        // All middleware passed, execute handler
+        handler(req as AuthenticatedRequest, res);
+      }
+    };
+
+    next();
+  };
+}
+
+// Auth Guard Classes
+export class PermissionGuard implements AuthGuard {
+  constructor(
+    private requiredPermissions: string[],
+    private rbacManager: RBACManager
+  ) {}
+
+  async canActivate(context: AuthContext): Promise<boolean> {
+    if (!context.isAuthenticated) {
+      return false;
+    }
+
+    const result = await this.rbacManager.checkPermissions(
+      context.user,
+      this.requiredPermissions
+    );
+
+    return result.granted;
+  }
+}
+
+export class RoleGuard implements AuthGuard {
+  constructor(
+    private requiredRoles: string[],
+    private rbacManager: RBACManager
+  ) {}
+
+  async canActivate(context: AuthContext): Promise<boolean> {
+    if (!context.isAuthenticated) {
+      return false;
+    }
+
+    const hasRole = await Promise.all(
+      this.requiredRoles.map(role => this.rbacManager.hasRole(context.user, role))
+    );
+
+    return hasRole.some(Boolean);
+  }
+}
+
+// Middleware factory functions
+export const createAuthMiddleware = (
+  jwtManager: JWTManager,
+  rbacManager: RBACManager,
+  securityService: SecurityServiceImpl
+) => {
+  return new AuthenticationMiddleware(jwtManager, rbacManager, securityService);
+};
+
+// Common middleware configurations
+export const commonMiddleware = {
+  // Basic authentication
+  auth: () => ({ permissions: [], roles: [] }),
+  
+  // Admin only
+  adminOnly: () => ({ roles: ['admin', 'super_admin'] }),
+  
+  // User management
+  userManagement: () => ({ permissions: ['admin:users'] }),
+  
+  // Quote management
+  quoteRead: () => ({ permissions: ['quote:read'] }),
+  quoteWrite: () => ({ permissions: ['quote:write'] }),
+  quoteApprove: () => ({ permissions: ['quote:approve'] }),
+  
+  // System administration
+  systemAdmin: () => ({ permissions: ['admin:system'] }),
+  
+  // Rate limited endpoints
+  rateLimited: (windowMs: number = 60000, maxRequests: number = 100) => ({
+    rateLimit: {
+      enabled: true,
+      windowMs,
+      maxRequests,
+      skipSuccessfulRequests: false,
+      skipFailedRequests: false
+    }
+  })
+};

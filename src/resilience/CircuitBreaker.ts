@@ -11,10 +11,10 @@ export enum CircuitBreakerState {
 
 export interface CircuitBreakerConfig {
   failureThreshold: number;      // Number of failures before opening circuit
-  successThreshold: number;      // Number of successes needed to close circuit
+  successThreshold?: number;      // Number of successes needed to close circuit
   timeout: number;               // Time in ms to wait before half-open attempt
-  monitoringPeriod: number;      // Time window for failure counting
-  volumeThreshold: number;       // Minimum requests before circuit can open
+  monitoringPeriod?: number;      // Time window for failure counting
+  volumeThreshold?: number;       // Minimum requests before circuit can open
   errorFilter?: (error: Error) => boolean; // Filter which errors count as failures
   onStateChange?: (state: CircuitBreakerState, metrics: CircuitBreakerMetrics) => void;
   name?: string;                 // Circuit breaker identifier

@@ -9,7 +9,7 @@ import { UniqueEntityId } from '../../domain/shared/UniqueEntityId';
  * Base Query Interface
  * All queries must implement this interface
  */
-export interface Query<TResult = unknown> {
+export interface Query {
   readonly queryId: string;
   readonly timestamp: Date;
   readonly correlationId?: string;
@@ -39,7 +39,7 @@ export interface SortingOptions {
 /**
  * Base Query Implementation
  */
-export abstract class BaseQuery<TResult = unknown> implements Query<TResult> {
+export abstract class BaseQuery implements Query {
   public readonly queryId: string;
   public readonly timestamp: Date;
 
@@ -58,7 +58,7 @@ export abstract class BaseQuery<TResult = unknown> implements Query<TResult> {
 /**
  * Query Handler Interface
  */
-export interface QueryHandler<TQuery extends Query<TResult>, TResult = unknown> {
+export interface QueryHandler<TQuery extends Query, TResult = unknown> {
   handle(query: TQuery): Promise<TResult>;
 }
 
@@ -66,11 +66,11 @@ export interface QueryHandler<TQuery extends Query<TResult>, TResult = unknown> 
  * Query Dispatcher Interface
  */
 export interface QueryDispatcher {
-  dispatch<TQuery extends Query<TResult>, TResult = unknown>(
+  dispatch<TQuery extends Query, TResult = unknown>(
     query: TQuery
   ): Promise<TResult>;
   
-  register<TQuery extends Query<TResult>, TResult = unknown>(
+  register<TQuery extends Query, TResult = unknown>(
     queryType: new (...args: unknown[]) => TQuery,
     handler: QueryHandler<TQuery, TResult>
   ): void;

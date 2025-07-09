@@ -11,7 +11,6 @@ import {
   getFieldWrapperClasses,
   getLabelClasses,
   getRequiredIndicatorProps,
-  getErrorIcon,
   formatFileSize,
   debounce,
 } from '@/lib/ui-utils';

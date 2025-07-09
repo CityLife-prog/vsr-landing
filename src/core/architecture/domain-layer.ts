@@ -95,6 +95,7 @@ export class ApplicationSubmission extends Entity<string> {
     this.props.status = ApplicationStatus.APPROVED;
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   reject(_reason?: string): void {
     if (this.props.status !== ApplicationStatus.PENDING) {
       throw new DomainError('Can only reject pending applications');

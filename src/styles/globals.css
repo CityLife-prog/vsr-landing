@@ -12,3 +12,161 @@ html {
     background-color: #111827;
     color: white;
 }
+
+/* Default form element styling for better visibility - only for unstyled inputs */
+input:not([class*="bg-"]):not([class*="text-"]), 
+textarea:not([class*="bg-"]):not([class*="text-"]), 
+select:not([class*="bg-"]):not([class*="text-"]) {
+  background-color: #374151 !important; /* Gray background */
+  color: #ffffff !important; /* White text */
+  border: 1px solid #6b7280 !important; /* Gray border */
+}
+
+input:not([class*="bg-"]):not([class*="text-"]):focus, 
+textarea:not([class*="bg-"]):not([class*="text-"]):focus, 
+select:not([class*="bg-"]):not([class*="text-"]):focus {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important; /* Blue border on focus */
+}
+
+/* Placeholder text styling */
+input::placeholder, textarea::placeholder {
+  color: #9ca3af !important; /* Lighter gray hint */
+}
+
+/* Button styling - buttons should keep their intended colors */
+button {
+  /* Don't override button colors - let Tailwind classes work */
+}
+
+/* Buttons with blue background should have white text */
+button[class*="bg-blue"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with red background should have white text */
+button[class*="bg-red"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with green background should have white text */
+button[class*="bg-green"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with yellow background should have white text */
+button[class*="bg-yellow"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with purple background should have white text */
+button[class*="bg-purple"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with indigo background should have white text */
+button[class*="bg-indigo"] {
+  color: #ffffff !important;
+}
+
+/* Buttons with gray background should have white text */
+button[class*="bg-gray"] {
+  color: #ffffff !important;
+}
+
+/* Header elements should match header background and have white text */
+header input, header textarea, header select, header button:not([class*="bg-"]) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Explicitly styled inputs should keep their styling */
+input[class*="bg-white"], textarea[class*="bg-white"], select[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+input[class*="bg-gray-800"], textarea[class*="bg-gray-800"], select[class*="bg-gray-800"] {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+}
+
+/* Dropdown and option elements */
+select {
+  /* Ensure dropdown arrow is visible */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Option elements - use dark background for better contrast */
+option {
+  color: #ffffff !important;
+  background-color: #374151 !important; /* Darker gray background */
+}
+
+/* For selects in admin forms (white background) */
+.admin-form select {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+.admin-form option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+/* Dropdown menus and select elements on dark backgrounds */
+select:not([class*="bg-white"]):not(.admin-form select) option {
+  background-color: #4b5563 !important; /* Lighter than landing background #111827 */
+  color: #ffffff !important;
+}
+
+/* General dropdown styling for better visibility */
+select:not([class*="bg-white"]):not(.admin-form select) {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border: 1px solid #6b7280 !important;
+}
+
+/* Admin forms - white background forms */
+.admin-form input, .admin-form textarea, .admin-form select {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.admin-form input:focus, .admin-form textarea:focus, .admin-form select:focus {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Dropdown menus and absolute positioned elements */
+div[class*="absolute"][class*="bg-white"] {
+  background-color: #f9fafb !important; /* Very light gray instead of white */
+}
+
+/* Ensure dropdown content is readable */
+.dropdown-content, [role="menu"], [role="listbox"] {
+  background-color: #4b5563 !important; /* Medium gray for dark backgrounds */
+  color: #ffffff !important;
+}
+
+/* Fix dropdown menus specifically - darker blue theme */
+.absolute.bg-white, .fixed.bg-white, .absolute.bg-gray-50, .fixed.bg-gray-50, .absolute.bg-gray-100, .fixed.bg-gray-100 {
+  background-color: #1e40af !important; /* Dark blue background */
+}
+
+/* Ensure dropdown buttons have proper text color */
+.absolute button, .fixed button {
+  color: #ffffff !important; /* White text */
+}
+
+.absolute button:hover, .fixed button:hover {
+  background-color: #1d4ed8 !important; /* Darker blue on hover */
+}

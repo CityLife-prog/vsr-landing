@@ -3,23 +3,21 @@
  * Handles quote processing commands for admin workflows
  */
 
-import { CommandHandler, BaseCommandResult, ValidationError } from '../../cqrs/Command';
+import { CommandHandler, BaseCommandResult } from '../../cqrs/Command';
 import { 
   MoveQuoteToReviewCommand,
   SendQuoteCommand,
   UpdateQuotePriorityCommand,
   RejectQuoteCommand,
-  AcceptQuoteCommand,
   QuoteProcessingResult,
   QuoteProcessingCommandResult 
 } from '../../commands/quote/ProcessQuoteCommand';
 
 // Domain imports
 import { QuoteRepository } from '../../../domain/quote/QuoteRepository';
-import { NotificationService } from '../../../domain/services/NotificationService';
 import { DomainEventPublisher } from '../../../domain/shared/DomainEventPublisher';
 import { UniqueEntityId } from '../../../domain/shared/UniqueEntityId';
-import { BusinessRuleViolationError, DomainValidationError } from '../../../domain/shared/DomainError';
+import { BusinessRuleViolationError } from '../../../domain/shared/DomainError';
 
 export class MoveQuoteToReviewCommandHandler 
   implements CommandHandler<MoveQuoteToReviewCommand, QuoteProcessingCommandResult> {
@@ -187,7 +185,8 @@ export class UpdateQuotePriorityCommandHandler
     }
   }
 
-  private handleError(commandId: string, error: unknown): QuoteProcessingCommandResult {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private handleError(commandId: string, _error: unknown): QuoteProcessingCommandResult {
     return BaseCommandResult.failure(
       commandId,
       [{ field: 'system', message: 'An unexpected error occurred', code: 'INTERNAL_ERROR' }],

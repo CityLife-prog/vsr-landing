@@ -39,7 +39,11 @@ export class CQRSUsageExamples {
       }
 
       console.log('✅ Quote submitted:', submitResult.data);
-      const quoteId = submitResult.data?.quoteId!;
+      const quoteId = submitResult.data?.quoteId;
+      if (!quoteId) {
+        console.error('❌ No quote ID returned from submission');
+        return;
+      }
 
       // 2. Move quote to review (Command)
       console.log('📋 Moving quote to review...');
@@ -95,7 +99,7 @@ export class CQRSUsageExamples {
           status: detailsResult.data?.status,
           priority: detailsResult.data?.priority,
           estimate: detailsResult.data?.estimatedValue,
-          timeline: detailsResult.data?.timeline.length
+          timeline: detailsResult.data?.timeline?.length || 0
         });
       }
 
@@ -111,7 +115,7 @@ export class CQRSUsageExamples {
       if (listResult.success) {
         console.log('📝 Quote list:', {
           total: listResult.data?.total,
-          itemCount: listResult.data?.items.length,
+          itemCount: listResult.data?.items?.length || 0,
           hasMore: listResult.data?.hasNext
         });
       }
@@ -203,14 +207,14 @@ export class CQRSUsageExamples {
       // First query (cache miss)
       console.log('🔍 First query (cache miss)...');
       const startTime1 = Date.now();
-      const result1 = await quoteService.getQuoteList({ limit: 5 });
+      await quoteService.getQuoteList({ limit: 5 });
       const time1 = Date.now() - startTime1;
       console.log(`✅ Query completed in ${time1}ms`);
 
       // Second identical query (cache hit)
       console.log('🔍 Second query (cache hit)...');
       const startTime2 = Date.now();
-      const result2 = await quoteService.getQuoteList({ limit: 5 });
+      await quoteService.getQuoteList({ limit: 5 });
       const time2 = Date.now() - startTime2;
       console.log(`⚡ Query completed in ${time2}ms (cached)`);
 

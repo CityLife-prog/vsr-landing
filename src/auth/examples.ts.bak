@@ -1,0 +1,580 @@
+/**
+ * Authentication System Usage Examples
+ * Demonstrates how to use the authentication system in the VSR landing application
+ */
+
+import { NextApiRequest, NextApiResponse } from 'next';
+import React from 'react';
+import {
+  authenticated,
+  optionalAuth,
+  adminOnly,
+  requirePermissions,
+  requireRoles,
+  rateLimited,
+  secureRoute,
+  createProtectedHandler,
+  AuthGuard,
+  AuthenticatedOnly,
+  UnauthenticatedOnly,
+  requireAuth,
+  useAuth,
+  useIsAuthenticated,
+  hasPermission,
+  isAdmin,
+  VSRPermissions
+} from './decorators';
+import { AuthenticationServiceImpl, SessionManager } from './authentication';
+import { RBACManager } from './rbac';
+import { SecurityServiceImpl, DEFAULT_SECURITY_CONFIG } from './security';
+import { PasswordManager, DEFAULT_PASSWORD_CONFIG } from './password';
+import { JWTManager, DEFAULT_JWT_CONFIG } from './jwt';
+// import { DEFAULT_AUTH_CONFIG } from './types'; // Not exported from types
+
+// =============================================================================
+// API ROUTE EXAMPLES
+// =============================================================================
+
+// Example 1: Public API route (no authentication required)
+export async function publicHandler(req: NextApiRequest, res: NextApiResponse) {
+  res.status(200).json({ message: 'This is a public endpoint' });
+}
+
+// Example 2: Protected API route (authentication required)
+export const protectedHandler = authenticated()(
+  async (req, res) => {
+    const { user } = req;
+    res.status(200).json({ 
+      message: 'This is a protected endpoint',
+      user: {
+        id: user!.id,
+        email: user!.email
+      }
+    });
+  }
+);
+
+// Example 3: Admin-only API route
+export const adminHandler = adminOnly()(
+  async (req, res) => {
+    const { user } = req;
+    res.status(200).json({ 
+      message: 'This is an admin-only endpoint',
+      adminUser: user!.email
+    });
+  }
+);
+
+// Example 4: Permission-based API route
+export const quoteManagementHandler = requirePermissions('quote:write', 'quote:approve')(
+  async (req, res) => {
+    const { user, permissions } = req;
+    
+    if (req.method === 'POST') {
+      // Create quote logic
+      res.status(201).json({ message: 'Quote created', quoteId: 123 });
+    } else if (req.method === 'PUT') {
+      // Update/approve quote logic
+      res.status(200).json({ message: 'Quote updated', quoteId: 123 });
+    } else {
+      res.status(405).json({ error: 'Method not allowed' });
+    }
+  }
+);
+
+// Example 5: Rate-limited API route
+export const rateLimitedHandler = rateLimited(10, 60000)( // 10 requests per minute
+  async (req, res) => {
+    res.status(200).json({ message: 'Rate limited endpoint' });
+  }
+);
+
+// Example 6: Secure route with multiple protections
+export const secureHandler = secureRoute({
+  permissions: ['admin:system'],
+  rateLimit: { maxRequests: 5, windowMs: 60000 }
+})(
+  async (req, res) => {
+    // System administration logic
+    res.status(200).json({ 
+      message: 'System admin endpoint',
+      systemInfo: {
+        uptime: process.uptime(),
+        memory: process.memoryUsage()
+      }
+    });
+  }
+);
+
+// Example 7: Using helper functions for different protection levels
+export const userLevelHandler = createProtectedHandler.user(
+  async (req, res) => {
+    res.status(200).json({ message: 'User level access' });
+  }
+);
+
+export const managerLevelHandler = createProtectedHandler.manager(
+  async (req, res) => {
+    res.status(200).json({ message: 'Manager level access' });
+  }
+);
+
+export const quoteReadHandler = createProtectedHandler.quoteRead(
+  async (req, res) => {
+    // Fetch user's quotes
+    const { user } = req;
+    res.status(200).json({ 
+      quotes: [
+        { id: 1, service: 'Concrete', status: 'pending', userId: user!.id },
+        { id: 2, service: 'Landscaping', status: 'approved', userId: user!.id }
+      ]
+    });
+  }
+);
+
+// Example 8: Optional authentication (works for both authenticated and anonymous users)
+export const optionalAuthHandler = optionalAuth()(
+  async (req, res) => {
+    const { user, authContext } = req;
+    
+    if (authContext?.isAuthenticated) {
+      res.status(200).json({ 
+        message: 'Welcome back!',
+        user: { email: user!.email }
+      });
+    } else {
+      res.status(200).json({ 
+        message: 'Hello, anonymous user!'
+      });
+    }
+  }
+);
+
+// =============================================================================
+// REACT COMPONENT EXAMPLES
+// =============================================================================
+
+// Example 1: Protected component that requires authentication
+const ProtectedDashboard = requireAuth(
+  function Dashboard() {
+    const auth = useAuth();
+    
+    return React.createElement('div', null,
+      React.createElement('h1', null, `Welcome to your dashboard, ${auth.user.email}!`),
+      React.createElement('p', null, `You have ${auth.permissions.length} permissions`),
+      React.createElement('p', null, `Your roles: ${auth.roles.map(r => r.name).join(', ')}`)
+    );
+  },
+  {
+    redirectTo: '/login',
+    fallback: () => React.createElement('div', null, 'Please log in to access the dashboard')
+  }
+);
+
+// Example 2: Admin-only component
+const AdminPanel = requireAuth(
+  function AdminPanel() {
+    const auth = useAuth();
+    
+    return React.createElement('div', null,
+      React.createElement('h1', null, 'Admin Panel'),
+      React.createElement('p', null, `Admin user: ${auth.user.email}`)
+      /* Admin functionality */
+    );
+  },
+  {
+    roles: ['admin', 'super_admin'],
+    fallback: () => React.createElement('div', null, 'Admin access required')
+  }
+);
+
+// Example 3: Component with conditional rendering based on authentication
+function Navigation() {
+  const isAuthenticated = useIsAuthenticated();
+  
+  return React.createElement('nav', null,
+    React.createElement('a', { href: '/' }, 'Home'),
+    React.createElement('a', { href: '/services' }, 'Services'),
+    
+    React.createElement(AuthenticatedOnly, null,
+      React.createElement('a', { href: '/dashboard' }, 'Dashboard'),
+      React.createElement('a', { href: '/quotes' }, 'My Quotes')
+    ),
+    
+    React.createElement(AuthGuard, { 
+      permissions: ['admin:users'],
+      children: React.createElement('a', { href: '/admin/users' }, 'User Management')
+    }),
+    
+    React.createElement(AuthGuard, { 
+      roles: ['manager', 'admin'],
+      children: React.createElement('a', { href: '/quotes/pending' }, 'Pending Quotes')
+    }),
+    
+    React.createElement(UnauthenticatedOnly, null,
+      React.createElement('a', { href: '/login' }, 'Login'),
+      React.createElement('a', { href: '/register' }, 'Register')
+    ),
+    
+    React.createElement(AuthenticatedOnly, null,
+      React.createElement(LogoutButton, null)
+    )
+  );
+}
+
+// Example 4: Component with complex permission logic
+function QuoteManagement() {
+  const auth = useAuth();
+  
+  const canRead = VSRPermissions.canReadQuotes(auth);
+  const canWrite = VSRPermissions.canWriteQuotes(auth);
+  const canApprove = VSRPermissions.canApproveQuotes(auth);
+  const canDelete = VSRPermissions.canDeleteQuotes(auth);
+  
+  return React.createElement('div', null,
+    React.createElement('h1', null, 'Quote Management'),
+    
+    canRead && React.createElement('section', null,
+      React.createElement('h2', null, 'Your Quotes')
+      /* Quote list */
+    ),
+    
+    canWrite && React.createElement('section', null,
+      React.createElement('h2', null, 'Create New Quote')
+      /* Quote creation form */
+    ),
+    
+    React.createElement(AuthGuard, { 
+      permissions: ['quote:approve'], 
+      fallback: React.createElement('p', null, 'You cannot approve quotes'),
+      children: React.createElement('section', null,
+        React.createElement('h2', null, 'Quotes Pending Approval')
+        /* Approval interface */
+      )
+    }),
+    
+    React.createElement(AuthGuard, { 
+      roles: ['admin'], 
+      fallback: null,
+      children: React.createElement('section', null,
+        React.createElement('h2', null, 'All Quotes (Admin View)')
+        /* Admin quote management */
+      )
+    })
+  );
+}
+
+// Example 5: Component with role-based features
+function UserProfile() {
+  const auth = useAuth();
+  const isUserAdmin = isAdmin(auth);
+  
+  return React.createElement('div', null,
+    React.createElement('h1', null, 'User Profile'),
+    React.createElement('p', null, `Email: ${auth.user.email}`),
+    React.createElement('p', null, `Member since: ${auth.user.createdAt.toLocaleDateString()}`),
+    
+    isUserAdmin && React.createElement('div', null,
+      React.createElement('h2', null, 'Admin Tools'),
+      React.createElement('button', null, 'Manage Users'),
+      React.createElement('button', null, 'System Settings')
+    ),
+    
+    React.createElement(AuthGuard, {
+      permissions: ['user:write'],
+      fallback: React.createElement('p', null, 'You cannot edit your profile'),
+      children: React.createElement('button', null, 'Edit Profile')
+    })
+  );
+}
+
+// Example 6: Login form component
+function LoginForm() {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    try {
+      // This would call your authentication API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+      
+      const data = await response.json();
+      
+      // Store tokens and redirect
+      localStorage.setItem('accessToken', data.tokens.accessToken);
+      localStorage.setItem('refreshToken', data.tokens.refreshToken);
+      
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return React.createElement('form', { onSubmit: handleSubmit },
+    React.createElement('h1', null, 'Login'),
+    
+    error && React.createElement('div', { style: { color: 'red' } }, error),
+    
+    React.createElement('div', null,
+      React.createElement('label', null, 'Email:'),
+      React.createElement('input', {
+        type: 'email',
+        value: email,
+        onChange: (e) => setEmail(e.target.value),
+        required: true
+      })
+    ),
+    
+    React.createElement('div', null,
+      React.createElement('label', null, 'Password:'),
+      React.createElement('input', {
+        type: 'password',
+        value: password,
+        onChange: (e) => setPassword(e.target.value),
+        required: true
+      })
+    ),
+    
+    React.createElement('button', { type: 'submit', disabled: loading },
+      loading ? 'Logging in...' : 'Login'
+    ),
+    
+    React.createElement('p', null,
+      'Don\'t have an account? ',
+      React.createElement('a', { href: '/register' }, 'Register here')
+    )
+  );
+}
+
+// Example logout button component
+function LogoutButton() {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+  
+  return React.createElement('button', { onClick: handleLogout }, 'Logout');
+}
+
+// =============================================================================
+// AUTHENTICATION SERVICE SETUP EXAMPLE
+// =============================================================================
+
+// Example of how to set up the authentication system
+export function createAuthenticationSystem() {
+  // Create services
+  const securityService = new SecurityServiceImpl(DEFAULT_SECURITY_CONFIG);
+  const sessionManager = new SessionManager();
+  
+  // Mock user service (in real app, this would connect to your database)
+  const userService = {
+    async findById(id: string) {
+      // Return user from database
+      return null;
+    },
+    async findByEmail(email: string) {
+      // Return user from database
+      return null;
+    },
+    async create(userData: any) {
+      // Create user in database
+      return { id: 'user_123', ...userData };
+    },
+    async update(userId: string, updates: any) {
+      // Update user in database
+      return { id: userId, ...updates };
+    },
+    async delete(id: string) {
+      // Delete user from database
+    },
+    async addRole(userId: string, roleId: string) {
+      // Add role to user
+    },
+    async removeRole(userId: string, roleId: string) {
+      // Remove role from user
+    },
+    async addPermission(userId: string, permissionId: string) {
+      // Add permission to user
+    },
+    async removePermission(userId: string, permissionId: string) {
+      // Remove permission from user
+    }
+  };
+  
+  // Create authentication service with basic config
+  const authConfig = {
+    jwt: {
+      ...DEFAULT_JWT_CONFIG,
+      secret: process.env.JWT_SECRET || 'fallback-secret-key',
+      algorithm: 'HS256' as const,
+      issuer: 'vsr-landing',
+      audience: 'vsr-users',
+      accessTokenTTL: 3600,
+      refreshTokenTTL: 604800,
+      emailVerificationTTL: 86400,
+      passwordResetTTL: 3600
+    },
+    password: DEFAULT_PASSWORD_CONFIG,
+    session: {
+      maxConcurrentSessions: 5,
+      slidingExpiration: true,
+      requireReauth: false,
+      reauthInterval: 24 * 60 * 60, // 24 hours in seconds
+      trackDevices: true
+    },
+    security: DEFAULT_SECURITY_CONFIG,
+    rbac: {
+      enableHierarchy: true,
+      enableInheritance: true,
+      enableContextualPermissions: false,
+      cachePermissions: true,
+      cacheTTL: 300 // 5 minutes
+    }
+  };
+  // Note: This would require complete interface implementations
+  // const authService = new AuthenticationServiceImpl(
+  //   authConfig,
+  //   userService,
+  //   sessionManager,
+  //   securityService
+  // );
+  
+  // Create RBAC manager
+  const rbacManager = new RBACManager();
+  
+  return {
+    // authService, // Would be available with complete implementations
+    rbacManager,
+    securityService,
+    sessionManager,
+    authConfig,
+    userService
+  };
+}
+
+// =============================================================================
+// INTEGRATION EXAMPLES FOR VSR LANDING
+// =============================================================================
+
+// Example API routes for VSR services
+export const concreteQuoteHandler = createProtectedHandler.quoteWrite(
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+    
+    const { user } = req;
+    const quoteData = req.body;
+    
+    // Create concrete service quote
+    const quote = {
+      id: Date.now(),
+      userId: user!.id,
+      service: 'concrete',
+      ...quoteData,
+      status: 'pending',
+      createdAt: new Date()
+    };
+    
+    res.status(201).json({ quote });
+  }
+);
+
+export const quoteApprovalHandler = createProtectedHandler.quoteApprove(
+  async (req, res) => {
+    if (req.method !== 'PUT') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+    
+    const { user } = req;
+    const { quoteId } = req.query;
+    const { approved, notes } = req.body;
+    
+    // Update quote approval status
+    const quote = {
+      id: quoteId,
+      status: approved ? 'approved' : 'rejected',
+      approvedBy: user!.id,
+      approvedAt: new Date(),
+      notes
+    };
+    
+    res.status(200).json({ quote });
+  }
+);
+
+// Example component for VSR service pages
+const ServicePageGuard = requireAuth(
+  function ServicePage({ service }: { service: string }) {
+    const auth = useAuth();
+    
+    return React.createElement('div', null,
+      React.createElement('h1', null, `${service} Service`),
+      
+      React.createElement(AuthGuard, { 
+        permissions: ['quote:write'],
+        children: React.createElement('section', null,
+          React.createElement('h2', null, 'Request a Quote')
+          /* Quote request form */
+        )
+      }),
+      
+      React.createElement(AuthGuard, { 
+        permissions: ['quote:read'],
+        children: React.createElement('section', null,
+          React.createElement('h2', null, 'Your Previous Quotes')
+          /* User's quotes for this service */
+        )
+      }),
+      
+      React.createElement(AuthGuard, { 
+        roles: ['manager', 'admin'],
+        children: React.createElement('section', null,
+          React.createElement('h2', null, 'Service Management')
+          /* Service management tools */
+        )
+      })
+    );
+  },
+  {
+    permissions: ['quote:read'],
+    fallback: () => React.createElement('div', null,
+      React.createElement('h1', null, 'Login Required'),
+      React.createElement('p', null, 'Please log in to access service quotes and management.'),
+      React.createElement('a', { href: '/login' }, 'Login')
+    )
+  }
+);
+
+export {
+  ProtectedDashboard,
+  AdminPanel,
+  Navigation,
+  QuoteManagement,
+  UserProfile,
+  LoginForm,
+  LogoutButton,
+  ServicePageGuard
+};

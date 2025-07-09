@@ -345,8 +345,8 @@ export class ServiceContainer {
       instances: new Map(),
       dispose: async () => {
         for (const instance of scope.instances.values()) {
-          if (instance && typeof (instance as any).dispose === 'function') {
-            await (instance as any).dispose();
+          if (instance && typeof (instance as Record<string, unknown>).dispose === 'function') {
+            await ((instance as Record<string, unknown>).dispose as () => Promise<void>)();
           }
         }
         scope.instances.clear();
@@ -450,7 +450,8 @@ export class ServiceContainer {
     }
   }
   
-  private getConstructorParameterTypes(constructor: Constructor): ServiceToken[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private getConstructorParameterTypes(_constructor: Constructor): ServiceToken[] {
     // In a real implementation, this would use reflection metadata
     // For now, return empty array (requires explicit dependencies)
     return [];
@@ -471,11 +472,12 @@ export class ServiceContainer {
 
 export class LoggingInterceptor<T> implements ServiceInterceptor<T> {
   constructor(
-    private readonly logger: any,
+    private readonly logger: Record<string, (message: string, data?: Record<string, unknown>) => void>,
     private readonly logLevel: 'debug' | 'info' = 'debug'
   ) {}
   
-  intercept(instance: T, container: ServiceContainer): T {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  intercept(instance: T, _container: ServiceContainer): T {
     const instanceName = instance?.constructor?.name || 'Unknown';
     
     this.logger[this.logLevel]('Service instance created', {
@@ -489,10 +491,14 @@ export class LoggingInterceptor<T> implements ServiceInterceptor<T> {
 
 export class PerformanceInterceptor<T> implements ServiceInterceptor<T> {
   constructor(
-    private readonly metrics: any
+    private readonly metrics: {
+      incrementCounter: (name: string, value: number, labels?: Record<string, string>) => void;
+      recordHistogram: (name: string, value: number, labels?: Record<string, string>) => void;
+    }
   ) {}
   
-  intercept(instance: T, container: ServiceContainer): T {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  intercept(instance: T, _container: ServiceContainer): T {
     const instanceName = instance?.constructor?.name || 'Unknown';
     
     // Record service creation metric
@@ -510,17 +516,17 @@ export class PerformanceInterceptor<T> implements ServiceInterceptor<T> {
       .filter(name => typeof prototype[name] === 'function' && name !== 'constructor');
     
     for (const methodName of methodNames) {
-      const originalMethod = (instance as any)[methodName];
+      const originalMethod = (instance as Record<string, unknown>)[methodName] as (...args: unknown[]) => unknown;
       
-      (instance as any)[methodName] = (...args: any[]) => {
+      (instance as Record<string, unknown>)[methodName] = (...args: unknown[]) => {
         const startTime = Date.now();
         
         try {
           const result = originalMethod.apply(instance, args);
           
           // Handle async methods
-          if (result && typeof result.then === 'function') {
-            return result.finally(() => {
+          if (result && typeof (result as { then?: unknown }).then === 'function') {
+            return (result as Promise<unknown>).finally(() => {
               this.recordMethodMetrics(serviceName, methodName, startTime, true);
             });
           }
@@ -556,20 +562,21 @@ export class PerformanceInterceptor<T> implements ServiceInterceptor<T> {
 }
 
 export class CachingInterceptor<T> implements ServiceInterceptor<T> {
-  private readonly cache = new Map<string, { value: any; expiry: number }>();
+  private readonly cache = new Map<string, { value: unknown; expiry: number }>();
   
   constructor(
     private readonly cacheTtlMs: number = 300000 // 5 minutes
   ) {}
   
-  intercept(instance: T, container: ServiceContainer): T {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  intercept(instance: T, _container: ServiceContainer): T {
     // Only cache methods that return promises and have no side effects
     const cacheableMethods = this.getCacheableMethods(instance);
     
     for (const methodName of cacheableMethods) {
-      const originalMethod = (instance as any)[methodName];
+      const originalMethod = (instance as Record<string, unknown>)[methodName] as (...args: unknown[]) => Promise<unknown>;
       
-      (instance as any)[methodName] = async (...args: any[]) => {
+      (instance as Record<string, unknown>)[methodName] = async (...args: unknown[]) => {
         const cacheKey = this.generateCacheKey(instance.constructor.name, methodName, args);
         const cached = this.getFromCache(cacheKey);
         
@@ -587,17 +594,18 @@ export class CachingInterceptor<T> implements ServiceInterceptor<T> {
     return instance;
   }
   
-  private getCacheableMethods<T>(instance: T): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private getCacheableMethods<T>(_instance: T): string[] {
     // In a real implementation, this would use metadata to identify cacheable methods
     return [];
   }
   
-  private generateCacheKey(className: string, methodName: string, args: any[]): string {
+  private generateCacheKey(className: string, methodName: string, args: unknown[]): string {
     const argsString = JSON.stringify(args);
     return `${className}.${methodName}(${argsString})`;
   }
   
-  private getFromCache(key: string): any | null {
+  private getFromCache(key: string): unknown | null {
     const cached = this.cache.get(key);
     if (!cached) {
       return null;
@@ -611,7 +619,7 @@ export class CachingInterceptor<T> implements ServiceInterceptor<T> {
     return cached.value;
   }
   
-  private setCache(key: string, value: any): void {
+  private setCache(key: string, value: unknown): void {
     this.cache.set(key, {
       value,
       expiry: Date.now() + this.cacheTtlMs
@@ -655,10 +663,10 @@ export function Injectable(token?: ServiceToken): ClassDecorator {
 }
 
 export function Inject(token: ServiceToken): ParameterDecorator {
-  return function(target: any, propertyKey: string | symbol | undefined, parameterIndex: number) {
-    const existingTokens = (target as any).__paramtypes || [];
+  return function(target: Record<string, unknown>, _propertyKey: string | symbol | undefined, parameterIndex: number) {
+    const existingTokens = (target as Record<string, ServiceToken[]>).__paramtypes || [];
     existingTokens[parameterIndex] = token;
-    (target as any).__paramtypes = existingTokens;
+    (target as Record<string, ServiceToken[]>).__paramtypes = existingTokens;
   };
 }
 

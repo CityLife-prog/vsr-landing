@@ -77,7 +77,7 @@ export default function ApplyPage() {
           type="text"
           name="name" 
           placeholder="John Doe"
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           required />
       </div>
       <div>
@@ -86,7 +86,7 @@ export default function ApplyPage() {
           name="email" 
           type="email" 
           placeholder="you@example.com"
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           />
       </div>
       <div>
@@ -97,7 +97,7 @@ export default function ApplyPage() {
           value={phone}
           onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
           placeholder="(123) 456-7890"
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           required />
       </div>
       <div>
@@ -106,7 +106,7 @@ export default function ApplyPage() {
           name="experience"
           rows={4}
           placeholder="Provide a brief overview of your experience..."
-          className="w-full p-2 bg-gray-700 rounded"
+          className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
         ></textarea>
       </div>
       

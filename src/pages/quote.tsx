@@ -2,10 +2,6 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useMobile } from '@/context/MobileContext';
 
-// DO NOT import nodemailer here! Remove any line like:
-// import nodemailer from 'nodemailer';
-// import * as nodemailer from 'nodemailer';
-
 export default function QuotePage() {
   const { isMobile } = useMobile();
   const [showBubble, setShowBubble] = useState(false);
@@ -154,7 +150,7 @@ export default function QuotePage() {
                   type="text"
                   name="fullName"
                   placeholder="John Doe"
-                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
                   required
                 />
               </div>
@@ -165,7 +161,7 @@ export default function QuotePage() {
                   type="email"
                   name="email"
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
                   required
                 />
               </div>
@@ -178,23 +174,38 @@ export default function QuotePage() {
                   value={phone}
                   onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
                   placeholder="(123) 456-7890"
-                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium">Service Class</label>
+                <select
+                  name="serviceClass"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                  required
+                >
+                  <option value="">Select Service Class</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="residential">Residential</option>
+                </select>
               </div>
 
               <div>
                 <label className="block mb-2 text-sm font-medium">Service Requested</label>
                 <select
                   name="service"
-                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                  required
                 >
-                  <option>Snow Removal</option>
-                  <option>Landscaping / Hardscaping</option>
-                  <option>Concrete / Asphalt Repairs</option>
-                  <option>Demolition</option>
-                  <option>Painting</option>
-                  <option>Other</option>
+                  <option value="">Select Service</option>
+                  <option value="snow-ice-removal">Snow and Ice Removal (Commercial Only)</option>
+                  <option value="landscaping">Landscaping / Hardscaping</option>
+                  <option value="concrete-asphalt">Concrete / Asphalt Repairs</option>
+                  <option value="demolition">Demolition</option>
+                  <option value="painting">Painting</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -204,7 +215,7 @@ export default function QuotePage() {
                   name="details"
                   rows={4}
                   placeholder="Describe your project..."
-                  className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
                   required
                 ></textarea>
               </div>

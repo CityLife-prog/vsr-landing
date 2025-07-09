@@ -225,13 +225,13 @@ export class EnterpriseContainerFactory {
     const metrics = container.resolve(ServiceTokens.ApplicationMetrics);
     
     // Add logging interceptor to all services
-    container.addInterceptor(ServiceTokens.ApplicationCoordinator, new LoggingInterceptor(logger));
-    container.addInterceptor(ServiceTokens.ApplicationRepository, new LoggingInterceptor(logger));
-    container.addInterceptor(ServiceTokens.FileStorageService, new LoggingInterceptor(logger));
+    container.addInterceptor(ServiceTokens.ApplicationCoordinator, new LoggingInterceptor(logger as any));
+    container.addInterceptor(ServiceTokens.ApplicationRepository, new LoggingInterceptor(logger as any));
+    container.addInterceptor(ServiceTokens.FileStorageService, new LoggingInterceptor(logger as any));
     
     // Add performance monitoring to application services
-    container.addInterceptor(ServiceTokens.ApplicationCoordinator, new PerformanceInterceptor(metrics));
-    container.addInterceptor(ServiceTokens.ApplicationRepository, new PerformanceInterceptor(metrics));
+    container.addInterceptor(ServiceTokens.ApplicationCoordinator, new PerformanceInterceptor(metrics as any));
+    container.addInterceptor(ServiceTokens.ApplicationRepository, new PerformanceInterceptor(metrics as any));
     
     return container;
   }

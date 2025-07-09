@@ -13,11 +13,11 @@ export enum RetryStrategy {
 
 export interface RetryConfig {
   maxAttempts: number;
-  strategy: RetryStrategy;
-  baseDelay: number;              // Base delay in milliseconds
-  maxDelay: number;               // Maximum delay in milliseconds
-  multiplier: number;             // Multiplier for exponential backoff
-  jitter: boolean;                // Add randomness to delays
+  strategy?: RetryStrategy;
+  baseDelay?: number;              // Base delay in milliseconds
+  maxDelay?: number;               // Maximum delay in milliseconds
+  multiplier?: number;             // Multiplier for exponential backoff
+  jitter?: boolean;                // Add randomness to delays
   retryCondition?: (error: Error, attempt: number) => boolean;
   onRetry?: (error: Error, attempt: number, delay: number) => void;
   timeout?: number;               // Overall timeout for all attempts
