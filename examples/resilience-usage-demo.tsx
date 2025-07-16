@@ -24,7 +24,7 @@ export function QuoteRequestPage() {
           <QuoteErrorFallback 
             error={error} 
             onRetry={retry}
-            onContactSupport={() => window.open('mailto:support@vsr.com')}
+            onContactSupport={() => window.open('mailto:contact@vsrsnow.com')}
           />
         )}
         onError={(error, errorInfo, errorId) => {

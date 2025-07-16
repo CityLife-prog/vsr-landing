@@ -7,12 +7,16 @@ import { User, Role, Permission } from '../auth/types';
 
 export interface AdminUser extends User {
   adminLevel: 'super_admin' | 'admin' | 'manager';
-  managementPermissions: AdminPermission[];
-  canManageUsers: boolean;
-  canManageEmployees: boolean;
-  canAccessTraining: boolean;
-  canViewReports: boolean;
-  canManageSystem: boolean;
+  managementPermissions?: AdminPermission[];
+  canManageUsers?: boolean;
+  canManageEmployees?: boolean;
+  canAccessTraining?: boolean;
+  canViewReports?: boolean;
+  canManageSystem?: boolean;
+  requiresPasswordReset?: boolean;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  password?: string; // For development/display purposes
 }
 
 export interface AdminPermission {
@@ -102,28 +106,43 @@ export interface AdminConsoleConfig {
   };
 }
 
-// Default admin users configuration
+// Default admin users configuration (3 default + 1 demo = 4 total)
 export const DEFAULT_ADMIN_USERS = [
   {
     email: 'citylife32@outlook.com',
-    firstName: 'Development',
+    firstName: 'CityLife',
     lastName: 'Admin',
     adminLevel: 'super_admin' as const,
-    permissions: 'all'
+    permissions: 'all',
+    defaultPassword: 'citylife32',
+    requiresPasswordReset: true
   },
   {
     email: 'marcus@vsrsnow.com',
     firstName: 'Marcus',
     lastName: 'VSR',
     adminLevel: 'admin' as const,
-    permissions: 'admin_operations'
+    permissions: 'admin_operations',
+    defaultPassword: 'Marcus',
+    requiresPasswordReset: true
   },
   {
-    email: 'zack@vsrsnow.com',
-    firstName: 'Zack',
+    email: 'zach@vsrsnow.com',
+    firstName: 'Zach',
     lastName: 'VSR',
     adminLevel: 'admin' as const,
-    permissions: 'admin_operations'
+    permissions: 'admin_operations',
+    defaultPassword: 'Zach',
+    requiresPasswordReset: true
+  },
+  {
+    email: 'demo@admin.com',
+    firstName: 'Demo',
+    lastName: 'Admin',
+    adminLevel: 'manager' as const,
+    permissions: 'admin_operations',
+    defaultPassword: 'demo123',
+    requiresPasswordReset: false
   }
 ] as const;
 

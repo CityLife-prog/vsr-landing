@@ -183,7 +183,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const emailJobId = await emailService.sendTemplateEmail(
         'application-submitted',
-        ['noreply@vsr.com'],
+        ['marcus@vsrsnow.com'],
         {
           name: validatedData.name,
           email: validatedData.email,

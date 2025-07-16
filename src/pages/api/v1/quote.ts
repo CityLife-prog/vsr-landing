@@ -209,7 +209,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const emailJobId = await emailService.sendTemplateEmail(
         'quote-requested',
-        [config.email.fromAddress],
+        ['marcus@vsrsnow.com', 'zach@vsrsnow.com'],
         {
           fullName: validatedData.fullName,
           email: validatedData.email,

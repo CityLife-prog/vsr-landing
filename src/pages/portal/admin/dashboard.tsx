@@ -16,9 +16,13 @@ import {
   FaClipboardCheck,
   FaServer,
   FaIdCard,
-  FaSnowflake
+  FaSnowflake,
+  FaEnvelope,
+  FaBell
 } from 'react-icons/fa';
 import { isFeatureEnabled, getCurrentVersion } from '@/utils/version';
+import NotificationBubble from '@/components/admin/NotificationBubble';
+import EmergencyMaintenanceButton from '@/components/admin/EmergencyMaintenanceButton';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -30,10 +34,155 @@ export default function AdminDashboard() {
     activeProjects: 0,
     pendingApprovals: 0
   });
+  
+  // Notification state
+  const [notifications, setNotifications] = useState({
+    quoteRequests: 0,
+    clientUpdates: 0,
+    updateRequests: 0,
+    employeeApprovals: 0,
+    systemUpdates: 0
+  });
+  const [systemHealth, setSystemHealth] = useState<any>(null);
+  const [serviceStatus, setServiceStatus] = useState<any>(null);
 
   useEffect(() => {
     checkAdminAuth();
+    // Load system health data on mount (removed auto-refresh)
+    loadSystemHealth();
+    loadAnalyticsData();
+    loadServiceStatus();
   }, []);
+
+  const loadSystemHealth = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/admin/health', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSystemHealth(data);
+      }
+    } catch (error) {
+      console.error('Failed to load system health:', error);
+    }
+  };
+
+  const loadServiceStatus = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/admin/service-status', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setServiceStatus(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load service status:', error);
+    }
+  };
+
+  const loadAnalyticsData = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      // Load quote requests
+      const quoteResponse = await fetch('/api/admin/quote-requests', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Load update requests
+      const updateResponse = await fetch('/api/admin/update-requests', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      let quoteRequestsCount = 0;
+      let updateRequestsCount = 0;
+
+      if (quoteResponse.ok) {
+        const quoteData = await quoteResponse.json();
+        quoteRequestsCount = quoteData.data?.summary?.pending || 0;
+      }
+
+      if (updateResponse.ok) {
+        const updateData = await updateResponse.json();
+        updateRequestsCount = updateData.data?.summary?.pending || 0;
+      }
+
+      // Update notifications with real data
+      setNotifications(prev => ({
+        ...prev,
+        quoteRequests: quoteRequestsCount,
+        updateRequests: updateRequestsCount,
+        clientUpdates: 0 // Can be expanded later
+      }));
+
+    } catch (error) {
+      console.error('Failed to load analytics data:', error);
+      // Fallback to mock data
+      setNotifications(prev => ({
+        ...prev,
+        quoteRequests: 2,
+        updateRequests: 3,
+        clientUpdates: 0
+      }));
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'operational':
+        return 'bg-green-600';
+      case 'degraded':
+        return 'bg-yellow-600';
+      case 'down':
+      case 'critical':
+        return 'bg-red-600';
+      default:
+        return 'bg-gray-600';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'operational':
+        return 'Online';
+      case 'degraded':
+        return 'Limited';
+      case 'down':
+        return 'Offline';
+      case 'critical':
+        return 'Critical';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const formatUptime = (uptime: number) => {
+    const days = Math.floor(uptime / 86400);
+    const hours = Math.floor((uptime % 86400) / 3600);
+    if (days > 0) {
+      return `${days}d ${hours}h`;
+    }
+    return `${hours}h`;
+  };
 
   const checkAdminAuth = async () => {
     const token = localStorage.getItem('accessToken');
@@ -64,6 +213,106 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleToggleService = async () => {
+    if (!serviceStatus) {
+      alert('Service status not loaded. Please refresh and try again.');
+      return;
+    }
+
+    const action = serviceStatus.isRunning ? 'stop' : 'start';
+    const actionWord = serviceStatus.isRunning ? 'STOP' : 'START';
+    
+    const confirmText = prompt(
+      `WARNING: This will ${action} the entire service!\n\n` +
+      `Type "${actionWord} SERVICE" to confirm:`
+    );
+
+    if (confirmText !== `${actionWord} SERVICE`) {
+      alert(`Service ${action} cancelled. Invalid confirmation text.`);
+      return;
+    }
+
+    const finalConfirm = confirm(
+      `Are you absolutely sure you want to ${action} the service?\n\n` +
+      (serviceStatus.isRunning ? 
+        'This will stop all modules and require manual restart.' :
+        'This will start all service modules.')
+    );
+
+    if (!finalConfirm) {
+      alert(`Service ${action} cancelled.`);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('/api/admin/service-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'toggle_service' })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setServiceStatus(result.data);
+        alert(`Service ${result.data.isRunning ? 'started' : 'stopped'} successfully!`);
+        
+        // Reload system health and analytics
+        loadSystemHealth();
+        loadAnalyticsData();
+      } else {
+        alert(`Failed to ${action} service: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(`Error ${action}ping service:`, error);
+      alert(`Error occurred while trying to ${action} service.`);
+    }
+  };
+
+  const handleToggleModule = async (moduleName: string) => {
+    if (!serviceStatus) return;
+
+    const isEnabled = serviceStatus.modules[moduleName];
+    const action = isEnabled ? 'disable' : 'enable';
+
+    const confirmed = confirm(
+      `Are you sure you want to ${action} the ${moduleName} module?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('/api/admin/service-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          action: 'toggle_module', 
+          module: moduleName 
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setServiceStatus(result.data);
+        alert(`Module ${moduleName} ${result.data.modules[moduleName] ? 'enabled' : 'disabled'} successfully!`);
+      } else {
+        alert(`Failed to ${action} module: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing module:`, error);
+      alert(`Error occurred while trying to ${action} module.`);
+    }
+  };
+
   // Logout handled by main Header component
 
   if (loading) {
@@ -88,6 +337,42 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gray-100">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Notification Summary Bar */}
+          {(notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.employeeApprovals) > 0 && (
+            <div className="bg-red-600 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center text-white">
+                  <FaBell className="h-5 w-5 mr-3" />
+                  <span className="font-medium">
+                    You have {notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.employeeApprovals} pending notifications
+                  </span>
+                </div>
+                <div className="flex space-x-2">
+                  {notifications.quoteRequests > 0 && (
+                    <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
+                      {notifications.quoteRequests} quotes
+                    </span>
+                  )}
+                  {notifications.clientUpdates > 0 && (
+                    <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
+                      {notifications.clientUpdates} client updates
+                    </span>
+                  )}
+                  {notifications.updateRequests > 0 && (
+                    <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
+                      {notifications.updateRequests} update requests
+                    </span>
+                  )}
+                  {notifications.employeeApprovals > 0 && (
+                    <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
+                      {notifications.employeeApprovals} approvals
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* System Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-gray-800 rounded-lg p-6">
@@ -116,24 +401,26 @@ export default function AdminDashboard() {
 
             <div className="bg-gray-800 rounded-lg p-6">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <FaProjectDiagram className="h-8 w-8 text-purple-500" />
+                <div className="flex-shrink-0 relative">
+                  <FaEnvelope className="h-8 w-8 text-yellow-500" />
+                  <NotificationBubble count={notifications.quoteRequests} color="red" size="md" />
                 </div>
                 <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-400">Active Projects</p>
-                  <p className="text-2xl font-bold text-white">{stats?.activeProjects || 0}</p>
+                  <p className="text-sm font-medium text-gray-400">Quote Requests</p>
+                  <p className="text-2xl font-bold text-white">{notifications.quoteRequests}</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-gray-800 rounded-lg p-6">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <FaExclamationTriangle className="h-8 w-8 text-yellow-500" />
+                <div className="flex-shrink-0 relative">
+                  <FaBell className="h-8 w-8 text-blue-500" />
+                  <NotificationBubble count={notifications.clientUpdates} color="blue" size="md" />
                 </div>
                 <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-400">Pending Approvals</p>
-                  <p className="text-2xl font-bold text-white">{stats?.pendingApprovals || 0}</p>
+                  <p className="text-sm font-medium text-gray-400">Client Updates</p>
+                  <p className="text-2xl font-bold text-white">{notifications.clientUpdates}</p>
                 </div>
               </div>
             </div>
@@ -181,9 +468,12 @@ export default function AdminDashboard() {
                   {isFeatureEnabled('admin-users') && (
                     <Link
                       href="/portal/admin/users"
-                      className="flex flex-col items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                      className="flex flex-col items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors relative"
                     >
-                      <FaUsers className="h-8 w-8 text-purple-400 mb-2" />
+                      <div className="relative">
+                        <FaUsers className="h-8 w-8 text-purple-400 mb-2" />
+                        <NotificationBubble count={notifications.clientUpdates} color="blue" size="sm" />
+                      </div>
                       <span className="text-sm text-white">User Management</span>
                     </Link>
                   )}
@@ -191,9 +481,12 @@ export default function AdminDashboard() {
                   {isFeatureEnabled('admin-employees') && (
                     <Link
                       href="/portal/admin/employees"
-                      className="flex flex-col items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                      className="flex flex-col items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors relative"
                     >
-                      <FaUserTie className="h-8 w-8 text-yellow-400 mb-2" />
+                      <div className="relative">
+                        <FaUserTie className="h-8 w-8 text-yellow-400 mb-2" />
+                        <NotificationBubble count={notifications.employeeApprovals} color="red" size="sm" />
+                      </div>
                       <span className="text-sm text-white">Employee Management</span>
                     </Link>
                   )}
@@ -307,52 +600,171 @@ export default function AdminDashboard() {
               <div className="bg-gray-800 rounded-lg p-6 mb-6">
                 <h2 className="text-xl font-semibold text-white mb-4">Pending Actions</h2>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-sm">Employee approvals</p>
-                      <p className="text-gray-400 text-xs">3 pending</p>
+                  {isFeatureEnabled('employee-approvals') && (
+                    <button 
+                      className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                      onClick={() => router.push('/portal/admin/employees')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                        <div className="text-left">
+                          <p className="text-white text-sm">Employee approvals</p>
+                          <p className="text-gray-400 text-xs">{notifications.employeeApprovals} pending</p>
+                        </div>
+                      </div>
+                      <NotificationBubble count={notifications.employeeApprovals} color="red" size="sm" />
+                    </button>
+                  )}
+                  
+                  <button 
+                    className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                    onClick={() => router.push('/portal/admin/quote-requests')}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+                      <div className="text-left">
+                        <p className="text-white text-sm">Quote requests</p>
+                        <p className="text-gray-400 text-xs">{notifications.quoteRequests} new</p>
+                      </div>
                     </div>
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-sm">Quote requests</p>
-                      <p className="text-gray-400 text-xs">5 new</p>
+                    <NotificationBubble count={notifications.quoteRequests} color="yellow" size="sm" />
+                  </button>
+                  
+                  <button 
+                    className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                    onClick={() => router.push('/portal/admin/update-requests')}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                      <div className="text-left">
+                        <p className="text-white text-sm">Update requests</p>
+                        <p className="text-gray-400 text-xs">{notifications.updateRequests} pending</p>
+                      </div>
                     </div>
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white text-sm">System updates</p>
-                      <p className="text-gray-400 text-xs">2 available</p>
-                    </div>
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  </div>
+                    <NotificationBubble count={notifications.updateRequests} color="orange" size="sm" />
+                  </button>
+                  
+                  {isFeatureEnabled('client-management') && (
+                    <button 
+                      className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                      onClick={() => router.push('/portal/admin/update-requests')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        <div className="text-left">
+                          <p className="text-white text-sm">Client updates</p>
+                          <p className="text-gray-400 text-xs">{notifications.updateRequests} linked to update requests</p>
+                        </div>
+                      </div>
+                      <NotificationBubble count={notifications.updateRequests} color="blue" size="sm" />
+                    </button>
+                  )}
+                  
+                  {isFeatureEnabled('system-management') && (
+                    <button 
+                      className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                      onClick={() => router.push('/portal/admin/settings')}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <div className="text-left">
+                          <p className="text-white text-sm">System updates</p>
+                          <p className="text-gray-400 text-xs">{notifications.systemUpdates} available</p>
+                        </div>
+                      </div>
+                      <NotificationBubble count={notifications.systemUpdates} color="green" size="sm" />
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* System Status */}
               <div className="bg-gray-800 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">System Status</h2>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Database</span>
-                    <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Email Service</span>
-                    <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Backup</span>
-                    <span className="text-xs bg-yellow-600 text-white px-2 py-1 rounded">Running</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">Uptime</span>
-                    <span className="text-xs text-white">99.8%</span>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-white">System Status</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        loadSystemHealth();
+                        loadAnalyticsData();
+                        loadServiceStatus();
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                    >
+                      <FaServer className="inline mr-1" />
+                      Refresh Now
+                    </button>
+                    {admin?.email === 'citylife32@outlook.com' && serviceStatus && (
+                      <button
+                        onClick={handleToggleService}
+                        className={`${
+                          serviceStatus.isRunning 
+                            ? 'bg-red-600 hover:bg-red-700' 
+                            : 'bg-green-600 hover:bg-green-700'
+                        } text-white px-3 py-1 rounded text-sm transition-colors`}
+                      >
+                        <FaExclamationTriangle className="inline mr-1" />
+                        {serviceStatus.isRunning ? 'Stop Service' : 'Start Service'}
+                      </button>
+                    )}
                   </div>
                 </div>
+                {systemHealth ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Database</span>
+                      <span className={`text-xs text-white px-2 py-1 rounded ${getStatusColor(systemHealth.services?.database?.status || 'unknown')}`}>
+                        {getStatusText(systemHealth.services?.database?.status || 'unknown')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Email Service</span>
+                      <span className={`text-xs text-white px-2 py-1 rounded ${getStatusColor(systemHealth.services?.email?.status || 'unknown')}`}>
+                        {getStatusText(systemHealth.services?.email?.status || 'unknown')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Authentication</span>
+                      <span className={`text-xs text-white px-2 py-1 rounded ${getStatusColor(systemHealth.services?.authentication?.status || 'unknown')}`}>
+                        {getStatusText(systemHealth.services?.authentication?.status || 'unknown')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Rate Limiting</span>
+                      <span className={`text-xs text-white px-2 py-1 rounded ${getStatusColor(systemHealth.services?.rateLimit?.status || 'unknown')}`}>
+                        {getStatusText(systemHealth.services?.rateLimit?.status || 'unknown')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Uptime</span>
+                      <span className="text-xs text-white">{formatUptime(systemHealth.uptime || 0)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Memory Usage</span>
+                      <span className="text-xs text-white">
+                        {systemHealth.metrics?.memoryUsage ? 
+                          `${Math.round(systemHealth.metrics.memoryUsage.used / 1024 / 1024)}MB` : 
+                          'Unknown'
+                        }
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">Loading...</span>
+                      <span className="text-xs bg-gray-600 text-white px-2 py-1 rounded">...</span>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Emergency Maintenance - Super Admin Only */}
+              {admin?.email === 'citylife32@outlook.com' && (
+                <div className="mt-6">
+                  <EmergencyMaintenanceButton userEmail={admin.email} />
+                </div>
+              )}
             </div>
           </div>
         </div>

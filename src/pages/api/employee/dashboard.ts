@@ -1,6 +1,6 @@
 // Employee Dashboard API
 import { NextApiRequest, NextApiResponse } from 'next';
-import { demoAuthService } from '@/services/DemoAuthService';
+import { simpleAuthService } from '@/services/SimpleAuthService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ success: false, message: 'No token provided' });
     }
 
-    const user = await demoAuthService.verifyToken(token);
+    const user = await simpleAuthService.verifyToken(token);
     
     if (!user || user.role !== 'employee') {
       return res.status(403).json({ success: false, message: 'Access denied' });

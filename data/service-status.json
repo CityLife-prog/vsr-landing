@@ -1,0 +1,22 @@
+{
+  "isRunning": true,
+  "modules": {
+    "analytics": true,
+    "dashboard": true,
+    "userManagement": true,
+    "projectTracker": true,
+    "emailService": true,
+    "authentication": true
+  },
+  "lastUpdated": "2025-07-16T05:00:57.433Z",
+  "updatedBy": "citylife32@outlook.com",
+  "emergencyShutdown": false,
+  "adminNotes": {
+    "analytics": {
+      "message": "Analytics system has been temporarily disabled by super admin",
+      "disabledAt": "2025-07-16T04:59:11.870Z",
+      "disabledBy": "citylife32@outlook.com",
+      "reason": "asdf"
+    }
+  }
+}

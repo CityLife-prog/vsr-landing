@@ -1,309 +1,58 @@
-🚀 VSR Landing Project TODO - Command Reference
+✅ Pre-Deployment To-Do: VSR Client Site (vsrsnow.com)
+🔐 1. Admin & Access Controls
+Task	Detail	Status
+🔑 Secure project owner account	Enable 2FA for kennermatt-cmd and contact@vsrsnow.com Google/Vercel accounts	⬜️
+👥 Team Access in Vercel	Invite contact@vsrsnow.com to the project → assign Admin or Developer role	⬜️
+🔄 Transfer Vercel project or ownership (if Pro plan)	Assign contact@vsrsnow.com as Owner once upgraded	⬜️
+🔒 Limit access to .env values	Ensure .env is not checked into version control (git)	✅
+📁 Back up credentials	Store API keys & passwords in 1Password, Bitwarden, or Google Vault	⬜️
 
-## Current Project Status
+🌐 2. Domain & DNS
+Task	Detail	Status
+🌍 A Record for vsrsnow.com	@ → 76.76.21.21 in Squarespace DNS	⬜️
+🌐 CNAME for www.vsrsnow.com	www → cname.vercel-dns.com	⬜️
+↪️ Redirect www → root domain	Vercel → Domains → Enable redirect	⬜️
+🔁 Flush old Squarespace DNS	Remove legacy CNAMEs, A records not needed for Vercel	⬜️
+🔍 Test propagation	Use dnschecker.org to confirm domain resolves	⬜️
 
-✅ Enterprise Architecture - Complete  
-✅ Frontend Refactoring - Complete  
-✅ Backend Issues - **RESOLVED**  
-✅ Linting/TypeScript Fixes - **COMPLETE**  
-✅ User Management System - **COMPLETE**  
-✅ Portal System - **COMPLETE**  
-🎯 Business Features - New Priority  
+📦 3. Vercel Project Readiness
+Task	Detail	Status
+✅ Production deployment builds successfully	Shown as “Ready” in Vercel dashboard	✅
+📤 Environment variables are set	EMAIL_FROM, EMAIL_PASS, NEXT_PUBLIC_*	✅
+🧪 Test contact/quote form	Test SMTP send works via Gmail	✅
+🔁 Enable automatic redeploy on main	GitHub → Vercel linked properly	✅
+🔒 Restrict Preview Environments (optional)	Only allow team access to preview builds	⬜️
 
----
+🔐 4. Cryptographic & Security Considerations
+Task	Detail	Status
+🔐 Use App Password or OAuth2 for email	No plain Gmail password in .env	✅
+🔒 TLS enabled for domain	Vercel auto-handles this (check for 🔒 HTTPS lock)	✅
+🛑 No secrets in browser-side code	.env vars are server-only unless prefixed with NEXT_PUBLIC_	✅
+🛡️ SPF/DKIM/DMARC configured (optional but best practice)	Prevents spoofing / improves deliverability	⬜️
 
-## ✅ RECENTLY COMPLETED TASKS
+📄 5. Post-Launch Monitoring
+Task	Detail	Status
+🧠 Add Google Analytics or Vercel Analytics	Optional, helps track visitor activity	⬜️
+🧰 Enable logging for emails / form submissions	Save failed delivery attempts or abuse detection	⬜️
+🛎️ Set up uptime monitoring	Use Vercel's or third-party uptime monitor	⬜️
 
-### **Portal System Implementation (January 2025)**
-✅ **Scalable Portal System Created**
-- Updated header navigation with Employee/Admin/Client portals
-- Separate login pages for each user type with proper authentication flows
-- Role-based dashboards with appropriate access levels
-- Professional UI with user-specific color schemes
+📋 Optional Polishing
+Task	Detail	Status
+🎨 Add favicon.ico	For browser tab branding	⬜️
+🧭 Test mobile responsiveness	Use Chrome DevTools → device emulators	✅
+🧪 404 + 500 pages implemented	Custom error UX (optional)	⬜️
+📧 Catch-all email routing	Emails to anything@vsrsnow.com route to catch-all inbox	⬜️
 
-✅ **Text Input Visibility Issues Fixed**
-- Enhanced quote form and apply form input styling
-- Better contrast with `bg-gray-800`, `text-white`, `placeholder:text-gray-400`
-- All forms now have clear, visible text input
+✅ Final Checks Before Announcing Site Live
+ Domain resolves via HTTPS
 
-✅ **WSL2 Development Environment**
-- Updated package.json with `-H 0.0.0.0` for WSL2 accessibility
-- Server now accessible via Windows browser at WSL2 IP address
+ Email sends from contact@vsrsnow.com
 
-✅ **Admin Password Requirements**
-- Removed forced password change after login for testing
-- Set `isPasswordDefault: false` for streamlined development
+ Forms tested
 
-✅ **Business Card System**
-- Created professional business card component with QR code placeholder
-- Added print functionality to admin portal (1, 5, 10, 20, 50 cards)
-- Integrated into admin tools dropdown
+ .env values backed up and private
 
----
+ Admin access secured via 2FA
 
-## ✅ PREVIOUSLY COMPLETED TASKS
+ Ready for client walkthrough or handoff
 
-~~1. Fix Linting/Build Errors (HIGH PRIORITY)~~  
-**/fix --build-errors --explain**  
-✅ **COMPLETED**: All critical ESLint and TypeScript errors resolved
-
-~~2. Enterprise Authentication System~~  
-**/implement --auth-system --jwt --rbac --security**  
-✅ **COMPLETED**: JWT, RBAC, and security infrastructure implemented
-
-~~3. Error Boundary & Resilience Systems~~  
-**/implement --error-boundaries --circuit-breaker --retry-logic**  
-✅ **COMPLETED**: Circuit breakers, retry logic, and error reporting deployed
-
-~~4. CQRS Application Layer~~  
-**/implement --cqrs --application-services --command-handlers**  
-✅ **COMPLETED**: Command/query handlers and application services implemented
-
-~~5. Dependency Injection Container~~  
-**/implement --di-container --ioc --service-registration**  
-✅ **COMPLETED**: Enterprise DI container with service registration
-
-~~6. Enterprise Monitoring & Observability~~  
-**/implement --observability --metrics --tracing --logging**  
-✅ **COMPLETED**: Monitoring, metrics collection, and health checks deployed
-
----
-
-## 🚀 CURRENT IMPLEMENTATION NEEDS
-
-### **Admin Portal Features**
-**Priority: HIGH**
-```bash
-/implement --admin-portal --user-management --employee-approval
-```
-- Complete user management system with CRUD operations
-- Employee approval workflow with status tracking
-- Admin analytics and reporting dashboard
-- System health monitoring and alerts
-
-### **Employee Portal Features**
-**Priority: HIGH**
-```bash
-/implement --employee-portal --tools --project-tracking
-```
-- Time tracking and clock in/out functionality
-- Project assignment and status updates
-- Employee-specific tools and resources
-- Performance metrics and reports
-
-### **Client Portal Features**
-**Priority: MEDIUM**
-```bash
-/implement --client-portal --project-visibility --communication
-```
-- Real-time project progress tracking
-- Photo galleries and documentation access
-- Direct messaging with project teams
-- Invoice and payment history
-
-### **Message Board System**
-**Priority: HIGH**
-```bash
-/implement --message-board --real-time --role-based
-```
-- Real-time messaging between all user types
-- Role-based message visibility (admin, employee, client)
-- File attachments and project-specific threads
-- Notification system for new messages
-
-### **Calendar & Project Tracker**
-**Priority: HIGH**
-```bash
-/implement --calendar --project-tracker --scheduling
-```
-- Shared calendar for all user types
-- Project milestone tracking and deadlines
-- Employee scheduling and availability
-- Client appointment booking
-
----
-
-## 🔄 INTEGRATION REQUIREMENTS
-
-### **Quote Form Enhancement**
-**Priority: MEDIUM**
-```bash
-/implement --quote-form --account-creation --client-portal
-```
-- Add optional client account creation during quote request
-- Automatic client portal access after quote submission
-- Quote status tracking in client dashboard
-- Follow-up communication system
-
-### **API Integration**
-**Priority: HIGH**
-```bash
-/implement --api-integration --authentication --crud-operations
-```
-- Complete API endpoints for all portal functions
-- Authentication middleware for each user type
-- CRUD operations for users, projects, messages
-- Data validation and error handling
-
-### **Database Schema Updates**
-**Priority: HIGH**
-```bash
-/implement --database-schema --user-types --project-data
-```
-- User tables for employees, clients, admins
-- Project tracking with status and progress
-- Message board data structure
-- Calendar and scheduling tables
-
----
-
-## 🎯 BUSINESS LOGIC FEATURES
-
-### **Service Data Collection Form**
-**Priority: MEDIUM**
-```bash
-/implement --service-form --comprehensive-fields --employee-dashboard
-```
-Create detailed service data form for project tracking with:
-- Service Data & Property Code
-- Brief Description of Location
-- Type of Service (A-U dropdown with legend)
-- Time In / Time Out tracking
-- Number of Workers & Worker Types
-- Contract Rate & Total Payable
-- Materials Used (Ice Melt, Deicer, Ice Slicer)
-- Total Hours calculation
-
-### **Service Type Classification System**
-**Priority: MEDIUM**
-```bash
-/implement --service-types --dropdown-legend --A-through-U-codes
-```
-Implement service type dropdown with comprehensive A-U legend system
-
-### **Worker Management with Property Splitting**
-**Priority: MEDIUM**
-```bash
-/implement --worker-tracking --multi-property --type-allocation
-```
-Add ability to split worker numbers and types across multiple properties
-
----
-
-## 🔧 TECHNICAL ENHANCEMENTS
-
-### **Performance Optimization**
-**Priority: MEDIUM**
-```bash
-/optimize --performance --dashboard-loading --image-optimization
-```
-- Dashboard loading optimization
-- Image compression and lazy loading
-- Bundle splitting and code optimization
-- Database query optimization
-
-### **Security Hardening**
-**Priority: HIGH**
-```bash
-/secure --input-validation --sanitization --csrf-protection
-```
-- Form input validation and sanitization
-- CSRF protection for all forms
-- Rate limiting for API endpoints
-- SQL injection prevention
-
-### **Testing Framework**
-**Priority: MEDIUM**
-```bash
-/implement --testing-framework --unit --integration --e2e
-```
-- Unit tests for all components
-- Integration tests for API endpoints
-- End-to-end tests for user workflows
-- Automated testing pipeline
-
----
-
-## 🚀 DEPLOYMENT & PRODUCTION
-
-### **Environment Configuration**
-**Priority: HIGH**
-```bash
-/implement --environment-configs --secrets-management --feature-flags
-```
-- Development, staging, and production environments
-- Environment-specific configuration management
-- Secure secrets management for API keys
-- Feature flags for gradual rollouts
-
-### **Container Configuration**
-**Priority: MEDIUM**
-```bash
-/implement --docker --kubernetes --deployment-configs
-```
-- Docker containers for all services
-- Kubernetes orchestration configurations
-- Auto-scaling and load balancing
-- Health checks and monitoring
-
-### **CI/CD Pipeline**
-**Priority: MEDIUM**
-```bash
-/implement --github-actions --automated-testing --deployment
-```
-- Automated build and testing pipeline
-- Deployment to staging and production
-- Rollback capabilities
-- Performance monitoring
-
----
-
-## 🎯 RECOMMENDED EXECUTION ORDER
-
-### **Phase 1: Complete Portal Functionality (Week 1)**
-```bash
-1. /implement --api-integration --authentication --crud-operations
-2. /implement --database-schema --user-types --project-data
-3. /implement --message-board --real-time --role-based
-4. /implement --calendar --project-tracker --scheduling
-```
-
-### **Phase 2: Business Features (Week 2)**
-```bash
-5. /implement --quote-form --account-creation --client-portal
-6. /implement --service-form --comprehensive-fields
-7. /implement --service-types --dropdown-legend
-8. /implement --worker-tracking --multi-property
-```
-
-### **Phase 3: Production Readiness (Week 3)**
-```bash
-9. /secure --input-validation --sanitization --csrf-protection
-10. /optimize --performance --dashboard-loading
-11. /implement --testing-framework --portal-system
-12. /implement --environment-configs --secrets-management
-```
-
----
-
-## ⚡ IMMEDIATE NEXT STEPS
-
-```bash
-# Priority 1: Make portals functional
-/implement --api-integration --database-schema --authentication
-
-# Priority 2: Add core business features
-/implement --message-board --calendar --project-tracker
-
-# Priority 3: Enhance quote-to-client workflow
-/implement --quote-form --account-creation --client-portal
-
-# Priority 4: Production deployment
-/secure --validate-inputs --optimize-performance --deploy-production
-```
-
-**Current Admin Credentials:**
-- Emails: `marcus@vsrsnow.com`, `citylife32@outlook.com`, `zack@vsrsnow.com`
-- Password: `VSRAdmin2025!`
-
-**Next Action: Implement API endpoints and database integration for portal functionality**

@@ -1,0 +1,89 @@
+{
+  "overview": {
+    "totalVisitors": 2,
+    "visitorChange": 100,
+    "pageViews": 26,
+    "pageViewChange": 100,
+    "quoteRequests": 1,
+    "quoteRequestChange": 100,
+    "conversionRate": 50,
+    "conversionRateChange": 100,
+    "totalLoginAttempts": 26,
+    "successfulLogins": 26,
+    "loginSuccessRate": 100
+  },
+  "topPages": [
+    {
+      "path": "/",
+      "views": 22,
+      "percentage": 84.61538461538461
+    },
+    {
+      "path": "/quote",
+      "views": 3,
+      "percentage": 11.538461538461538
+    },
+    {
+      "path": "/apply",
+      "views": 1,
+      "percentage": 3.8461538461538463
+    }
+  ],
+  "trafficSources": [
+    {
+      "source": "Direct",
+      "visitors": 2,
+      "percentage": 100
+    },
+    {
+      "source": "Google Search",
+      "visitors": 0,
+      "percentage": 0
+    },
+    {
+      "source": "Social Media",
+      "visitors": 0,
+      "percentage": 0
+    },
+    {
+      "source": "QR Code",
+      "visitors": 0,
+      "percentage": 0
+    },
+    {
+      "source": "Referral",
+      "visitors": 0,
+      "percentage": 0
+    }
+  ],
+  "deviceBreakdown": [
+    {
+      "device": "Desktop",
+      "percentage": 100
+    },
+    {
+      "device": "Mobile",
+      "percentage": 0
+    },
+    {
+      "device": "Tablet",
+      "percentage": 0
+    }
+  ],
+  "qrCodeScans": [],
+  "loginAttempts": [
+    {
+      "loginType": "admin",
+      "attempts": 26,
+      "successful": 26,
+      "successRate": 100
+    }
+  ],
+  "historical": {
+    "totalVisitors": 0,
+    "pageViews": 0,
+    "quoteRequests": 0,
+    "conversionRate": 0,
+    "lastUpdateDate": "Tue Jul 15 2025"
+  }
+}

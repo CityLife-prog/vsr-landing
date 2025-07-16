@@ -96,7 +96,7 @@ const ChangePasswordPage: React.FC = () => {
       if (data.success) {
         setSuccess(true);
         setTimeout(() => {
-          router.push('/admin/login');
+          router.push('/portal/admin/login');
         }, 3000);
       } else {
         setError(data.message);
@@ -129,7 +129,7 @@ const ChangePasswordPage: React.FC = () => {
                 </p>
                 <div className="mt-6">
                   <Link
-                    href="/admin/login"
+                    href="/portal/admin/login"
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
                   >
                     Continue to Login
@@ -222,7 +222,7 @@ const ChangePasswordPage: React.FC = () => {
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 bg-white"
                   />
                   <button
                     type="button"
@@ -246,7 +246,7 @@ const ChangePasswordPage: React.FC = () => {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 bg-white"
                   />
                   <button
                     type="button"
@@ -316,7 +316,7 @@ const ChangePasswordPage: React.FC = () => {
               <div className="mt-6">
                 <div className="text-center">
                   <Link
-                    href="/admin"
+                    href="/portal/admin/dashboard"
                     className="text-sm text-blue-600 hover:text-blue-500"
                   >
                     ← Back to Admin Console

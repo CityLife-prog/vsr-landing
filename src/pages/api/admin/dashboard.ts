@@ -4,7 +4,7 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { demoAuthService } from '../../../services/DemoAuthService';
+import { simpleAuthService } from '../../../services/SimpleAuthService';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -19,26 +19,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const token = authHeader.substring(7);
     
-    // Verify token using demo auth service
-    const user = await demoAuthService.verifyToken(token);
+    // Verify token using simple auth service
+    const user = await simpleAuthService.verifyToken(token);
     if (!user || user.role !== 'admin') {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
     switch (method) {
       case 'GET':
-        // Return demo dashboard statistics
+        // Return actual dashboard statistics - clean data for production
         const stats = {
-          totalUsers: 156,
-          totalEmployees: 89,
-          activeProjects: 23,
-          pendingApprovals: 7,
+          totalUsers: 4,
+          totalEmployees: 4,
+          activeProjects: 0,
+          pendingApprovals: 0,
           systemHealth: 'good',
-          recentActivity: [
-            { action: 'User registration', user: 'john.doe@example.com', timestamp: new Date().toISOString() },
-            { action: 'Project updated', user: 'jane.smith@example.com', timestamp: new Date().toISOString() },
-            { action: 'Employee approved', user: 'mike.wilson@example.com', timestamp: new Date().toISOString() }
-          ]
+          recentActivity: [] // No activity yet - will be populated with real data
         };
         
         return res.status(200).json({

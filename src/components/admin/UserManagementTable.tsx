@@ -14,8 +14,10 @@ import {
   FaEdit,
   FaTrash,
   FaEye,
+  FaEyeSlash,
   FaUserCheck,
-  FaUserTimes
+  FaUserTimes,
+  FaKey
 } from 'react-icons/fa';
 import { AdminUser } from '../../types/admin';
 
@@ -35,6 +37,7 @@ interface SortConfig {
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({
   users,
+  onUserUpdate,
   onUserDelete,
   onUserCreate,
   onBulkAction,
@@ -48,6 +51,18 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
   const [itemsPerPage] = useState(10);
   const [filterLevel, setFilterLevel] = useState<'all' | 'super_admin' | 'admin' | 'manager'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [passwordVisibility, setPasswordVisibility] = useState<{[key: string]: boolean}>({});
+  const [newUserData, setNewUserData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    adminLevel: 'manager' as 'super_admin' | 'admin' | 'manager',
+    isActive: true
+  });
 
   useEffect(() => {
     let filtered = users;
@@ -121,6 +136,47 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
     setSelectedUsers(new Set());
   };
 
+  const handleCreateUser = () => {
+    setShowCreateModal(true);
+  };
+
+  const handleEditUser = (user: AdminUser) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleViewUser = (user: AdminUser) => {
+    setSelectedUser(user);
+    setShowViewModal(true);
+  };
+
+  const togglePasswordVisibility = (userId: string) => {
+    setPasswordVisibility(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
+
+  const handleSubmitNewUser = () => {
+    onUserCreate();
+    setShowCreateModal(false);
+    setNewUserData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      adminLevel: 'manager',
+      isActive: true
+    });
+  };
+
+  const handleSubmitEditUser = () => {
+    if (selectedUser) {
+      onUserUpdate(selectedUser.id, selectedUser);
+      setShowEditModal(false);
+      setSelectedUser(null);
+    }
+  };
+
   const getAdminLevelIcon = (level: string) => {
     switch (level) {
       case 'super_admin': return FaShieldAlt;
@@ -178,13 +234,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
           </div>
           
           <div className="flex items-center space-x-2">
-            <button
-              onClick={onUserCreate}
-              className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              <FaPlus />
-              <span>Add User</span>
-            </button>
+            <span className="text-sm text-gray-500">Read-Only View</span>
           </div>
         </div>
 
@@ -224,43 +274,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
         </div>
       </div>
 
-      {/* Bulk Actions */}
-      {selectedUsers.size > 0 && (
-        <div className="px-6 py-3 bg-blue-50 border-b border-blue-200">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-blue-700">
-              {selectedUsers.size} user{selectedUsers.size > 1 ? 's' : ''} selected
-            </span>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handleBulkAction('activate_users')}
-                className="flex items-center space-x-1 text-sm text-green-700 hover:text-green-900"
-              >
-                <FaUserCheck />
-                <span>Activate</span>
-              </button>
-              <button
-                onClick={() => handleBulkAction('deactivate_users')}
-                className="flex items-center space-x-1 text-sm text-yellow-700 hover:text-yellow-900"
-              >
-                <FaUserTimes />
-                <span>Deactivate</span>
-              </button>
-              <button
-                onClick={() => {
-                  if (confirm('Are you sure you want to delete the selected users?')) {
-                    handleBulkAction('delete_users');
-                  }
-                }}
-                className="flex items-center space-x-1 text-sm text-red-700 hover:text-red-900"
-              >
-                <FaTrash />
-                <span>Delete</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Table */}
       {loading ? (
@@ -273,14 +286,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left">
-                  <input
-                    type="checkbox"
-                    checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
-                    onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('firstName')}
@@ -327,7 +332,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Default Password
                 </th>
               </tr>
             </thead>
@@ -337,14 +342,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                 
                 return (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={selectedUsers.has(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -378,33 +375,21 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(user.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => alert(`View user details for ${user.firstName} ${user.lastName}`)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="View Details"
-                        >
-                          <FaEye />
-                        </button>
-                        <button
-                          onClick={() => alert(`Edit user ${user.firstName} ${user.lastName}`)}
-                          className="text-green-600 hover:text-green-900"
-                          title="Edit User"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-                              onUserDelete(user.id);
-                            }
-                          }}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete User"
-                        >
-                          <FaTrash />
-                        </button>
+                        <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2">
+                          <FaKey className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm font-mono text-gray-700">
+                            {passwordVisibility[user.id] ? (user.password || 'demo123') : '••••••••'}
+                          </span>
+                          <button
+                            onClick={() => togglePasswordVisibility(user.id)}
+                            className="ml-2 text-gray-500 hover:text-gray-700"
+                            title={passwordVisibility[user.id] ? 'Hide password' : 'Show password'}
+                          >
+                            {passwordVisibility[user.id] ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -468,6 +453,194 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
               : 'Get started by adding a new user.'
             }
           </p>
+        </div>
+      )}
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Create New User</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  value={newUserData.firstName}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, firstName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={newUserData.lastName}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, lastName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newUserData.email}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Admin Level</label>
+                <select
+                  value={newUserData.adminLevel}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, adminLevel: e.target.value as any }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitNewUser}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Create User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Edit User</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  value={selectedUser.firstName}
+                  onChange={(e) => setSelectedUser(prev => prev ? ({ ...prev, firstName: e.target.value }) : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={selectedUser.lastName}
+                  onChange={(e) => setSelectedUser(prev => prev ? ({ ...prev, lastName: e.target.value }) : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={selectedUser.email}
+                  onChange={(e) => setSelectedUser(prev => prev ? ({ ...prev, email: e.target.value }) : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Admin Level</label>
+                <select
+                  value={selectedUser.adminLevel}
+                  onChange={(e) => setSelectedUser(prev => prev ? ({ ...prev, adminLevel: e.target.value as any }) : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedUser.isActive}
+                    onChange={(e) => setSelectedUser(prev => prev ? ({ ...prev, isActive: e.target.checked }) : null)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">Active</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitEditUser}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View User Modal */}
+      {showViewModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">User Details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <p className="text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <p className="text-gray-900">{selectedUser.email}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Admin Level</label>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getAdminLevelColor(selectedUser.adminLevel)}`}>
+                  {selectedUser.adminLevel.replace('_', ' ').toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Status</label>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                  selectedUser.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {selectedUser.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Last Login</label>
+                <p className="text-gray-900">{selectedUser.lastLoginAt ? formatTimeAgo(selectedUser.lastLoginAt) : 'Never'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Created</label>
+                <p className="text-gray-900">{formatDate(selectedUser.createdAt)}</p>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

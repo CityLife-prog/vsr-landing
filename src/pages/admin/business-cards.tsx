@@ -3,118 +3,24 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FaPrint, FaArrowLeft, FaPalette, FaQrcode, FaDownload } from 'react-icons/fa';
 import BusinessCard from '../../components/BusinessCard';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const BusinessCardsPage: React.FC = () => {
   const router = useRouter();
-  const [isPrinting, setIsPrinting] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [textColor, setTextColor] = useState('text-gray-800');
-  const [qrCode, setQrCode] = useState<'qr-code.png' | 'qrcode.svg'>('qr-code.png');
-  const frontCardsRef = useRef<HTMLDivElement>(null);
-  const backCardsRef = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  
+  // Derived values based on mode
+  const textColor = mode === 'light' ? 'text-gray-800' : 'text-white';
+  const qrCode = mode === 'light' ? 'qrcode.svg' : 'qr-code.png';
+  const cardBackground = mode === 'light' ? 'bg-white' : 'bg-gray-900';
 
-  const handlePrint = () => {
-    setIsPrinting(true);
-    // Give time for the state to update before printing
-    setTimeout(() => {
-      window.print();
-      setIsPrinting(false);
-    }, 200);
-  };
-
-  const generatePDF = async () => {
-    setIsGeneratingPDF(true);
-    
-    try {
-      // Create a new PDF document (8.5" x 11" - letter size)
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'in',
-        format: 'letter'
-      });
-
-      // Generate front cards page
-      if (frontCardsRef.current) {
-        const frontCanvas = await html2canvas(frontCardsRef.current, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff'
-        });
-        
-        const frontImgData = frontCanvas.toDataURL('image/png');
-        const imgWidth = 8.5;
-        const imgHeight = (frontCanvas.height * imgWidth) / frontCanvas.width;
-        
-        pdf.addImage(frontImgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      }
-
-      // Add a new page for back cards
-      pdf.addPage();
-      
-      // Generate back cards page
-      if (backCardsRef.current) {
-        const backCanvas = await html2canvas(backCardsRef.current, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff'
-        });
-        
-        const backImgData = backCanvas.toDataURL('image/png');
-        const imgWidth = 8.5;
-        const imgHeight = (backCanvas.height * imgWidth) / backCanvas.width;
-        
-        pdf.addImage(backImgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      }
-
-      // Save the PDF
-      pdf.save('VSR-Business-Cards.pdf');
-      
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
-  const generateFrontCards = () => {
-    const cards = [];
-    for (let i = 0; i < 10; i++) {
-      cards.push(
-        <div key={`front-${i}`} className="pdf-card-container" style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          width: '3.5in',
-          height: '2in'
-        }}>
-          <BusinessCard side="front" className="pdf-card" textColor={textColor} qrCode={qrCode} />
-        </div>
-      );
-    }
-    return cards;
-  };
-
-  const generateBackCards = () => {
-    const cards = [];
-    for (let i = 0; i < 10; i++) {
-      cards.push(
-        <div key={`back-${i}`} className="pdf-card-container" style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          width: '3.5in',
-          height: '2in'
-        }}>
-          <BusinessCard side="back" className="pdf-card" textColor={textColor} qrCode={qrCode} />
-        </div>
-      );
-    }
-    return cards;
+  const downloadPDF = () => {
+    const filename = mode === 'light' ? 'Light_BusinessCard.pdf' : 'Dark_BusinessCard.pdf';
+    const link = document.createElement('a');
+    link.href = `/${filename}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -145,11 +51,10 @@ const BusinessCardsPage: React.FC = () => {
             width: 3.5in;
             height: 2in;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 2px solid #1f2937;
+            border-radius: 0;
             margin: 0;
             padding: 12px;
-            background: white;
           }
           
           .print-section {
@@ -183,11 +88,10 @@ const BusinessCardsPage: React.FC = () => {
               width: 3.5in !important;
               height: 2in !important;
               box-shadow: none !important;
-              border: 1px solid #000 !important;
+              border: 2px solid #000 !important;
               transform: none !important;
               margin: 0 !important;
-              border-radius: 0.25rem !important;
-              background: white !important;
+              border-radius: 0 !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
@@ -237,32 +141,13 @@ const BusinessCardsPage: React.FC = () => {
             <div className="flex items-center justify-between py-6">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => router.push('/admin')}
+                  onClick={() => router.push('/portal/admin/dashboard')}
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                 >
                   <FaArrowLeft />
                   <span>Back to Admin Dashboard</span>
                 </button>
                 <h1 className="text-2xl font-bold text-gray-900">Business Card Dashboard</h1>
-              </div>
-              <div className="flex space-x-4">
-                <button
-                  onClick={handlePrint}
-                  disabled={isPrinting}
-                  className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 font-medium"
-                >
-                  <FaPrint />
-                  <span>{isPrinting ? 'Preparing...' : 'Print Cards'}</span>
-                </button>
-                
-                <button
-                  onClick={generatePDF}
-                  disabled={isGeneratingPDF}
-                  className="flex items-center space-x-2 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 font-medium"
-                >
-                  <FaDownload />
-                  <span>{isGeneratingPDF ? 'Generating PDF...' : 'Download PDF'}</span>
-                </button>
               </div>
             </div>
           </div>
@@ -272,46 +157,42 @@ const BusinessCardsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
           <div className="bg-gray-50 rounded-lg p-6 mb-6 admin-form">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Customization Controls</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Text Color Control */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   <FaPalette className="inline mr-2" />
-                  Text Color
+                  Card Theme
                 </label>
-                <select
-                  value={textColor}
-                  onChange={(e) => setTextColor(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                >
-                  <option value="text-gray-800">Black</option>
-                  <option value="text-gray-300">Gray</option>
-                  <option value="text-white">White</option>
-                  <option value="text-blue-800">Blue</option>
-                  <option value="text-red-800">Red</option>
-                  <option value="text-green-800">Green</option>
-                  <option value="text-purple-800">Purple</option>
-                  <option value="text-indigo-800">Indigo</option>
-                </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setMode('light')}
+                    className={`flex items-center justify-center py-3 px-4 border-2 rounded-lg transition-all ${
+                      mode === 'light'
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-lg font-medium">Light Mode</div>
+                      <div className="text-xs mt-1">Black text • White background</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setMode('dark')}
+                    className={`flex items-center justify-center py-3 px-4 border-2 rounded-lg transition-all ${
+                      mode === 'dark'
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-lg font-medium">Dark Mode</div>
+                      <div className="text-xs mt-1">White text • Dark background</div>
+                    </div>
+                  </button>
+                </div>
               </div>
-
-              {/* QR Code Control */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaQrcode className="inline mr-2" />
-                  QR Code
-                </label>
-                <select
-                  value={qrCode}
-                  onChange={(e) => setQrCode(e.target.value as 'qr-code.png' | 'qrcode.svg')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                >
-                  <option value="qr-code.png">QR Code (PNG)</option>
-                  <option value="qrcode.svg">QR Code (SVG)</option>
-                </select>
-              </div>
-
             </div>
           </div>
         </div>
@@ -324,83 +205,66 @@ const BusinessCardsPage: React.FC = () => {
             <div className="flex flex-col lg:flex-row justify-center items-center gap-12">
               <div className="text-center">
                 <h3 className="text-md font-medium text-gray-700 mb-4">Front Side</h3>
-                <BusinessCard side="front" textColor={textColor} qrCode={qrCode} />
+                <BusinessCard side="front" textColor={textColor} qrCode={qrCode} cardBackground={cardBackground} />
               </div>
               <div className="text-center">
                 <h3 className="text-md font-medium text-gray-700 mb-4">Back Side</h3>
-                <BusinessCard side="back" textColor={textColor} qrCode={qrCode} />
+                <BusinessCard side="back" textColor={textColor} qrCode={qrCode} cardBackground={cardBackground} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Print Section */}
+        {/* Printable Document Download */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="bg-white rounded-lg shadow border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Print Layout</h2>
-            
-            {/* Page 1: Front Cards */}
-            <div className="mb-8">
-              <h3 className="text-md font-medium text-gray-700 mb-4">Page 1 - Front Cards</h3>
-              <div 
-                ref={frontCardsRef}
-                className="pdf-layout-grid"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridTemplateRows: 'repeat(5, 1fr)',
-                  gap: '0.25in',
-                  width: '8.5in',
-                  height: '11in',
-                  padding: '0.5in',
-                  backgroundColor: '#ffffff',
-                  margin: '0 auto'
-                }}
-              >
-                {generateFrontCards()}
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Printable Business Cards</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {/* Thumbnail */}
+                <div className="w-24 h-32 bg-gray-100 border-2 border-gray-300 rounded-lg overflow-hidden relative">
+                  <iframe 
+                    src={`/${mode === 'light' ? 'Light_BusinessCard.pdf' : 'Dark_BusinessCard.pdf'}#toolbar=0&navpanes=0&scrollbar=0`}
+                    className="w-full h-full transform scale-50 origin-top-left"
+                    style={{ width: '200%', height: '200%' }}
+                    title="PDF Preview"
+                  />
+                  <div className="absolute bottom-1 left-1 right-1 bg-black bg-opacity-75 text-white text-xs text-center py-1 rounded">
+                    {mode === 'light' ? 'Light' : 'Dark'} PDF
+                  </div>
+                </div>
+                
+                {/* Document Info */}
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">VSR Business Cards - Print Template</h3>
+                  <p className="text-sm text-gray-600 mb-2">Printable PDF with 10 cards per page (2 pages: front & back)</p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Standard business card size (3.5" × 2")</li>
+                    <li>• High-resolution 300 DPI</li>
+                    <li>• Ready for professional printing</li>
+                    <li>• Includes cut lines and bleed marks</li>
+                    {mode === 'dark' && (
+                      <li className="text-orange-600 font-medium">• Dark mode uses white text on transparent background - choose dark cardstock for best results</li>
+                    )}
+                  </ul>
+                </div>
               </div>
-            </div>
-            
-            {/* Page 2: Back Cards */}
-            <div>
-              <h3 className="text-md font-medium text-gray-700 mb-4">Page 2 - Back Cards</h3>
-              <div 
-                ref={backCardsRef}
-                className="pdf-layout-grid"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridTemplateRows: 'repeat(5, 1fr)',
-                  gap: '0.25in',
-                  width: '8.5in',
-                  height: '11in',
-                  padding: '0.5in',
-                  backgroundColor: '#ffffff',
-                  margin: '0 auto'
-                }}
-              >
-                {generateBackCards()}
+              
+              {/* Download Button */}
+              <div className="text-right">
+                <button
+                  onClick={downloadPDF}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium text-lg"
+                >
+                  <FaDownload />
+                  <span>Download PDF</span>
+                </button>
+                <p className="text-xs text-gray-500 mt-2">Click to generate printable PDF</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Print Area (Only visible when printing) */}
-        <div className="print-section">
-          {/* Page 1: Front Cards */}
-          <div className="print-page">
-            <div className="print-cards-grid">
-              {generateFrontCards()}
-            </div>
-          </div>
-          
-          {/* Page 2: Back Cards */}
-          <div className="print-page">
-            <div className="print-cards-grid">
-              {generateBackCards()}
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );

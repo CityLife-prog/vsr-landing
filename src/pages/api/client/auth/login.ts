@@ -3,7 +3,7 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { demoAuthService } from '../../../../services/DemoAuthService';
+import { simpleAuthService } from '../../../../services/SimpleAuthService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const result = await demoAuthService.login(email, password);
+    const result = await simpleAuthService.login(email, password);
 
     if (!result.success) {
       return res.status(401).json({ 

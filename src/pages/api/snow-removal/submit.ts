@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { demoAuthService } from '@/services/DemoAuthService';
+import { simpleAuthService } from '@/services/SimpleAuthService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const token = authHeader.split(' ')[1];
     
     // Verify the token
-    const user = await demoAuthService.verifyToken(token);
+    const user = await simpleAuthService.verifyToken(token);
     if (!user || (user.role !== 'employee' && user.role !== 'admin')) {
       return res.status(401).json({ error: 'Unauthorized' });
     }

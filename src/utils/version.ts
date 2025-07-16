@@ -43,7 +43,7 @@ export const isFeatureEnabled = (feature: string): boolean => {
     'employee-profile': ['v1', 'v4'],
     'client-portal': ['v1', 'v3', 'v4'],
     'client-dashboard': ['v1', 'v3', 'v4'],
-    'admin-users': ['v1', 'v2', 'v3', 'v4'], // Include in v2
+    'admin-users': ['v3', 'v4'], // Moved to v3+
     'admin-employees': ['v1', 'v3', 'v4'],
     'admin-projects': ['v1', 'v3', 'v4'],
     'admin-dashboard-full': ['v1', 'v3', 'v4'],
@@ -55,12 +55,17 @@ export const isFeatureEnabled = (feature: string): boolean => {
     'admin-system': ['v1', 'v4'],
     'admin-employee-tools': ['v1', 'v4'],
     'admin-website-content': ['v1', 'v4'],
-    'projects-page': ['v1', 'v3', 'v4'],
+    'projects-page': ['v1', 'v2', 'v3', 'v4'], // Enable projects page in v2 with full screen map
     'socials': ['v1', 'v3', 'v4'],
     'galleries': ['v1', 'v3', 'v4'],
     
     // v2 Features: Landing page + Admin portal (business cards, analytics, admin profile, user management) ONLY
     'portal-coming-soon': ['v2'], // Only show "coming soon" in v2
+    
+    // Employee approvals moved to v3+
+    'employee-approvals': ['v3', 'v4'],
+    'client-management': ['v3', 'v4'],
+    'system-management': ['v4'],
     
     // Additional v4 only features
     'client-messages': ['v4'],
@@ -100,6 +105,7 @@ export const getVersionInfo = () => {
         'Admin business cards tool',
         'Admin analytics dashboard',
         'Admin profile management',
+        'Quote and update request management',
         'Portal coming soon messages for employee/client'
       ]
     },

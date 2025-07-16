@@ -7,13 +7,16 @@ import About from '@/components/About';
 import Featured from '@/components/Featured';
 import Services from '@/components/Services';
 import NowHiring from '@/components/NowHiring';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export default function Home() {
   console.log("Rendering Home Page");
+  
+  // Initialize analytics tracking
+  useAnalytics();
 
   return (
     <>
-
       <main>
           <Hero />
           <Featured />

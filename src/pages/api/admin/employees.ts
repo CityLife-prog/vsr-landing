@@ -8,9 +8,17 @@ import { AdminUserService } from '../../../services/AdminUserService';
 import { withAdminAuth } from '../../../middleware/withAdminAuth';
 import { ADMIN_PERMISSIONS } from '../../../types/admin';
 
+interface AdminApiRequest extends NextApiRequest {
+  user?: {
+    id: string;
+    email: string;
+    adminLevel: string;
+  };
+}
+
 const adminService = new AdminUserService();
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: AdminApiRequest, res: NextApiResponse) {
   const { method } = req;
   const { employeeId, action } = req.query;
 

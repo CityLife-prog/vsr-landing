@@ -3,9 +3,12 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaShieldAlt } from 'react-icons/fa';
+import PasswordChangeModal from '../../../components/admin/PasswordChangeModal';
+import { useAnalyticsContext } from '../../../components/AnalyticsProvider';
 
 export default function AdminLogin() {
   const router = useRouter();
+  const { trackLoginAttempt } = useAnalyticsContext();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -13,6 +16,8 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
+  const [pendingUser, setPendingUser] = useState<any>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,48 +44,67 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('accessToken', data.token);
-        router.push('/portal/admin/dashboard');
+        // Track successful login
+        trackLoginAttempt('admin', true);
+        
+        if (data.requiresPasswordChange) {
+          // Store user info and show password change modal
+          setPendingUser(data.user);
+          setShowPasswordChangeModal(true);
+        } else {
+          // Normal login - proceed to dashboard
+          localStorage.setItem('accessToken', data.token);
+          router.push('/portal/admin/dashboard');
+        }
       } else {
+        // Track failed login
+        trackLoginAttempt('admin', false);
         setError(data.message || 'Login failed');
       }
     } catch (err) {
+      // Track failed login due to network error
+      trackLoginAttempt('admin', false);
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    setError('');
+  const handlePasswordChange = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+    if (!pendingUser) return false;
 
     try {
-      const response = await fetch('/api/demo/login', {
+      const response = await fetch('/api/admin/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          email: 'demo.admin@vsrsnow.com', 
-          password: 'demo123' 
+        body: JSON.stringify({
+          email: pendingUser.email,
+          currentPassword,
+          newPassword
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
+        // Password changed successfully - store token and redirect
         localStorage.setItem('accessToken', data.token);
+        setShowPasswordChangeModal(false);
+        setPendingUser(null);
         router.push('/portal/admin/dashboard');
+        return true;
       } else {
-        setError(data.message || 'Demo login failed');
+        setError(data.message || 'Password change failed');
+        return false;
       }
     } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setIsLoading(false);
+      setError('Network error during password change. Please try again.');
+      return false;
     }
   };
+
 
   return (
     <>
@@ -184,19 +208,6 @@ export default function AdminLogin() {
             </div>
 
             <div className="text-center space-y-4">
-              <div className="border-t border-gray-600 pt-4">
-                <p className="text-xs text-gray-500 mb-2">Demo Access (Development Only)</p>
-                <button
-                  onClick={handleDemoLogin}
-                  disabled={isLoading}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                >
-                  🚀 One-Click Admin Demo
-                </button>
-                <p className="text-xs text-gray-500 mt-1">
-                  Demo User: demo.admin@vsrsnow.com | Password: demo123
-                </p>
-              </div>
               
               <Link
                 href="/portal/admin/forgot-password"
@@ -208,6 +219,18 @@ export default function AdminLogin() {
           </form>
         </div>
       </div>
+
+      {/* Password Change Modal */}
+      <PasswordChangeModal
+        isOpen={showPasswordChangeModal}
+        onClose={() => {
+          setShowPasswordChangeModal(false);
+          setPendingUser(null);
+        }}
+        onSubmit={handlePasswordChange}
+        userEmail={pendingUser?.email || ''}
+        isFirstLogin={true}
+      />
     </>
   );
 }

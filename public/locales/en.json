@@ -1,0 +1,243 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "services": "Services",
+    "projects": "Projects",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "dashboard": "Dashboard"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "projects": "Projects",
+    "contact": "Contact",
+    "quote": "Get Quote",
+    "hiring": "Now Hiring",
+    "admin": "Admin",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "hero": {
+    "title": "Built for Every Season. Trusted in Every Service.",
+    "subtitle": "VSR LLC provides reliable commercial and residential services throughout the Denver Metro Area",
+    "cta": "Get Free Quote",
+    "learn_more": "Learn More"
+  },
+  "services": {
+    "title": "Our Services",
+    "coming_soon": "Gallery coming soon!",
+    "snow_removal": {
+      "title": "Snow & Ice Removal",
+      "description": "Reliable winter maintenance for commercial properties."
+    },
+    "landscaping": {
+      "title": "Landscaping, Arboring & Hardscaping",
+      "description": "Full-service yard transformation and maintenance."
+    },
+    "concrete": {
+      "title": "Concrete & Asphalt Repairs",
+      "description": "Patching, sealing, and surface restoration."
+    },
+    "demolition": {
+      "title": "Demolition",
+      "description": "Safe and clean demolition for residential and commercial sites."
+    },
+    "painting": {
+      "title": "Painting",
+      "description": "Interior and exterior painting for long-lasting appeal."
+    }
+  },
+  "quote": {
+    "title": "Request a Quote",
+    "page_title": "Request a Quote",
+    "description": "Let us know what services you need and we'll get back to you with a custom quote.",
+    "success": "Quote submitted successfully!",
+    "error": "Submission failed. Please try again.",
+    "network_error": "Network error. Please try again.",
+    "form": {
+      "name": "Full Name",
+      "name_placeholder": "John Doe",
+      "email": "Email Address",
+      "email_placeholder": "you@example.com",
+      "phone": "Phone Number",
+      "phone_placeholder": "(123) 456-7890",
+      "service_class": "Service Class",
+      "service_class_placeholder": "Select Service Class",
+      "commercial": "Commercial",
+      "residential": "Residential",
+      "service_type": "Service Requested",
+      "service_type_placeholder": "Select Service",
+      "service_options": {
+        "snow_ice": "Snow and Ice Removal (Commercial Only)",
+        "landscaping": "Landscaping / Hardscaping",
+        "concrete": "Concrete / Asphalt Repairs",
+        "demolition": "Demolition",
+        "painting": "Painting",
+        "other": "Other"
+      },
+      "details": "Additional Details",
+      "details_placeholder": "Describe your project...",
+      "photos": "Upload Files or Photos (optional)",
+      "choose_files": "Choose Files",
+      "add_more_files": "Add More Files",
+      "files_selected": "file(s) selected",
+      "selected_files": "Selected Files:",
+      "clear_all": "Clear All",
+      "remove": "Remove",
+      "submit": "Submit Request",
+      "file_too_large": "File {{filename}} is too large. Please select files under 10MB."
+    },
+    "update_form": {
+      "title": "Update the VSR Team",
+      "description": "Keep us informed about your project progress, questions, or concerns",
+      "contract_id": "Contract ID (if known)",
+      "contract_id_placeholder": "Enter your contract ID",
+      "job_description": "Job Description",
+      "job_description_placeholder": "Brief description of your project...",
+      "reason_for_contact": "Reason for Contact",
+      "reason_placeholder": "Select reason",
+      "reason_options": {
+        "files": "Sending Files, Photos, & Notes",
+        "meeting": "Meeting Request",
+        "account": "Account Creation"
+      },
+      "notes": "Notes",
+      "notes_placeholder": "Additional notes, questions, or concerns...",
+      "submit": "Send Update",
+      "success": "Update sent successfully! We'll be in touch soon.",
+      "error": "Error sending update. Please try again."
+    }
+  },
+  "admin": {
+    "title": "Admin Portal",
+    "login": {
+      "title": "Admin Login",
+      "email": "Email",
+      "password": "Password",
+      "remember_me": "Remember Me",
+      "forgot_password": "Forgot Password?",
+      "submit": "Sign In"
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "quote_requests": "Quote Requests",
+      "projects": "Projects",
+      "users": "Users",
+      "analytics": "Analytics"
+    },
+    "quotes": {
+      "title": "Quote Requests",
+      "status": {
+        "pending": "Pending",
+        "review": "Review",
+        "quoted": "Quoted",
+        "accepted": "Accepted",
+        "declined": "Declined"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Business Hours"
+  },
+  "about": {
+    "description": "Established in 2021, VSR LLC was founded with one goal: to deliver dependable, high-quality property maintenance all year round. From commercial snow removal to full-scale landscaping, hardscaping, demolition, and concrete work — we're the team businesses trust to show up, do it right, and treat every job like it's our own.",
+    "learn_more": "More About Us"
+  },
+  "projects": {
+    "title": "Our Projects",
+    "description": "Explore our work across the Denver Metro area. Map shows general service areas grouped by zip codes.",
+    "description_detailed": "Explore our recent and ongoing work across the Denver Metro area. Projects are grouped by service area for privacy and security.",
+    "privacy_notice_title": "Privacy Notice",
+    "privacy_notice_text": "Project locations are grouped by zipcode areas to protect client privacy. Exact addresses are only available to authorized personnel.",
+    "service_areas": "Service Areas",
+    "zipcode": "Zipcode",
+    "projects": "Projects",
+    "services": "Services",
+    "map_title": "Service Area Map",
+    "map_disclaimer": "* Map shows general service areas only. Exact project locations are confidential.",
+    "stats": {
+      "total_projects": "Total Projects",
+      "service_areas": "Service Areas",
+      "services_offered": "Services Offered"
+    },
+    "service_names": {
+      "snow_removal": "Snow Removal",
+      "landscaping": "Landscaping",
+      "concrete_work": "Concrete Work",
+      "demolition": "Demolition",
+      "painting": "Painting",
+      "commercial_snow_removal": "Commercial Snow Removal",
+      "asphalt_repairs": "Asphalt Repairs",
+      "hardscaping": "Hardscaping",
+      "residential_landscaping": "Residential Landscaping"
+    },
+    "featured_title": "Featured Project",
+    "featured_description": "Check out our latest commercial snow removal client in Aurora Colorado.",
+    "view_all": "View All Projects"
+  },
+  "hiring": {
+    "title": "We're Hiring!",
+    "description": "Join the VSR team this season. We're looking for snow removal pros, drivers, and general crew members.",
+    "apply_today": "Apply Today"
+  },
+  "footer": {
+    "tagline": "Built for Every Season. Ready for Every Challenge.",
+    "view_projects": "View Projects",
+    "get_quote": "Get a Quote",
+    "apply_now": "Apply Now",
+    "socials_not_available": "Socials are not yet available.",
+    "socials_coming_soon": "Socials coming soon!",
+    "back_to_top": "Back to Top",
+    "web_development": "Web Development Contact",
+    "copyright": "© 2025 VSR LLC. All rights reserved.",
+    "privacy_policy": "Privacy Policy",
+    "terms_conditions": "Terms & Conditions",
+    "accessibility": "Accessibility Statement"
+  },
+  "apply": {
+    "title": "Apply Today",
+    "success": "Application submitted successfully!",
+    "error": "Submission failed. Please try again.",
+    "network_error": "An error occurred. Please try again.",
+    "form": {
+      "name": "Full Name",
+      "name_placeholder": "John Doe",
+      "email": "Email Address",
+      "email_placeholder": "you@example.com",
+      "phone": "Phone",
+      "phone_placeholder": "(123) 456-7890",
+      "experience": "Experience",
+      "experience_placeholder": "Provide a brief overview of your experience...",
+      "resume": "Resume",
+      "submit": "Submit Application"
+    }
+  },
+  "help": {
+    "client_update": "Client Update",
+    "contact_team": "Contact VSR Team",
+    "need_help": "Need Help?"
+  }
+}

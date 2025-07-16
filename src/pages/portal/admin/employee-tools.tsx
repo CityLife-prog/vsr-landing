@@ -194,6 +194,25 @@ export default function EmployeeTools() {
             </div>
           </div>
 
+          {/* Project Locations Map */}
+          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Project Locations</h2>
+            <p className="text-gray-600 mb-4">View current project locations and employee assignments across the service area.</p>
+            <div className="w-full h-96 rounded-lg overflow-hidden border border-gray-300">
+              <iframe
+                src="https://www.google.com/maps/d/u/2/embed?mid=1aVdr54uGZGF0ODBmkjRGUnVu8FPc_Is&ehbc=2E312F"
+                width="100%"
+                height="100%"
+                allowFullScreen
+                loading="lazy"
+                style={{ border: 0 }}
+              />
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              * Map shows active project locations for employee coordination and resource allocation.
+            </p>
+          </div>
+
           {/* Quick Actions */}
           <div className="mt-8 bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>

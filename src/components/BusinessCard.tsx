@@ -6,13 +6,15 @@ interface BusinessCardProps {
   side?: 'front' | 'back';
   textColor?: string;
   qrCode?: 'qr-code.png' | 'qrcode.svg';
+  cardBackground?: string;
 }
 
 const BusinessCard: React.FC<BusinessCardProps> = ({ 
   className = '', 
   side = 'front', 
   textColor = 'text-gray-800', 
-  qrCode = 'qr-code.png' 
+  qrCode = 'qr-code.png',
+  cardBackground = 'bg-white'
 }) => {
   // Helper function to get matching bullet color for text color
   const getBulletColor = (textColor: string) => {
@@ -20,6 +22,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
       case 'text-white': return 'bg-white';
       case 'text-gray-800': return 'bg-gray-800';
       case 'text-gray-300': return 'bg-gray-300';
+      case 'text-gray-400': return 'bg-gray-400';
       case 'text-blue-800': return 'bg-blue-800';
       case 'text-red-800': return 'bg-red-800';
       case 'text-green-800': return 'bg-green-800';
@@ -30,7 +33,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
   };
   if (side === 'back') {
     return (
-      <div className={`bg-white shadow-lg rounded-lg p-3 border ${className}`} style={{ width: '3.5in', height: '2in' }}>
+      <div className={`${cardBackground} shadow-lg p-3 border-2 border-gray-800 ${className}`} style={{ width: '3.5in', height: '2in' }}>
         <div className="h-full flex flex-col justify-between">
           {/* Top section with services and QR code */}
           <div className="flex justify-between">
@@ -56,7 +59,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
                 </li>
                 <li className="flex items-center">
                   <span className={`w-1.5 h-1.5 rounded-full mr-2 ${getBulletColor(textColor)}`}></span>
-                  Painting
+                  Tree & Stump Removal
                 </li>
                 <li className="flex items-center">
                   <span className={`w-1.5 h-1.5 rounded-full mr-2 ${getBulletColor(textColor)}`}></span>
@@ -96,7 +99,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
   }
 
   return (
-    <div className={`bg-white shadow-lg rounded-lg p-3 border ${className}`} style={{ width: '3.5in', height: '2in' }}>
+    <div className={`${cardBackground} shadow-lg p-3 border-2 border-gray-800 ${className}`} style={{ width: '3.5in', height: '2in' }}>
       <div className="h-full flex flex-col justify-between">
         {/* Top section with company name and contact info */}
         <div className="flex items-center justify-between">

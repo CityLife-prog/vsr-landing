@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { FaSnowflake, FaMapMarkerAlt, FaCalendarAlt, FaTools, FaFileExcel } from 'react-icons/fa';
+import { FaSnowflake, FaMapMarkerAlt, FaCalendarAlt, FaTools, FaFileExcel, FaArrowLeft } from 'react-icons/fa';
 
 interface SnowRemovalForm {
   propertyCode: string;
@@ -214,10 +214,11 @@ export default function SnowRemovalTool() {
                   <span>Export to Excel</span>
                 </button>
                 <button
-                  onClick={() => router.back()}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  onClick={() => router.push('/portal/admin/dashboard')}
+                  className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
-                  Back to Dashboard
+                  <FaArrowLeft className="h-4 w-4" />
+                  <span>Back to Admin Dashboard</span>
                 </button>
               </div>
             </div>

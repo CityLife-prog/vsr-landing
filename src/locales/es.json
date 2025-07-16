@@ -1,0 +1,166 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "services": "Servicios",
+    "projects": "Proyectos",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "services": "Servicios",
+    "projects": "Proyectos",
+    "contact": "Contacto",
+    "quote": "Cotización",
+    "admin": "Admin",
+    "employee": "Empleado",
+    "client": "Cliente",
+    "hiring": "Contratando"
+  },
+  "hero": {
+    "title": "Construido para Todas las Estaciones. Confiable en Todos los Servicios.",
+    "subtitle": "VSR LLC proporciona servicios confiables comerciales y residenciales en toda el área metropolitana de Denver",
+    "cta": "Cotización Gratuita",
+    "learn_more": "Saber Más"
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "coming_soon": "¡Galería próximamente!",
+    "snow_removal": {
+      "title": "Remoción de Nieve y Hielo",
+      "description": "Remoción profesional de nieve y hielo para propiedades comerciales y residenciales"
+    },
+    "landscaping": {
+      "title": "Paisajismo",
+      "description": "Servicios completos de diseño, instalación y mantenimiento de paisajes"
+    },
+    "concrete": {
+      "title": "Concreto y Asfalto",
+      "description": "Trabajo de concreto, reparación de asfalto y servicios de pavimentación"
+    },
+    "demolition": {
+      "title": "Demolición",
+      "description": "Servicios de demolición seguros y eficientes para todos los tamaños de proyecto"
+    },
+    "tree_removal": {
+      "title": "Remoción de Árboles y Tocones",
+      "description": "Servicios profesionales de remoción de árboles y trituración de tocones"
+    },
+    "painting": {
+      "title": "Pintura",
+      "description": "Pintura interior y exterior para propiedades residenciales y comerciales"
+    }
+  },
+  "quote": {
+    "title": "Obtenga Su Cotización Gratuita",
+    "description": "Déjanos saber qué servicios necesitas y te responderemos con una cotización personalizada.",
+    "form": {
+      "name": "Nombre Completo",
+      "name_placeholder": "Juan Pérez",
+      "email": "Dirección de Correo Electrónico",
+      "email_placeholder": "tu@ejemplo.com",
+      "phone": "Número de Teléfono",
+      "phone_placeholder": "(123) 456-7890",
+      "service_type": "Tipo de Servicio",
+      "service_class": "Clase de Servicio",
+      "service_class_placeholder": "Seleccionar Clase de Servicio",
+      "service_placeholder": "Seleccionar Servicio",
+      "commercial": "Comercial",
+      "residential": "Residencial",
+      "details": "Detalles Adicionales",
+      "details_placeholder": "Describe tu proyecto...",
+      "photos": "Subir Archivos o Fotos (opcional)",
+      "submit": "Solicitar Cotización",
+      "choose_files": "Elegir Archivos",
+      "add_more_files": "Agregar Más Archivos"
+    },
+    "success": "¡Solicitud de cotización enviada exitosamente! Nos pondremos en contacto con usted dentro de 24 horas.",
+    "error": "Error al enviar la solicitud de cotización. Por favor, inténtelo de nuevo.",
+    "network_error": "Error de red. Por favor, inténtelo de nuevo."
+  },
+  "admin": {
+    "title": "Portal de Admin",
+    "login": {
+      "title": "Inicio de Sesión Admin",
+      "email": "Correo",
+      "password": "Contraseña",
+      "remember_me": "Recordarme",
+      "forgot_password": "¿Olvidó su contraseña?",
+      "submit": "Iniciar Sesión"
+    },
+    "dashboard": {
+      "title": "Panel de Admin",
+      "quote_requests": "Solicitudes de Cotización",
+      "projects": "Proyectos",
+      "users": "Usuarios",
+      "analytics": "Análisis"
+    },
+    "quotes": {
+      "title": "Solicitudes de Cotización",
+      "status": {
+        "pending": "Pendiente",
+        "review": "Revisión",
+        "quoted": "Cotizado",
+        "accepted": "Aceptado",
+        "declined": "Rechazado"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "address": "Dirección",
+    "hours": "Horario de Atención",
+    "founder": "Fundador/CEO",
+    "co_owner": "Copropietario",
+    "web_development": "Desarrollo Web"
+  },
+  "about": {
+    "description": "Establecida en 2021, VSR LLC fue fundada con un objetivo: brindar mantenimiento de propiedades confiable y de alta calidad durante todo el año. Desde remoción comercial de nieve hasta paisajismo completo, hardscaping, demolición y trabajo de concreto — somos el equipo en el que las empresas confían para aparecer, hacerlo bien y tratar cada trabajo como si fuera nuestro.",
+    "learn_more": "Más Sobre Nosotros"
+  },
+  "projects": {
+    "featured_title": "Proyecto Destacado",
+    "featured_description": "Consulta nuestro último cliente de remoción comercial de nieve en Aurora Colorado.",
+    "view_all": "Ver Todos los Proyectos"
+  },
+  "hiring": {
+    "title": "¡Estamos Contratando!",
+    "description": "Únete al equipo VSR esta temporada. Buscamos profesionales de remoción de nieve, conductores y miembros generales del equipo.",
+    "apply_today": "Aplicar Hoy"
+  },
+  "footer": {
+    "tagline": "Construido para Todas las Estaciones. Listo para Todos los Desafíos.",
+    "view_projects": "Ver Proyectos",
+    "get_quote": "Obtener Cotización",
+    "apply_now": "Aplicar Ahora",
+    "socials_not_available": "Las redes sociales aún no están disponibles.",
+    "socials_coming_soon": "¡Redes sociales próximamente!",
+    "back_to_top": "Volver Arriba",
+    "web_development": "Contacto de Desarrollo Web",
+    "copyright": "© 2025 VSR LLC. Todos los derechos reservados.",
+    "privacy_policy": "Política de Privacidad",
+    "terms_conditions": "Términos y Condiciones",
+    "accessibility": "Declaración de Accesibilidad"
+  }
+}

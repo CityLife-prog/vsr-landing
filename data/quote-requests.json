@@ -1,0 +1,43 @@
+[
+  {
+    "id": "qr_1752641503323_96s0p3jdl",
+    "fullName": "Matthew Kenner",
+    "email": "citylife32@outlook.com",
+    "phone": "(720) 525-5659",
+    "serviceClass": "not-specified",
+    "service": "snow-ice-removal",
+    "details": "Full client flow experience",
+    "photoFiles": [],
+    "status": "accepted",
+    "submittedAt": "2025-07-16T04:51:43.323Z",
+    "submittedBy": "Matthew Kenner",
+    "ipAddress": "127.0.0.1",
+    "userAgent": "node",
+    "reviewedAt": "2025-07-16T04:52:01.404Z",
+    "quotedAt": "2025-07-16T04:52:26.730Z",
+    "updatedAt": "2025-07-16T05:01:48.027Z",
+    "updatedBy": "test@vsrsnow.com",
+    "adminNotes": "This is a test",
+    "quotedAmount": 2500,
+    "estimatedValue": 2500
+  },
+  {
+    "id": "qr_1752546579533_3g56zb5sy",
+    "fullName": "Pre-Deploy Test",
+    "email": "test@test.com",
+    "phone": "(111) 111-1111",
+    "serviceClass": "not-specified",
+    "service": "snow-ice-removal",
+    "details": "This is  a test",
+    "photoFiles": [],
+    "status": "review",
+    "submittedAt": "2025-07-15T02:29:39.533Z",
+    "submittedBy": "Pre-Deploy Test",
+    "ipAddress": "127.0.0.1",
+    "userAgent": "node",
+    "updatedAt": "2025-07-16T04:49:15.394Z",
+    "updatedBy": "citylife32@outlook.com",
+    "reviewedAt": "2025-07-16T04:48:57.978Z",
+    "quotedAt": "2025-07-16T04:49:02.274Z"
+  }
+]

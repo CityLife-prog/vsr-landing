@@ -84,6 +84,7 @@ export interface QuoteData {
   fullName: string;
   email: string;
   phone: string;
+  serviceClass: string;
   service: string;
   details: string;
 }
@@ -121,6 +122,15 @@ export function validateQuoteData(fields: Record<string, unknown>, files: Record
     errors.push('Valid phone number is required (10 digits)');
   } else {
     data.phone = phoneValidation.sanitized;
+  }
+
+  // Validate service class
+  const allowedServiceClasses = ['commercial', 'residential'];
+  const serviceClass = sanitizeText(Array.isArray(fields.serviceClass) ? fields.serviceClass[0] : fields.serviceClass);
+  if (!serviceClass || !allowedServiceClasses.includes(serviceClass)) {
+    errors.push('Please select a valid service class');
+  } else {
+    data.serviceClass = serviceClass;
   }
 
   // Validate service

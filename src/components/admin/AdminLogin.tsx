@@ -6,14 +6,23 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { DEFAULT_ADMIN_USERS } from '../../types/admin';
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Load remembered email on component mount
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedAdminEmail');
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,16 +35,26 @@ const AdminLogin: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('accessToken', data.token);
+        // Handle Remember Me functionality
+        if (rememberMe) {
+          localStorage.setItem('rememberedAdminEmail', email);
+          // Set longer token expiry for remember me
+          localStorage.setItem('accessToken', data.token);
+          localStorage.setItem('rememberMeToken', 'true');
+        } else {
+          localStorage.removeItem('rememberedAdminEmail');
+          localStorage.setItem('accessToken', data.token);
+          localStorage.removeItem('rememberMeToken');
+        }
         
-        if (data.requiresPasswordChange) {
-          router.push(`/admin/change-password?email=${encodeURIComponent(email)}&forced=true`);
+        if (data.requiresPasswordChange || data.requiresPasswordReset) {
+          router.push(`/portal/admin/change-password?email=${encodeURIComponent(email)}&forced=true`);
         } else {
           router.push('/portal/admin/dashboard');
         }
@@ -53,10 +72,6 @@ const AdminLogin: React.FC = () => {
     }
   };
 
-  const quickLogin = (adminEmail: string) => {
-    setEmail(adminEmail);
-    setPassword('demo123');
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -124,9 +139,22 @@ const AdminLogin: React.FC = () => {
             )}
 
             <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
               <div className="text-sm">
                 <Link
-                  href="/admin/forgot-password"
+                  href="/portal/admin/forgot-password"
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Forgot your password?
@@ -146,32 +174,6 @@ const AdminLogin: React.FC = () => {
           </form>
 
 
-          {/* Demo Quick Login Options */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Demo Quick Login</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 gap-3">
-              {DEFAULT_ADMIN_USERS.map((admin) => (
-                <button
-                  key={admin.email}
-                  onClick={() => quickLogin(admin.email)}
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                >
-                  <span className="sr-only">Sign in as</span>
-                  <span className="text-sm">
-                    {admin.firstName} {admin.lastName} ({admin.adminLevel.replace('_', ' ')})
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="mt-6">
             <div className="text-center">

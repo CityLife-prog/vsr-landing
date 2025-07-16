@@ -1,0 +1,50 @@
+[
+  {
+    "id": "admin-citylife32",
+    "email": "citylife32@outlook.com",
+    "password": "SFHooah19!",
+    "firstName": "Matthew",
+    "lastName": "Kenner",
+    "role": "admin",
+    "status": "active",
+    "requiresPasswordReset": false,
+    "isFirstLogin": false,
+    "lastLoginAt": "2025-07-16T05:16:12.054Z"
+  },
+  {
+    "id": "admin-zach",
+    "email": "zach@vsrsnow.com",
+    "password": "VSRZach2025!",
+    "firstName": "Zach",
+    "lastName": "Lewis",
+    "role": "admin",
+    "status": "active",
+    "requiresPasswordReset": false,
+    "isFirstLogin": true,
+    "lastLoginAt": "2025-07-16T04:55:48.938Z"
+  },
+  {
+    "id": "admin-marcus",
+    "email": "marcus@vsrsnow.com",
+    "password": "VSRMarcus2025!",
+    "firstName": "Marcus",
+    "lastName": "Vargas",
+    "role": "admin",
+    "status": "active",
+    "requiresPasswordReset": true,
+    "isFirstLogin": true,
+    "lastLoginAt": "2025-07-16T04:54:49.237Z"
+  },
+  {
+    "id": "admin-test-firstlogin",
+    "email": "test@vsrsnow.com",
+    "password": "SFHooah19!",
+    "firstName": "Test",
+    "lastName": "User",
+    "role": "admin",
+    "status": "active",
+    "requiresPasswordReset": false,
+    "isFirstLogin": false,
+    "lastLoginAt": "2025-07-16T05:02:24.310Z"
+  }
+]

@@ -11,22 +11,22 @@ import {
 } from '../../application/cqrs/Query';
 
 export class InMemoryQueryDispatcher implements QueryDispatcher {
-  private handlers = new Map<string, QueryHandler<Query<unknown>, unknown>>();
+  private handlers = new Map<string, QueryHandler<Query, unknown>>();
   private cache?: QueryCache;
 
   constructor(cache?: QueryCache) {
     this.cache = cache;
   }
 
-  register<TQuery extends Query<TResult>, TResult = unknown>(
+  register<TQuery extends Query, TResult = unknown>(
     queryType: new (...args: unknown[]) => TQuery,
     handler: QueryHandler<TQuery, TResult>
   ): void {
     const queryName = queryType.name;
-    this.handlers.set(queryName, handler as QueryHandler<Query<unknown>, unknown>);
+    this.handlers.set(queryName, handler as QueryHandler<Query, unknown>);
   }
 
-  async dispatch<TQuery extends Query<TResult>, TResult = unknown>(
+  async dispatch<TQuery extends Query, TResult = unknown>(
     query: TQuery
   ): Promise<TResult> {
     const queryName = query.constructor.name;
@@ -59,14 +59,14 @@ export class InMemoryQueryDispatcher implements QueryDispatcher {
     return result;
   }
 
-  private isCacheable(query: Query<unknown>): boolean {
+  private isCacheable(query: Query): boolean {
     // Add logic to determine if query should be cached
     // For example, exclude real-time queries or user-specific queries
     const nonCacheableQueries = ['GetRealtimeQuoteStatusQuery', 'GetUserSessionQuery'];
     return !nonCacheableQueries.includes(query.constructor.name);
   }
 
-  private generateCacheKey(query: Query<unknown>): string {
+  private generateCacheKey(query: Query): string {
     const queryName = query.constructor.name;
     const queryData = JSON.stringify({
       filters: query.filters,
@@ -77,7 +77,7 @@ export class InMemoryQueryDispatcher implements QueryDispatcher {
     return `query:${queryName}:${Buffer.from(queryData).toString('base64')}`;
   }
 
-  private getCacheTTL(query: Query<unknown>): number {
+  private getCacheTTL(query: Query): number {
     // Different TTL for different query types
     const ttlMap: Record<string, number> = {
       'GetQuoteListQuery': 300, // 5 minutes

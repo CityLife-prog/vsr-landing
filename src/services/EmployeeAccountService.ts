@@ -41,7 +41,7 @@ export class EmployeeAccountService {
 
   constructor() {
     this.initializeEmailTransporter();
-    this.loadSampleEmployees();
+    // this.loadSampleEmployees(); // Removed for production - no sample data
   }
 
   /**
@@ -596,5 +596,13 @@ export class EmployeeAccountService {
       suspended: employees.filter(emp => emp.status === 'suspended').length,
       unverified: employees.filter(emp => emp.verificationStatus === 'unverified').length
     };
+  }
+
+  /**
+   * Restore employee account (used for database cleanup)
+   */
+  async restoreEmployee(employeeData: EmployeeAccount): Promise<EmployeeAccount> {
+    this.employeeAccounts.set(employeeData.id, employeeData);
+    return employeeData;
   }
 }

@@ -1,0 +1,243 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "services": "Servicios",
+    "projects": "Proyectos",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "services": "Servicios",
+    "projects": "Proyectos",
+    "contact": "Contacto",
+    "quote": "Cotización",
+    "hiring": "Contratando",
+    "admin": "Admin",
+    "employee": "Empleado",
+    "client": "Cliente"
+  },
+  "hero": {
+    "title": "Construido para Todas las Estaciones. Confiable en Todos los Servicios.",
+    "subtitle": "VSR LLC proporciona servicios confiables comerciales y residenciales en toda el área metropolitana de Denver",
+    "cta": "Cotización Gratuita",
+    "learn_more": "Saber Más"
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "coming_soon": "¡Galería próximamente!",
+    "snow_removal": {
+      "title": "Remoción de Nieve y Hielo",
+      "description": "Mantenimiento invernal confiable para propiedades comerciales."
+    },
+    "landscaping": {
+      "title": "Paisajismo, Arboricultura y Hardscaping",
+      "description": "Transformación y mantenimiento completo de jardines."
+    },
+    "concrete": {
+      "title": "Reparaciones de Concreto y Asfalto",
+      "description": "Parchado, sellado y restauración de superficies."
+    },
+    "demolition": {
+      "title": "Demolición",
+      "description": "Demolición segura y limpia para sitios residenciales y comerciales."
+    },
+    "painting": {
+      "title": "Pintura",
+      "description": "Pintura interior y exterior para un atractivo duradero."
+    }
+  },
+  "quote": {
+    "title": "Solicitar Cotización",
+    "page_title": "Solicitar Cotización",
+    "description": "Déjanos saber qué servicios necesitas y te responderemos con una cotización personalizada.",
+    "success": "¡Cotización enviada exitosamente!",
+    "error": "Error en el envío. Por favor, inténtelo de nuevo.",
+    "network_error": "Error de red. Por favor, inténtelo de nuevo.",
+    "form": {
+      "name": "Nombre Completo",
+      "name_placeholder": "Juan Pérez",
+      "email": "Dirección de Correo Electrónico",
+      "email_placeholder": "tu@ejemplo.com",
+      "phone": "Número de Teléfono",
+      "phone_placeholder": "(123) 456-7890",
+      "service_class": "Clase de Servicio",
+      "service_class_placeholder": "Seleccionar Clase de Servicio",
+      "commercial": "Comercial",
+      "residential": "Residencial",
+      "service_type": "Servicio Solicitado",
+      "service_type_placeholder": "Seleccionar Servicio",
+      "service_options": {
+        "snow_ice": "Remoción de Nieve y Hielo (Solo Comercial)",
+        "landscaping": "Paisajismo / Hardscaping",
+        "concrete": "Reparaciones de Concreto / Asfalto",
+        "demolition": "Demolición",
+        "painting": "Pintura",
+        "other": "Otro"
+      },
+      "details": "Detalles Adicionales",
+      "details_placeholder": "Describe tu proyecto...",
+      "photos": "Subir Archivos o Fotos (opcional)",
+      "choose_files": "Elegir Archivos",
+      "add_more_files": "Agregar Más Archivos",
+      "files_selected": "archivo(s) seleccionado(s)",
+      "selected_files": "Archivos Seleccionados:",
+      "clear_all": "Limpiar Todo",
+      "remove": "Eliminar",
+      "submit": "Enviar Solicitud",
+      "file_too_large": "El archivo {{filename}} es demasiado grande. Por favor, seleccione archivos menores a 10MB."
+    },
+    "update_form": {
+      "title": "Actualizar al Equipo VSR",
+      "description": "Manténganos informados sobre el progreso de su proyecto, preguntas o inquietudes",
+      "contract_id": "ID del Contrato (si lo conoce)",
+      "contract_id_placeholder": "Ingrese su ID de contrato",
+      "job_description": "Descripción del Trabajo",
+      "job_description_placeholder": "Breve descripción de su proyecto...",
+      "reason_for_contact": "Motivo del Contacto",
+      "reason_placeholder": "Seleccionar motivo",
+      "reason_options": {
+        "files": "Enviando Archivos, Fotos y Notas",
+        "meeting": "Solicitud de Reunión",
+        "account": "Creación de Cuenta"
+      },
+      "notes": "Notas",
+      "notes_placeholder": "Notas adicionales, preguntas o inquietudes...",
+      "submit": "Enviar Actualización",
+      "success": "¡Actualización enviada exitosamente! Nos pondremos en contacto pronto.",
+      "error": "Error al enviar la actualización. Por favor, inténtelo de nuevo."
+    }
+  },
+  "admin": {
+    "title": "Portal de Admin",
+    "login": {
+      "title": "Inicio de Sesión Admin",
+      "email": "Correo",
+      "password": "Contraseña",
+      "remember_me": "Recordarme",
+      "forgot_password": "¿Olvidó su contraseña?",
+      "submit": "Iniciar Sesión"
+    },
+    "dashboard": {
+      "title": "Panel de Admin",
+      "quote_requests": "Solicitudes de Cotización",
+      "projects": "Proyectos",
+      "users": "Usuarios",
+      "analytics": "Análisis"
+    },
+    "quotes": {
+      "title": "Solicitudes de Cotización",
+      "status": {
+        "pending": "Pendiente",
+        "review": "Revisión",
+        "quoted": "Cotizado",
+        "accepted": "Aceptado",
+        "declined": "Rechazado"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "address": "Dirección",
+    "hours": "Horario de Atención"
+  },
+  "about": {
+    "description": "Establecida en 2021, VSR LLC fue fundada con un objetivo: brindar mantenimiento de propiedades confiable y de alta calidad durante todo el año. Desde remoción comercial de nieve hasta paisajismo completo, hardscaping, demolición y trabajo de concreto — somos el equipo en el que las empresas confían para aparecer, hacerlo bien y tratar cada trabajo como si fuera nuestro.",
+    "learn_more": "Más Sobre Nosotros"
+  },
+  "projects": {
+    "title": "Nuestros Proyectos",
+    "description": "Explore nuestro trabajo en el área metropolitana de Denver. El mapa muestra áreas de servicio generales agrupadas por códigos postales.",
+    "description_detailed": "Explore nuestro trabajo reciente y en curso en el área metropolitana de Denver. Los proyectos están agrupados por área de servicio por privacidad y seguridad.",
+    "privacy_notice_title": "Aviso de Privacidad",
+    "privacy_notice_text": "Las ubicaciones de los proyectos están agrupadas por áreas de código postal para proteger la privacidad del cliente. Las direcciones exactas solo están disponibles para personal autorizado.",
+    "service_areas": "Áreas de Servicio",
+    "zipcode": "Código Postal",
+    "projects": "Proyectos",
+    "services": "Servicios",
+    "map_title": "Mapa de Área de Servicio",
+    "map_disclaimer": "* El mapa muestra solo áreas de servicio generales. Las ubicaciones exactas de los proyectos son confidenciales.",
+    "stats": {
+      "total_projects": "Proyectos Totales",
+      "service_areas": "Áreas de Servicio",
+      "services_offered": "Servicios Ofrecidos"
+    },
+    "service_names": {
+      "snow_removal": "Remoción de Nieve",
+      "landscaping": "Paisajismo",
+      "concrete_work": "Trabajo de Concreto",
+      "demolition": "Demolición",
+      "painting": "Pintura",
+      "commercial_snow_removal": "Remoción Comercial de Nieve",
+      "asphalt_repairs": "Reparaciones de Asfalto",
+      "hardscaping": "Hardscaping",
+      "residential_landscaping": "Paisajismo Residencial"
+    },
+    "featured_title": "Proyecto Destacado",
+    "featured_description": "Consulta nuestro último cliente de remoción comercial de nieve en Aurora Colorado.",
+    "view_all": "Ver Todos los Proyectos"
+  },
+  "hiring": {
+    "title": "¡Estamos Contratando!",
+    "description": "Únete al equipo VSR esta temporada. Buscamos profesionales de remoción de nieve, conductores y miembros generales del equipo.",
+    "apply_today": "Aplicar Hoy"
+  },
+  "footer": {
+    "tagline": "Construido para Todas las Estaciones. Listo para Todos los Desafíos.",
+    "view_projects": "Ver Proyectos",
+    "get_quote": "Obtener Cotización",
+    "apply_now": "Aplicar Ahora",
+    "socials_not_available": "Las redes sociales aún no están disponibles.",
+    "socials_coming_soon": "¡Redes sociales próximamente!",
+    "back_to_top": "Volver Arriba",
+    "web_development": "Contacto de Desarrollo Web",
+    "copyright": "© 2025 VSR LLC. Todos los derechos reservados.",
+    "privacy_policy": "Política de Privacidad",
+    "terms_conditions": "Términos y Condiciones",
+    "accessibility": "Declaración de Accesibilidad"
+  },
+  "apply": {
+    "title": "Aplicar Hoy",
+    "success": "¡Solicitud enviada exitosamente!",
+    "error": "Error en el envío. Por favor, inténtelo de nuevo.",
+    "network_error": "Ocurrió un error. Por favor, inténtelo de nuevo.",
+    "form": {
+      "name": "Nombre Completo",
+      "name_placeholder": "Juan Pérez",
+      "email": "Dirección de Correo Electrónico",
+      "email_placeholder": "tu@ejemplo.com",
+      "phone": "Teléfono",
+      "phone_placeholder": "(123) 456-7890",
+      "experience": "Experiencia",
+      "experience_placeholder": "Proporcione una breve descripción de su experiencia...",
+      "resume": "Currículum",
+      "submit": "Enviar Solicitud"
+    }
+  },
+  "help": {
+    "client_update": "Actualización del Cliente",
+    "contact_team": "Contactar Equipo VSR",
+    "need_help": "¿Necesita Ayuda?"
+  }
+}

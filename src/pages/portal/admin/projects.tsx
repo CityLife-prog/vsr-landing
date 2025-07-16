@@ -8,6 +8,7 @@ import { FaArrowLeft, FaEdit, FaEye, FaPlus, FaTimes } from 'react-icons/fa';
 interface Project {
   id: string;
   title: string;
+  propertyCode?: string;
   client: string;
   serviceClass: 'commercial' | 'residential';
   serviceType: string;
@@ -17,6 +18,17 @@ interface Project {
   createdDate: string;
   lastUpdated: string;
   adminNotes?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  contact?: {
+    name: string;
+    phone: string;
+    email: string;
+  };
 }
 
 export default function AdminProjects() {
@@ -32,11 +44,24 @@ export default function AdminProjects() {
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState<Project | null>(null);
   const [newProjectData, setNewProjectData] = useState({
     title: '',
+    propertyCode: '',
     client: '',
     serviceClass: 'commercial' as 'commercial' | 'residential',
     serviceType: 'snow-ice-removal',
     statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
-    showStatusBar: true
+    showStatusBar: true,
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: ''
+    },
+    contact: {
+      name: '',
+      phone: '',
+      email: ''
+    },
+    adminNotes: ''
   });
 
   useEffect(() => {
@@ -72,61 +97,147 @@ export default function AdminProjects() {
     }
   };
 
-  const loadProjects = () => {
-    // Mock project data
-    const mockProjects: Project[] = [
-      {
-        id: '1',
-        title: 'Commercial Snow Removal - Office Complex',
-        client: 'ABC Corporation',
-        serviceClass: 'commercial',
-        serviceType: 'snow-ice-removal',
-        currentStatus: 3,
-        statusLabels: ['Quote Request', 'Quote Response', 'Contract Signed', 'Service Active', 'Service Complete'],
-        showStatusBar: false, // Long-term contract
-        createdDate: '2024-01-15',
-        lastUpdated: '2024-01-20',
-        adminNotes: 'Priority client - requires weekly updates'
-      },
-      {
-        id: '2',
-        title: 'Residential Landscaping Project',
-        client: 'John Smith',
-        serviceClass: 'residential',
-        serviceType: 'landscaping',
-        currentStatus: 2,
-        statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Service Phase 1', 'Service Phase 2', 'Service Complete'],
-        showStatusBar: true,
-        createdDate: '2024-01-10',
-        lastUpdated: '2024-01-18',
-        adminNotes: 'Client requested specific plant varieties'
-      },
-      {
-        id: '3',
-        title: 'Commercial Concrete Repair',
-        client: 'XYZ Industries',
-        serviceClass: 'commercial',
-        serviceType: 'concrete-asphalt',
-        currentStatus: 1,
-        statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
-        showStatusBar: true,
-        createdDate: '2024-01-12',
-        lastUpdated: '2024-01-16',
-        adminNotes: 'Requires special equipment - coordinate with team lead'
+  const loadProjects = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return;
       }
-    ];
-    setProjects(mockProjects);
+
+      const response = await fetch('/api/admin/projects', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data.projects);
+      } else {
+        // Fallback to mock data if API fails
+        const mockProjects: Project[] = [
+          {
+            id: '1',
+            title: 'Commercial Snow Removal - Office Complex',
+            propertyCode: 'COM-001',
+            client: 'ABC Corporation',
+            serviceClass: 'commercial',
+            serviceType: 'snow-ice-removal',
+            currentStatus: 3,
+            statusLabels: ['Quote Request', 'Quote Response', 'Contract Signed', 'Service Active', 'Service Complete'],
+            showStatusBar: false, // Long-term contract
+            createdDate: '2024-01-15',
+            lastUpdated: '2024-01-20',
+            adminNotes: 'Priority client - requires weekly updates',
+            address: {
+              street: '123 Business Park Dr',
+              city: 'Grand Rapids',
+              state: 'MI',
+              zipCode: '49503'
+            },
+            contact: {
+              name: 'John Manager',
+              phone: '(616) 555-0123',
+              email: 'john@abccorp.com'
+            }
+          },
+          {
+            id: '2',
+            title: 'Residential Landscaping Project',
+            propertyCode: 'RES-002',
+            client: 'John Smith',
+            serviceClass: 'residential',
+            serviceType: 'landscaping',
+            currentStatus: 2,
+            statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Service Phase 1', 'Service Phase 2', 'Service Complete'],
+            showStatusBar: true,
+            createdDate: '2024-01-10',
+            lastUpdated: '2024-01-18',
+            adminNotes: 'Client requested specific plant varieties',
+            address: {
+              street: '456 Maple Street',
+              city: 'Wyoming',
+              state: 'MI',
+              zipCode: '49509'
+            },
+            contact: {
+              name: 'John Smith',
+              phone: '(616) 555-0456',
+              email: 'john.smith@email.com'
+            }
+          },
+          {
+            id: '3',
+            title: 'Commercial Concrete Repair',
+            propertyCode: 'COM-003',
+            client: 'XYZ Industries',
+            serviceClass: 'commercial',
+            serviceType: 'concrete-asphalt',
+            currentStatus: 1,
+            statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
+            showStatusBar: true,
+            createdDate: '2024-01-12',
+            lastUpdated: '2024-01-16',
+            adminNotes: 'Requires special equipment - coordinate with team lead',
+            address: {
+              street: '789 Industrial Blvd',
+              city: 'Kentwood',
+              state: 'MI',
+              zipCode: '49512'
+            },
+            contact: {
+              name: 'Mike Supervisor',
+              phone: '(616) 555-0789',
+              email: 'mike@xyzindustries.com'
+            }
+          }
+        ];
+        setProjects(mockProjects);
+      }
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+    }
   };
 
-  const handleStatusChange = (projectId: string, newStatus: number, photos?: File[], notes?: string, adminNotes?: string) => {
-    setProjects(prev => prev.map(project => 
-      project.id === projectId 
-        ? { ...project, currentStatus: newStatus, lastUpdated: new Date().toISOString().split('T')[0], adminNotes }
-        : project
-    ));
+  const handleStatusChange = async (projectId: string, newStatus: number, photos?: File[], notes?: string, adminNotes?: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return;
+      }
 
-    // Here you would typically send the update to your backend
-    console.log('Status updated:', { projectId, newStatus, photos, notes, adminNotes });
+      // Update locally first for immediate UI feedback
+      setProjects(prev => prev.map(project => 
+        project.id === projectId 
+          ? { ...project, currentStatus: newStatus, lastUpdated: new Date().toISOString().split('T')[0], adminNotes }
+          : project
+      ));
+
+      // Send update to backend
+      const response = await fetch(`/api/admin/projects/${projectId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          currentStatus: newStatus,
+          lastUpdated: new Date().toISOString().split('T')[0],
+          adminNotes,
+          statusNotes: notes
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to update project status');
+        // Reload projects to revert if update failed
+        await loadProjects();
+      }
+    } catch (error) {
+      console.error('Error updating project status:', error);
+      // Reload projects to revert if update failed
+      await loadProjects();
+    }
   };
 
   const getServiceClassBadge = (serviceClass: string) => {
@@ -151,41 +262,108 @@ export default function AdminProjects() {
     setShowNewProjectModal(true);
   };
 
-  const handleCreateProject = () => {
-    const newProject: Project = {
-      id: (projects.length + 1).toString(),
-      title: newProjectData.title,
-      client: newProjectData.client,
-      serviceClass: newProjectData.serviceClass,
-      serviceType: newProjectData.serviceType,
-      currentStatus: 0,
-      statusLabels: newProjectData.statusLabels,
-      showStatusBar: newProjectData.showStatusBar,
-      createdDate: new Date().toISOString().split('T')[0],
-      lastUpdated: new Date().toISOString().split('T')[0]
-    };
+  const handleCreateProject = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return;
+      }
 
-    setProjects(prev => [...prev, newProject]);
-    setShowNewProjectModal(false);
-    setNewProjectData({
-      title: '',
-      client: '',
-      serviceClass: 'commercial',
-      serviceType: 'snow-ice-removal',
-      statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
-      showStatusBar: true
-    });
+      const projectData = {
+        title: newProjectData.title,
+        propertyCode: newProjectData.propertyCode,
+        client: newProjectData.client,
+        serviceClass: newProjectData.serviceClass,
+        serviceType: newProjectData.serviceType,
+        statusLabels: newProjectData.statusLabels,
+        showStatusBar: newProjectData.showStatusBar,
+        address: newProjectData.address,
+        contact: newProjectData.contact,
+        adminNotes: newProjectData.adminNotes
+      };
+
+      const response = await fetch('/api/admin/projects', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(projectData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(prev => [...prev, data.project]);
+      } else {
+        // Fallback to local creation if API fails
+        const newProject: Project = {
+          id: (projects.length + 1).toString(),
+          title: newProjectData.title,
+          propertyCode: newProjectData.propertyCode,
+          client: newProjectData.client,
+          serviceClass: newProjectData.serviceClass,
+          serviceType: newProjectData.serviceType,
+          currentStatus: 0,
+          statusLabels: newProjectData.statusLabels,
+          showStatusBar: newProjectData.showStatusBar,
+          createdDate: new Date().toISOString().split('T')[0],
+          lastUpdated: new Date().toISOString().split('T')[0],
+          address: newProjectData.address,
+          contact: newProjectData.contact,
+          adminNotes: newProjectData.adminNotes
+        };
+        setProjects(prev => [...prev, newProject]);
+      }
+
+      setShowNewProjectModal(false);
+      setNewProjectData({
+        title: '',
+        propertyCode: '',
+        client: '',
+        serviceClass: 'commercial',
+        serviceType: 'snow-ice-removal',
+        statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
+        showStatusBar: true,
+        address: {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: ''
+        },
+        contact: {
+          name: '',
+          phone: '',
+          email: ''
+        },
+        adminNotes: ''
+      });
+    } catch (error) {
+      console.error('Error creating project:', error);
+    }
   };
 
   const handleCancelNewProject = () => {
     setShowNewProjectModal(false);
     setNewProjectData({
       title: '',
+      propertyCode: '',
       client: '',
       serviceClass: 'commercial',
       serviceType: 'snow-ice-removal',
       statusLabels: ['Quote Request', 'Quote Response', 'Scheduled Review', 'Started Service', 'Service Complete'],
-      showStatusBar: true
+      showStatusBar: true,
+      address: {
+        street: '',
+        city: '',
+        state: '',
+        zipCode: ''
+      },
+      contact: {
+        name: '',
+        phone: '',
+        email: ''
+      },
+      adminNotes: ''
     });
   };
 
@@ -481,66 +659,218 @@ export default function AdminProjects() {
         {/* New Project Modal */}
         {showNewProjectModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Create New Project</h2>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* Basic Project Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Project Title
+                    </label>
+                    <input
+                      type="text"
+                      value={newProjectData.title}
+                      onChange={(e) => setNewProjectData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                      placeholder="Enter project title"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Property Code (If applicable)
+                    </label>
+                    <input
+                      type="text"
+                      value={newProjectData.propertyCode}
+                      onChange={(e) => setNewProjectData(prev => ({ ...prev, propertyCode: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                      placeholder="Property code (optional)"
+                    />
+                  </div>
+                </div>
+
+                {/* Client and Service Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Client Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newProjectData.client}
+                      onChange={(e) => setNewProjectData(prev => ({ ...prev, client: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                      placeholder="Enter client name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Service Class
+                    </label>
+                    <select
+                      value={newProjectData.serviceClass}
+                      onChange={(e) => setNewProjectData(prev => ({ ...prev, serviceClass: e.target.value as 'commercial' | 'residential' }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                    >
+                      <option value="commercial">Commercial</option>
+                      <option value="residential">Residential</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Service Type
+                    </label>
+                    <select
+                      value={newProjectData.serviceType}
+                      onChange={(e) => setNewProjectData(prev => ({ ...prev, serviceType: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                    >
+                      <option value="snow-ice-removal">Snow & Ice Removal</option>
+                      <option value="landscaping">Landscaping</option>
+                      <option value="concrete-asphalt">Concrete & Asphalt</option>
+                      <option value="demolition">Demolition</option>
+                      <option value="painting">Painting</option>
+                      <option value="general-construction">General Construction</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Address Section */}
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Project Address</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Street Address
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectData.address.street}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          address: { ...prev.address, street: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="Enter street address"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectData.address.city}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          address: { ...prev.address, city: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="City"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectData.address.state}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          address: { ...prev.address, state: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="State"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        ZIP Code
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectData.address.zipCode}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          address: { ...prev.address, zipCode: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="ZIP Code"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Section */}
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Contact Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectData.contact.name}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          contact: { ...prev.contact, name: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="Contact person"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={newProjectData.contact.phone}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          contact: { ...prev.contact, phone: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="(123) 456-7890"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={newProjectData.contact.email}
+                        onChange={(e) => setNewProjectData(prev => ({ 
+                          ...prev, 
+                          contact: { ...prev.contact, email: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                        placeholder="contact@example.com"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes Section */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Project Title
+                    Project Notes
                   </label>
-                  <input
-                    type="text"
-                    value={newProjectData.title}
-                    onChange={(e) => setNewProjectData(prev => ({ ...prev, title: e.target.value }))}
+                  <textarea
+                    value={newProjectData.adminNotes}
+                    onChange={(e) => setNewProjectData(prev => ({ ...prev, adminNotes: e.target.value }))}
+                    rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
-                    placeholder="Enter project title"
+                    placeholder="Add any notes about this project..."
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Client Name
-                  </label>
-                  <input
-                    type="text"
-                    value={newProjectData.client}
-                    onChange={(e) => setNewProjectData(prev => ({ ...prev, client: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
-                    placeholder="Enter client name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Service Class
-                  </label>
-                  <select
-                    value={newProjectData.serviceClass}
-                    onChange={(e) => setNewProjectData(prev => ({ ...prev, serviceClass: e.target.value as 'commercial' | 'residential' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
-                  >
-                    <option value="commercial">Commercial</option>
-                    <option value="residential">Residential</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Service Type
-                  </label>
-                  <select
-                    value={newProjectData.serviceType}
-                    onChange={(e) => setNewProjectData(prev => ({ ...prev, serviceType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
-                  >
-                    <option value="snow-ice-removal">Snow & Ice Removal</option>
-                    <option value="landscaping">Landscaping</option>
-                    <option value="concrete-asphalt">Concrete & Asphalt</option>
-                    <option value="demolition">Demolition</option>
-                    <option value="painting">Painting</option>
-                    <option value="general-construction">General Construction</option>
-                  </select>
                 </div>
 
                 <div>
@@ -558,17 +888,21 @@ export default function AdminProjects() {
 
               <div className="flex justify-end space-x-3 mt-6">
                 <button
+                  type="button"
                   onClick={handleCancelNewProject}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
-                  Cancel
+                  <FaTimes className="h-4 w-4" />
+                  <span>Cancel</span>
                 </button>
                 <button
+                  type="button"
                   onClick={handleCreateProject}
                   disabled={!newProjectData.title || !newProjectData.client}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  Create Project
+                  <FaPlus className="h-4 w-4" />
+                  <span>Create Project</span>
                 </button>
               </div>
             </div>

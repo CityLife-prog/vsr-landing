@@ -31,12 +31,41 @@ async function loginHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    // TODO: Complete auth system implementation
-    return res.status(501).json({
-      error: true,
-      message: 'Authentication system not implemented',
-      code: 'NOT_IMPLEMENTED'
-    });
+    const { email, password } = req.body;
+
+    // Import simple auth service
+    const { simpleAuthService } = await import('../../../services/SimpleAuthService');
+
+    // Handle login
+    if (!email || !password) {
+      return res.status(400).json({
+        error: true,
+        message: 'Email and password are required',
+        code: 'INVALID_INPUT'
+      });
+    }
+
+    const result = await simpleAuthService.login(email, password);
+    
+    if (result.success) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          user: result.user,
+          tokens: {
+            accessToken: result.token,
+            refreshToken: result.token
+          }
+        },
+        message: result.message
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: result.message || 'Invalid credentials',
+        code: 'INVALID_CREDENTIALS'
+      });
+    }
 
     // Placeholder for when auth system is complete:
     /*

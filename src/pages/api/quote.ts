@@ -137,6 +137,34 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     try {
+      // Save to database first
+      const quoteRequestData = {
+        fullName: validatedData.fullName,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        serviceClass: validatedData.serviceClass || 'commercial',
+        service: validatedData.service,
+        details: validatedData.details,
+        photoFiles: validatedAttachments.map(att => att.filename),
+        ipAddress: req.headers['x-forwarded-for'] as string || req.connection.remoteAddress,
+        userAgent: req.headers['user-agent']
+      };
+
+      // Save to quote requests (would be database in production)
+      try {
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/admin/quote-requests`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer system_token` // Special system token for internal calls
+          },
+          body: JSON.stringify(quoteRequestData)
+        });
+      } catch (dbError) {
+        console.error('Failed to save quote request to database:', dbError);
+        // Continue with email even if database save fails
+      }
+
       // SECURITY: Use sanitized data for email content
       const emailContent = {
         from: process.env.EMAIL_FROM,
@@ -147,6 +175,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
               `Name: ${validatedData.fullName}\n` +
               `Email: ${validatedData.email}\n` +
               `Phone: ${validatedData.phone}\n` +
+              `Service Class: ${validatedData.serviceClass || 'Not specified'}\n` +
               `Service: ${validatedData.service}\n\n` +
               `Project Details:\n${validatedData.details}\n\n` +
               `Photos attached: ${validatedAttachments.length}\n` +

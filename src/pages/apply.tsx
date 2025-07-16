@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ApplyPage() {
+  const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [, setFormSubmitted] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
@@ -29,20 +31,20 @@ export default function ApplyPage() {
       });
       const result = await res.json();
       if (result.success) {
-        setStatusMessage('Application submitted successfully!');
+        setStatusMessage(t('apply.success', 'Application submitted successfully!'));
         setTimeout(() => setStatusMessage(''), 5000);
         setFormSubmitted(true);
         formRef.current?.reset();
         setSelectedFile(null);
         setPhone('');
-        //alert('Application submitted successfully.');
       } else {
-        setStatusMessage(`Submission failed: ${result.error}`);
+        setStatusMessage(t('apply.error', `Submission failed: ${result.error}`));
         setTimeout(() => setStatusMessage(''), 5000);
       }
     } catch (err) {
       console.error('Error submitting form:', err);
-      alert('An error occurred.');
+      setStatusMessage(t('apply.network_error', 'An error occurred. Please try again.'));
+      setTimeout(() => setStatusMessage(''), 5000);
     }
   };
   function formatPhoneNumber(value: string): string {
@@ -59,7 +61,7 @@ export default function ApplyPage() {
 
   return (
     <div className="w-full max-w-3xl mt-16 mx-auto">
-    <h1 className="text-4xl font-bold text-center mb-6">Apply Today</h1>
+    <h1 className="text-4xl font-bold text-center mb-6">{t('apply.title', 'Apply Today')}</h1>
     {statusMessage && (
       <div className="mb-4 p-3 rounded bg-yellow-700 text-white text-sm text-center">
         {statusMessage}
@@ -72,46 +74,46 @@ export default function ApplyPage() {
       className="space-y-6 bg-gray-800 p-6 rounded-lg text-white"
     >
       <div>
-        <label className="block mb-2 text-sm font-medium">Full Name</label>
+        <label className="block mb-2 text-sm font-medium">{t('apply.form.name', 'Full Name')}</label>
         <input 
           type="text"
           name="name" 
-          placeholder="John Doe"
+          placeholder={t('apply.form.name_placeholder', 'John Doe')}
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           required />
       </div>
       <div>
-        <label className="block mb-2 text-sm font-medium">Email Address</label>
+        <label className="block mb-2 text-sm font-medium">{t('apply.form.email', 'Email Address')}</label>
         <input 
           name="email" 
           type="email" 
-          placeholder="you@example.com"
+          placeholder={t('apply.form.email_placeholder', 'you@example.com')}
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           />
       </div>
       <div>
-        <label className="block mb-2 text-sm font-medium">Phone</label>
+        <label className="block mb-2 text-sm font-medium">{t('apply.form.phone', 'Phone')}</label>
         <input 
           type="tel"
           name="phone" 
           value={phone}
           onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-          placeholder="(123) 456-7890"
+          placeholder={t('apply.form.phone_placeholder', '(123) 456-7890')}
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
           required />
       </div>
       <div>
-        <label className="block mb-2 text-sm font-medium">Experience</label>
+        <label className="block mb-2 text-sm font-medium">{t('apply.form.experience', 'Experience')}</label>
         <textarea
           name="experience"
           rows={4}
-          placeholder="Provide a brief overview of your experience..."
+          placeholder={t('apply.form.experience_placeholder', 'Provide a brief overview of your experience...')}
           className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
         ></textarea>
       </div>
       
       <div>
-        <label className="block mb-2 text-sm font-medium">Resume</label>
+        <label className="block mb-2 text-sm font-medium">{t('apply.form.resume', 'Resume')}</label>
         <input
           type="file"
           name="resume"
@@ -128,8 +130,15 @@ export default function ApplyPage() {
         )}
       </div>
       <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded">
-        Submit Application
+        {t('apply.form.submit', 'Submit Application')}
       </button>
+      
+      <p className="text-xs text-gray-400 mt-2 text-center">
+        By submitting, you consent to us storing your data per our{' '}
+        <a href="/privacy-policy" className="underline hover:text-gray-300">
+          Privacy Policy
+        </a>.
+      </p>
     </form>
     </div>
   );

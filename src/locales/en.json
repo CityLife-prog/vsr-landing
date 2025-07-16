@@ -1,0 +1,123 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "services": "Services",
+    "projects": "Projects",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "dashboard": "Dashboard"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "projects": "Projects",
+    "contact": "Contact",
+    "quote": "Get Quote",
+    "admin": "Admin",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "hero": {
+    "title": "Built for Every Season. Trusted in Every Service.",
+    "subtitle": "VSR LLC provides reliable commercial and residential services throughout the Denver Metro Area",
+    "cta": "Get Free Quote",
+    "learn_more": "Learn More"
+  },
+  "services": {
+    "title": "Our Services",
+    "snow_removal": {
+      "title": "Snow & Ice Removal",
+      "description": "Professional snow and ice removal for commercial and residential properties"
+    },
+    "landscaping": {
+      "title": "Landscaping",
+      "description": "Complete landscape design, installation, and maintenance services"
+    },
+    "concrete": {
+      "title": "Concrete & Asphalt",
+      "description": "Concrete work, asphalt repair, and paving services"
+    },
+    "demolition": {
+      "title": "Demolition",
+      "description": "Safe and efficient demolition services for all project sizes"
+    },
+    "tree_removal": {
+      "title": "Tree & Stump Removal",
+      "description": "Professional tree removal and stump grinding services"
+    },
+    "painting": {
+      "title": "Painting",
+      "description": "Interior and exterior painting for residential and commercial properties"
+    }
+  },
+  "quote": {
+    "title": "Get Your Free Quote",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "service_type": "Service Type",
+      "service_class": "Service Class",
+      "commercial": "Commercial",
+      "residential": "Residential",
+      "details": "Project Details",
+      "photos": "Upload Photos",
+      "submit": "Request Quote"
+    },
+    "success": "Quote request submitted successfully! We'll contact you within 24 hours.",
+    "error": "Error submitting quote request. Please try again."
+  },
+  "admin": {
+    "title": "Admin Portal",
+    "login": {
+      "title": "Admin Login",
+      "email": "Email",
+      "password": "Password",
+      "remember_me": "Remember Me",
+      "forgot_password": "Forgot Password?",
+      "submit": "Sign In"
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "quote_requests": "Quote Requests",
+      "projects": "Projects",
+      "users": "Users",
+      "analytics": "Analytics"
+    },
+    "quotes": {
+      "title": "Quote Requests",
+      "status": {
+        "pending": "Pending",
+        "review": "Review",
+        "quoted": "Quoted",
+        "accepted": "Accepted",
+        "declined": "Declined"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Business Hours"
+  }
+}

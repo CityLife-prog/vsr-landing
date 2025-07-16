@@ -33,6 +33,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!validateContentType(req)) {
     secureLog('warn', 'Invalid content type for application upload');
     return res.status(400).json({ 
+      success: false,
       error: 'Invalid content type. Multipart form data required.' 
     });
   }
@@ -42,6 +43,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!sizeValidation.isValid) {
     secureLog('warn', 'Request size validation failed', { error: sizeValidation.error });
     return res.status(413).json({ 
+      success: false,
       error: sizeValidation.error 
     });
   }
@@ -65,6 +67,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
     if (err) {
       secureLog('error', 'Form parsing failed', { error: err.message });
       return res.status(400).json({ 
+        success: false,
         error: 'Failed to process application. Please check file size and format.' 
       });
     }
@@ -74,6 +77,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!validation.success) {
       secureLog('warn', 'Application validation failed', { errors: validation.errors });
       return res.status(400).json({ 
+        success: false,
         error: 'Validation failed',
         details: validation.errors 
       });
@@ -86,6 +90,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!resume) {
       secureLog('warn', 'Resume file missing in application');
       return res.status(400).json({ 
+        success: false,
         error: 'Resume file is required' 
       });
     }
@@ -101,6 +106,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
         mimetype: resumeFile.mimetype 
       });
       return res.status(400).json({ 
+        success: false,
         error: fileValidation.error 
       });
     }
@@ -133,7 +139,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
       // SECURITY: Use sanitized data for email content
       const emailContent = {
         from: process.env.EMAIL_FROM,
-        to: 'marcus@vsrsnow.com',
+        to: process.env.TEST_EMAIL_RECIPIENT || 'marcus@vsrsnow.com',
         // SECURITY: Prevent email injection by using template
         subject: 'New Job Application Received',
         text: `A new job application has been received:\n\n` +
@@ -169,6 +175,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
       });
       
       res.status(500).json({ 
+        success: false,
         error: 'Failed to submit application. Please try again.' 
       });
     }    

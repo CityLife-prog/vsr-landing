@@ -51,33 +51,6 @@ export default function EmployeeLogin() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/demo/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role: 'employee' })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        localStorage.setItem('employeeToken', data.token);
-        router.push('/portal/employee/dashboard');
-      } else {
-        setError(data.message || 'Demo login failed');
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
@@ -185,19 +158,6 @@ export default function EmployeeLogin() {
             </div>
 
             <div className="text-center space-y-4">
-              <div className="border-t border-gray-600 pt-4">
-                <p className="text-xs text-gray-500 mb-2">Demo Access (Development Only)</p>
-                <button
-                  onClick={handleDemoLogin}
-                  disabled={isLoading}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                >
-                  🚀 One-Click Employee Demo
-                </button>
-                <p className="text-xs text-gray-500 mt-1">
-                  Demo User: demo.employee@vsrsnow.com | Password: demo123
-                </p>
-              </div>
               
               <div className="text-sm text-gray-400">
                 Don't have an account?{' '}

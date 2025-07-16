@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
   name: string;
@@ -21,6 +22,7 @@ export default function ServiceBox({
   disabled = false,
   variant = 'landing',
 }: Props) {
+  const { t } = useTranslation();
   const [hovered, setHovered] = useState(false);
   const isDisabled = disabled || !isV2;
   const isMobile = variant === 'mobile';
@@ -44,7 +46,9 @@ export default function ServiceBox({
       <div className={isDisabled ? 'opacity-50' : ''}>{name}</div>
 
       {isDisabled && (
-        <div className="text-xs text-gray-400 mt-1 italic">Gallery coming soon!</div>
+        <div className="text-xs text-gray-400 mt-1 italic">
+          {t('services.coming_soon', 'Gallery coming soon!')}
+        </div>
       )}
 
       {/* Tooltip description (desktop only) */}

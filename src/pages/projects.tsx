@@ -1,4 +1,5 @@
 import { getCurrentVersion } from '@/utils/version';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ProjectArea {
   zipcode: string;
@@ -11,27 +12,39 @@ interface ProjectArea {
 }
 
 export default function ProjectsPage() {
+  const { t } = useTranslation();
   const currentVersion = getCurrentVersion();
   
   // For v2, show simple full-screen map (you will update Google My Maps with zipcode pins)
   if (currentVersion === 'v2') {
     return (
-      <main className="min-h-screen bg-gray-900 text-white px-4 py-10">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-bold mb-6">Our Projects</h1>
-          <p className="mb-4 text-lg">
-            Explore some of our recent and ongoing work across the Denver Metro area. Click on a location on the map to learn more about the project.
-          </p>
-          
-          <div className="w-full h-[600px] rounded-xl overflow-hidden border border-gray-700">
-            <iframe
-              src="https://www.google.com/maps/d/u/2/embed?mid=1BJDyMnTrLDz1GEWH9flRBrQxcVIa0hU&ehbc=2E312F"
-              width="100%"
-              height="100%"
-              allowFullScreen
-              loading="lazy"
-              className="rounded-xl"
-            />
+      <main className="min-h-screen bg-gray-900 text-white">
+        {/* Header Section */}
+        <div className="bg-gray-900 pt-20 pb-6 px-6">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-4xl font-bold mb-4">{t('projects.title', 'Our Projects')}</h1>
+            <p className="text-lg text-gray-300 max-w-3xl">
+              {t('projects.description', 'Explore our work across the Denver Metro area. Map shows general service areas grouped by zip codes.')}
+            </p>
+          </div>
+        </div>
+        
+        {/* Map Section with Margins */}
+        <div className="px-6 pb-6">
+          <div className="max-w-6xl mx-auto">
+            <div 
+              className="w-full rounded-lg overflow-hidden shadow-lg border border-gray-700" 
+              style={{ height: 'calc(100vh - 280px)' }}
+            >
+              <iframe
+                src="https://www.google.com/maps/d/u/2/embed?mid=1BJDyMnTrLDz1GEWH9flRBrQxcVIa0hU&ehbc=2E312F"
+                width="100%"
+                height="100%"
+                allowFullScreen
+                loading="lazy"
+                style={{ border: 0 }}
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -81,42 +94,41 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen bg-gray-900 text-white px-4 py-10">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">Our Projects</h1>
+        <h1 className="text-4xl font-bold mb-6">{t('projects.title', 'Our Projects')}</h1>
         <p className="mb-4 text-lg">
-          Explore our recent and ongoing work across the Denver Metro area. Projects are grouped by service area for privacy and security.
+          {t('projects.description_detailed', 'Explore our recent and ongoing work across the Denver Metro area. Projects are grouped by service area for privacy and security.')}
         </p>
         
         {/* Security Notice */}
         <div className="mb-6 p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
           <p className="text-sm text-blue-200">
-            <strong>Privacy Notice:</strong> Project locations are grouped by zipcode areas to protect client privacy. 
-            Exact addresses are only available to authorized personnel.
+            <strong>{t('projects.privacy_notice_title', 'Privacy Notice:')}:</strong> {t('projects.privacy_notice_text', 'Project locations are grouped by zipcode areas to protect client privacy. Exact addresses are only available to authorized personnel.')}
           </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Project Areas Summary */}
           <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Service Areas</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t('projects.service_areas', 'Service Areas')}</h2>
             <div className="space-y-4">
               {projectAreas.map((area) => (
                 <div key={area.zipcode} className="bg-gray-700 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="text-lg font-medium">{area.city}, {area.state}</h3>
-                      <p className="text-gray-400">Zipcode: {area.zipcode}</p>
+                      <p className="text-gray-400">{t('projects.zipcode', 'Zipcode')}: {area.zipcode}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-400">Projects</p>
+                      <p className="text-sm text-gray-400">{t('projects.projects', 'Projects')}</p>
                       <p className="text-xl font-bold text-blue-400">{area.projectCount}</p>
                     </div>
                   </div>
                   <div className="mt-3">
-                    <p className="text-sm text-gray-400 mb-1">Services:</p>
+                    <p className="text-sm text-gray-400 mb-1">{t('projects.services', 'Services')}:</p>
                     <div className="flex flex-wrap gap-2">
                       {area.services.map((service) => (
                         <span key={service} className="bg-blue-600 text-white px-2 py-1 rounded text-xs">
-                          {service}
+                          {t(`projects.service_names.${service.toLowerCase().replace(/\s+/g, '_').replace(/&/g, 'and')}`, service)}
                         </span>
                       ))}
                     </div>
@@ -128,7 +140,7 @@ export default function ProjectsPage() {
 
           {/* Enhanced Map with Zipcode Pins */}
           <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Service Area Map</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t('projects.map_title', 'Service Area Map')}</h2>
             <div className="w-full h-[500px] rounded-xl overflow-hidden border border-gray-700">
               {/* 
                 SECURITY IMPROVEMENT: 
@@ -147,7 +159,7 @@ export default function ProjectsPage() {
               />
             </div>
             <p className="text-sm text-gray-400 mt-2">
-              * Map shows general service areas only. Exact project locations are confidential.
+              {t('projects.map_disclaimer', '* Map shows general service areas only. Exact project locations are confidential.')}
             </p>
           </div>
         </div>
@@ -155,17 +167,17 @@ export default function ProjectsPage() {
         {/* Service Statistics */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-gray-800 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Total Projects</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('projects.stats.total_projects', 'Total Projects')}</h3>
             <p className="text-3xl font-bold text-blue-400">
               {projectAreas.reduce((sum, area) => sum + area.projectCount, 0)}
             </p>
           </div>
           <div className="bg-gray-800 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Service Areas</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('projects.stats.service_areas', 'Service Areas')}</h3>
             <p className="text-3xl font-bold text-green-400">{projectAreas.length}</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Services Offered</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('projects.stats.services_offered', 'Services Offered')}</h3>
             <p className="text-3xl font-bold text-purple-400">
               {[...new Set(projectAreas.flatMap(area => area.services))].length}
             </p>

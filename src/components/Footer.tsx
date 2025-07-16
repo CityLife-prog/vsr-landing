@@ -2,12 +2,14 @@ import Link from 'next/link';
 import { featureFlags } from '@/lib/version';
 import { FaLinkedin, FaInstagram, FaArrowUp, FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface FooterProps {
   variant?: 'enhanced' | 'simple';
 }
 
 export default function Footer({ variant = 'enhanced' }: FooterProps) {
+  const { t } = useTranslation();
   const socialIcons = variant === 'enhanced' ? [
     { name: 'Instagram', icon: <FaInstagram />, href: 'https://instagram.com' },
     { name: 'LinkedIn', icon: <FaLinkedin />, href: 'https://linkedin.com' },
@@ -42,7 +44,7 @@ export default function Footer({ variant = 'enhanced' }: FooterProps) {
               >
                 {social.icon}
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                  Socials are not yet available.
+                  {t('footer.socials_not_available', 'Socials are not yet available.')}
                 </div>
               </div>
             )
@@ -71,23 +73,25 @@ export default function Footer({ variant = 'enhanced' }: FooterProps) {
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto text-center space-y-6">
         <h2 className="text-2xl font-bold">VSR LLC</h2>
-        <p className="text-gray-300 text-lg">Built for Every Season. Ready for Every Challenge.</p>
+        <p className="text-gray-300 text-lg">
+          {t('footer.tagline', 'Built for Every Season. Ready for Every Challenge.')}
+        </p>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-4 flex-wrap">
           <Link href="/projects">
             <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-white font-medium transition">
-              View Projects
+              {t('footer.view_projects', 'View Projects')}
             </button>
           </Link>
           <Link href="/quote">
             <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-white font-medium transition">
-              Get a Quote
+              {t('footer.get_quote', 'Get a Quote')}
             </button>
           </Link>
           <Link href="/apply">
             <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg text-white font-medium transition">
-              Apply Now
+              {t('footer.apply_now', 'Apply Now')}
             </button>
           </Link>
         </div>
@@ -123,7 +127,7 @@ export default function Footer({ variant = 'enhanced' }: FooterProps) {
               >
                 {social.icon}
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                  Socials coming soon!
+                  {t('footer.socials_coming_soon', 'Socials coming soon!')}
                 </div>
               </div>
             )
@@ -134,7 +138,7 @@ export default function Footer({ variant = 'enhanced' }: FooterProps) {
         <div>
           <button onClick={scrollToTop} className="mt-6 text-gray-400 hover:text-white transition">
             <FaArrowUp className="inline mr-2" />
-            Back to Top
+            {t('footer.back_to_top', 'Back to Top')}
           </button>
         </div>
 
@@ -142,19 +146,35 @@ export default function Footer({ variant = 'enhanced' }: FooterProps) {
           href="mailto:citylife32@outlook.com?subject=Web%20Development%20Inquiry"
           className="text-sm text-gray-400 hover:text-white block mt-2"
         >
-          Web Development Contact
+          {t('footer.web_development', 'Web Development Contact')}
         </a>
 
         {/* Copyright */}
         <p className="text-xs text-gray-500 mt-4">
-          © {new Date().getFullYear()} VSR LLC. All rights reserved.
+          {t('footer.copyright', `© ${new Date().getFullYear()} VSR LLC. All rights reserved.`)}
         </p>
-        <Link
-          href="/privacy"
-          className="text-sm text-gray-400 hover:text-white"
-        >
-          Privacy Policy
-        </Link>
+        
+        {/* Legal Links */}
+        <div className="flex justify-center gap-4 flex-wrap text-sm">
+          <Link
+            href="/privacy"
+            className="text-gray-400 hover:text-white"
+          >
+            {t('footer.privacy_policy', 'Privacy Policy')}
+          </Link>
+          <Link
+            href="/terms"
+            className="text-gray-400 hover:text-white"
+          >
+            {t('footer.terms_conditions', 'Terms & Conditions')}
+          </Link>
+          <Link
+            href="/accessibility"
+            className="text-gray-400 hover:text-white"
+          >
+            {t('footer.accessibility', 'Accessibility Statement')}
+          </Link>
+        </div>
 
 
       </div>

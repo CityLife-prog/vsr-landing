@@ -262,14 +262,14 @@ export default function ClientDashboard() {
                     <FaPhone className="h-5 w-5 text-green-400" />
                     <div>
                       <p className="text-white text-sm">Phone</p>
-                      <p className="text-gray-400 text-xs">(555) 123-4567</p>
+                      <p className="text-gray-400 text-xs">(720) 838-5807</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
                     <FaEnvelope className="h-5 w-5 text-blue-400" />
                     <div>
                       <p className="text-white text-sm">Email</p>
-                      <p className="text-gray-400 text-xs">info@vsrconstruction.com</p>
+                      <p className="text-gray-400 text-xs">contact@vsrsnow.com</p>
                     </div>
                   </div>
                   <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors">
