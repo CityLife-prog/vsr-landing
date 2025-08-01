@@ -9,7 +9,7 @@
     "status": "active",
     "requiresPasswordReset": false,
     "isFirstLogin": false,
-    "lastLoginAt": "2025-07-16T05:16:12.054Z"
+    "lastLoginAt": "2025-07-17T20:29:54.180Z"
   },
   {
     "id": "admin-zach",
@@ -33,7 +33,7 @@
     "status": "active",
     "requiresPasswordReset": true,
     "isFirstLogin": true,
-    "lastLoginAt": "2025-07-16T04:54:49.237Z"
+    "lastLoginAt": "2025-07-16T16:47:49.762Z"
   },
   {
     "id": "admin-test-firstlogin",

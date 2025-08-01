@@ -221,7 +221,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     try {
       dispatch({ type: 'LOGIN_START' });
 
-      const response = await fetch('/api/auth/login', {
+      // Use admin login endpoint for admin authentication
+      const loginEndpoint = credentials.isAdmin ? '/api/admin/auth/login' : '/api/auth/login';
+      
+      const response = await fetch(loginEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

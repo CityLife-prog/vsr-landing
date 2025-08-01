@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaExclamationTriangle, FaCheck } from 'react-icons/fa';
-import PasswordStrengthIndicator from '../PasswordStrengthIndicator';
+import SimplePasswordField from '../SimplePasswordField';
 import { validatePassword } from '../../utils/passwordValidation';
 
 interface PasswordChangeModalProps {
@@ -120,12 +120,11 @@ export default function PasswordChangeModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               New Password
             </label>
-            <PasswordStrengthIndicator
+            <SimplePasswordField
               password={newPassword}
               onPasswordChange={setNewPassword}
               placeholder="Enter new password"
               required={true}
-              showGenerator={true}
               className=""
             />
           </div>

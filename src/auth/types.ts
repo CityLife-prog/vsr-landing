@@ -197,6 +197,7 @@ export interface LoginRequest {
   password: string;
   rememberMe?: boolean;
   deviceInfo?: DeviceInfo;
+  isAdmin?: boolean;
 }
 
 export interface LoginResponse {

@@ -10,7 +10,7 @@ import { isFeatureEnabled, shouldShowComingSoon } from '@/utils/version';
 import { useAnalyticsContext } from '@/components/AnalyticsProvider';
 import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import SimplePasswordField from './SimplePasswordField';
 import { validatePassword } from '../utils/passwordValidation';
 
 export default function Header() {
@@ -559,12 +559,11 @@ export default function Header() {
                   New Password
                 </label>
                 <div className="text-white">
-                  <PasswordStrengthIndicator
+                  <SimplePasswordField
                     password={newPassword}
                     onPasswordChange={setNewPassword}
                     placeholder="Enter new password"
                     required={true}
-                    showGenerator={true}
                     className=""
                   />
                 </div>

@@ -1,11 +1,14 @@
 /**
  * Admin Password Reset API Endpoint
+ * SECURITY: Uses secure password validation and cookie authentication
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { simpleAuthService } from '../../../../services/SimpleAuthService';
 import { withSecurity } from '../../../../middleware/cors';
 import { withAuthRateLimit } from '../../../../middleware/rateLimit';
+import { secureCookieManager } from '../../../../lib/secure-cookie-auth';
+import { passwordSecurity } from '../../../../lib/password-security';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -29,11 +32,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    if (newPassword.length < 8) {
+    // Validate new password strength using security system
+    const passwordValidation = passwordSecurity.validatePasswordStrength(newPassword);
+    if (!passwordValidation.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters long.',
-        error: 'INVALID_PASSWORD'
+        message: 'Password does not meet security requirements',
+        error: 'WEAK_PASSWORD',
+        details: {
+          errors: passwordValidation.errors,
+          suggestions: passwordValidation.suggestions,
+          score: passwordValidation.score
+        }
       });
     }
 
@@ -47,11 +57,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (resetResult.success) {
       console.log(`Password reset successful for token: ${token.substring(0, 8)}... at ${new Date().toISOString()}`);
       
+      // Set secure authentication cookies for the user
+      if (resetResult.token) {
+        secureCookieManager.setAuthCookies(res, {
+          accessToken: resetResult.token,
+          refreshToken: resetResult.token,
+          sessionId: `session_${Date.now()}_${Math.random()}`
+        });
+      }
+      
       return res.status(200).json({
         success: true,
-        token: resetResult.token,
         user: resetResult.user,
-        message: resetResult.message
+        message: resetResult.message,
+        authMethod: 'secure_cookies'
       });
     }
 

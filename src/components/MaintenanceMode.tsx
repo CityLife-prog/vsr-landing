@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { FaCog, FaTools, FaExclamationTriangle } from 'react-icons/fa';
+import { useRouter } from 'next/router';
+import { FaCog, FaTools, FaExclamationTriangle, FaShieldAlt } from 'react-icons/fa';
 
 interface MaintenanceConfig {
   enabled: boolean;
@@ -9,6 +10,7 @@ interface MaintenanceConfig {
 }
 
 export default function MaintenanceMode() {
+  const router = useRouter();
   const [maintenanceConfig, setMaintenanceConfig] = useState<MaintenanceConfig | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -84,6 +86,14 @@ export default function MaintenanceMode() {
           >
             <FaCog className="inline mr-2" />
             Check Status
+          </button>
+          
+          <button
+            onClick={() => router.push('/portal/admin/login')}
+            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors"
+          >
+            <FaShieldAlt className="inline mr-2" />
+            Super Admin Login
           </button>
           
           <p className="text-xs text-gray-500">

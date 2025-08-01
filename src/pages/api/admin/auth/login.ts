@@ -1,13 +1,15 @@
 /**
  * Admin Login API Endpoint
+ * SECURITY: Uses secure cookie authentication instead of client-side JWT
  */
 
-import { NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { simpleAuthService } from '../../../../services/SimpleAuthService';
 import { withSecurity } from '../../../../middleware/cors';
 import { withAuthRateLimit } from '../../../../middleware/rateLimit';
+import { secureCookieManager } from '../../../../lib/secure-cookie-auth';
 
-async function handler(req: any, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ 
@@ -30,12 +32,14 @@ async function handler(req: any, res: NextApiResponse) {
       });
     }
 
-    // Rate limiting check (basic)
-    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    // Get client IP and user agent for security logging
+    const clientIP = req.headers['x-forwarded-for'] as string || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    
     console.log(`Admin login attempt from IP: ${clientIP}, Email: ${email}`);
-
-    // Login
-    const result = await simpleAuthService.login(email, password, rememberMe || false);
+    
+    // Login with secure authentication
+    const result = await simpleAuthService.login(email, password, rememberMe || false, clientIP, userAgent);
     
     // Track login attempt in analytics
     try {
@@ -70,14 +74,20 @@ async function handler(req: any, res: NextApiResponse) {
         });
       }
       
-      // Return result with password reset flag
+      // Set secure authentication cookies instead of returning JWT token
+      secureCookieManager.setAuthCookies(res, {
+        accessToken: result.token!,
+        refreshToken: result.token!, // In production, use separate refresh token
+        sessionId: `session_${Date.now()}_${Math.random()}`
+      });
+      
+      // Return result without exposing the token
       return res.status(200).json({
         success: true,
-        token: result.token,
         user: result.user,
         message: result.message,
-        requiresPasswordReset: result.requiresPasswordReset,
-        requiresPasswordChange: result.requiresPasswordChange
+        requiresPasswordChange: result.requiresPasswordChange,
+        authMethod: 'secure_cookies'
       });
     } else {
       // Log failed login

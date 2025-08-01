@@ -1,10 +1,13 @@
 /**
  * Admin Change Password API Endpoint
+ * SECURITY: Uses secure cookie authentication and password validation
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { simpleAuthService } from '../../../../services/SimpleAuthService';
 import { withSecurity } from '../../../../middleware/cors';
+import { secureCookieManager } from '../../../../lib/secure-cookie-auth';
+import { passwordSecurity } from '../../../../lib/password-security';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -17,63 +20,88 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { email, currentPassword, newPassword } = req.body;
+    // Authenticate user with secure cookies
+    const authResult = secureCookieManager.getAuthFromCookies(req);
+    
+    if (!authResult.success) {
+      return res.status(401).json({
+        success: false,
+        message: authResult.message || 'Authentication required',
+        error: 'UNAUTHORIZED'
+      });
+    }
+
+    // Validate CSRF token
+    if (!secureCookieManager.validateCSRFToken(req)) {
+      return res.status(403).json({
+        success: false,
+        message: 'CSRF validation failed',
+        error: 'CSRF_VALIDATION_FAILED'
+      });
+    }
+
+    const { currentPassword, newPassword } = req.body;
 
     // Input validation
-    if (!email || !newPassword) {
+    if (!currentPassword || !newPassword) {
       return res.status(400).json({ 
         success: false,
-        message: 'Email and new password are required',
+        message: 'Current password and new password are required',
         error: 'MISSING_FIELDS'
       });
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
+    // Validate new password strength using security system
+    const passwordValidation = passwordSecurity.validatePasswordStrength(newPassword);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
         success: false,
-        message: 'Invalid email format',
-        error: 'INVALID_EMAIL'
+        message: 'Password does not meet security requirements',
+        error: 'WEAK_PASSWORD',
+        details: {
+          errors: passwordValidation.errors,
+          suggestions: passwordValidation.suggestions,
+          score: passwordValidation.score
+        }
       });
     }
 
-    // Password strength validation
-    if (newPassword.length < 8) {
-      return res.status(400).json({ 
+    // Get user email from session (more secure than client-provided email)
+    const userEmail = authResult.user?.email;
+    if (!userEmail) {
+      return res.status(401).json({
         success: false,
-        message: 'New password must be at least 8 characters long',
-        error: 'WEAK_PASSWORD'
-      });
-    }
-
-    // Check for common weak passwords
-    const weakPasswords = ['password', '12345678', 'admin123', 'qwerty123'];
-    if (weakPasswords.includes(newPassword.toLowerCase())) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'Password too common, please choose a stronger password',
-        error: 'COMMON_PASSWORD'
+        message: 'User email not found in session',
+        error: 'INVALID_SESSION'
       });
     }
 
     // Log password change attempt
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log(`Password change attempt for ${email} from IP: ${clientIP} at ${new Date().toISOString()}`);
+    console.log(`Password change attempt for ${userEmail} from IP: ${clientIP} at ${new Date().toISOString()}`);
 
-    const result = await simpleAuthService.changePassword(email, currentPassword, newPassword);
+    const result = await simpleAuthService.changePassword(userEmail, currentPassword, newPassword);
 
     if (result.success) {
-      console.log(`Successful password change for ${email} at ${new Date().toISOString()}`);
+      console.log(`Successful password change for ${userEmail} at ${new Date().toISOString()}`);
+      
+      // Update authentication cookies with new token
+      if (result.token) {
+        secureCookieManager.setAuthCookies(res, {
+          accessToken: result.token,
+          refreshToken: result.token,
+          sessionId: authResult.sessionId!
+        });
+      }
       
       return res.status(200).json({
         success: true,
-        token: result.token,
         user: result.user,
-        message: result.message
+        message: result.message,
+        authMethod: 'secure_cookies'
       });
     } else {
-      console.warn(`Failed password change for ${email}: ${result.message} at ${new Date().toISOString()}`);
+      console.warn(`Failed password change for ${userEmail}: ${result.message} at ${new Date().toISOString()}`);
       
       return res.status(400).json({
         success: false,
