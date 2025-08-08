@@ -74,15 +74,27 @@ export default function AdminLogin() {
     if (!pendingUser) return false;
 
     try {
+      // Get CSRF token from cookie
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+      
+      const csrfToken = getCookie('vsr_csrf_token');
+      
       const response = await fetch('/api/admin/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken || ''
         },
         body: JSON.stringify({
           email: pendingUser.email,
           currentPassword,
-          newPassword
+          newPassword,
+          csrfToken
         })
       });
 

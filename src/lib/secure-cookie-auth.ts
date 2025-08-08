@@ -74,17 +74,21 @@ export class SecureCookieManager {
    */
   private encrypt(data: string): { encrypted: string; iv: string; tag: string } {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher('aes-256-gcm', this.ENCRYPTION_KEY);
+    const key = Buffer.from(this.ENCRYPTION_KEY.slice(0, 64), 'hex'); // Ensure 32 bytes
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     
-    const tag = cipher.getAuthTag();
+    // For AES-CBC, we'll use HMAC for authentication instead of GCM
+    const hmac = crypto.createHmac('sha256', this.ENCRYPTION_KEY);
+    hmac.update(encrypted + iv.toString('hex'));
+    const tag = hmac.digest('hex');
     
     return {
       encrypted,
       iv: iv.toString('hex'),
-      tag: tag.toString('hex')
+      tag
     };
   }
 
@@ -92,8 +96,18 @@ export class SecureCookieManager {
    * Decrypt cookie data
    */
   private decrypt(encryptedData: { encrypted: string; iv: string; tag: string }): string {
-    const decipher = crypto.createDecipher('aes-256-gcm', this.ENCRYPTION_KEY);
-    decipher.setAuthTag(Buffer.from(encryptedData.tag, 'hex'));
+    // Verify HMAC tag first
+    const hmac = crypto.createHmac('sha256', this.ENCRYPTION_KEY);
+    hmac.update(encryptedData.encrypted + encryptedData.iv);
+    const expectedTag = hmac.digest('hex');
+    
+    if (expectedTag !== encryptedData.tag) {
+      throw new Error('Authentication tag verification failed');
+    }
+    
+    const key = Buffer.from(this.ENCRYPTION_KEY.slice(0, 64), 'hex'); // Ensure 32 bytes
+    const iv = Buffer.from(encryptedData.iv, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
     
     let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
@@ -201,11 +215,8 @@ export class SecureCookieManager {
     // Set all cookies
     const cookies = [accessTokenCookie, refreshTokenCookie, sessionCookie, csrfCookie];
     
-    if ('setHeader' in res) {
-      // NextApiResponse
-      res.setHeader('Set-Cookie', cookies);
-    } else {
-      // ServerResponse
+    if ('setHeader' in res && typeof res.setHeader === 'function') {
+      // NextApiResponse or ServerResponse
       res.setHeader('Set-Cookie', cookies);
     }
   }
@@ -213,7 +224,7 @@ export class SecureCookieManager {
   /**
    * Get authentication data from cookies
    */
-  getAuthFromCookies(req: NextApiRequest | IncomingMessage): CookieAuthResult {
+  async getAuthFromCookies(req: NextApiRequest | IncomingMessage): Promise<CookieAuthResult> {
     try {
       const cookies = this.parseCookies(req);
       
@@ -253,8 +264,17 @@ export class SecureCookieManager {
         return { success: false, message: 'Access token expired' };
       }
 
+      // Get user info from secure user manager using session ID
+      const { secureUserManager } = await import('./secure-user-manager');
+      const sessionValidation = secureUserManager.validateSession(accessTokenData.sessionId);
+      
+      if (!sessionValidation.valid) {
+        return { success: false, message: 'Invalid session' };
+      }
+
       return {
         success: true,
+        user: sessionValidation.user,
         sessionId: accessTokenData.sessionId,
         csrfToken: accessTokenData.csrfToken,
         message: 'Authentication successful'
@@ -354,11 +374,8 @@ export class SecureCookieManager {
       })
     ];
 
-    if ('setHeader' in res) {
-      // NextApiResponse
-      res.setHeader('Set-Cookie', expiredCookies);
-    } else {
-      // ServerResponse
+    if ('setHeader' in res && typeof res.setHeader === 'function') {
+      // NextApiResponse or ServerResponse
       res.setHeader('Set-Cookie', expiredCookies);
     }
   }
@@ -414,7 +431,7 @@ export function withCookieAuth(
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       // Get authentication from cookies
-      const authResult = secureCookieManager.getAuthFromCookies(req);
+      const authResult = await secureCookieManager.getAuthFromCookies(req);
       
       if (!authResult.success) {
         return res.status(401).json({

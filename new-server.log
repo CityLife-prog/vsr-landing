@@ -1,0 +1,100 @@
+
+> vsr-landing@0.1.0 dev
+> next dev -H 0.0.0.0
+
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3004
+   - Network:      http://0.0.0.0:3004
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1709ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.4s (503 modules)
+ ✓ Compiled in 222ms (503 modules)
+ GET / 200 in 3161ms
+ ✓ Compiled /api/maintenance-status in 283ms (526 modules)
+CORS: POST /api/admin/analytics from origin: http://localhost:3004
+📊 Analytics API received: {
+  action: 'visitor',
+  data: {
+    referrer: '',
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+    timestamp: '2025-08-06T18:48:34.220Z',
+    deviceType: 'desktop',
+    source: 'direct'
+  }
+}
+ GET /api/maintenance-status 200 in 219ms
+ POST /api/admin/analytics 200 in 333ms
+CORS: POST /api/admin/analytics from origin: http://localhost:3004
+📊 Analytics API received: {
+  action: 'page_view',
+  data: {
+    path: '/',
+    referrer: '',
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+    timestamp: '2025-08-06T18:48:34.590Z',
+    deviceType: 'desktop',
+    source: 'direct'
+  }
+}
+ POST /api/admin/analytics 200 in 17ms
+ ✓ Compiled /api/auth/me in 135ms (205 modules)
+🔐 Initializing secure user system...
+📝 Creating default admin users with secure passwords:
+ GET /api/auth/me 401 in 242ms
+ GET /api/auth/me 401 in 4ms
+✅ Created admin user: citylife32@outlook.com
+🔑 Password: VSRAdmin2025!
+⚠️  This password must be changed on first login
+
+ GET /favicon.ico 200 in 836ms
+✅ Created admin user: zach@vsrsnow.com
+🔑 Password: VSRAdmin2025!
+⚠️  This password must be changed on first login
+
+✅ Created admin user: marcus@vsrsnow.com
+🔑 Password: VSRAdmin2025!
+⚠️  This password must be changed on first login
+
+💾 Users saved to secure storage
+🔒 Secure user system initialized successfully!
+⚠️  IMPORTANT: Save the temporary passwords above and change them immediately!
+ ✓ Compiled /portal/admin/login in 279ms (546 modules)
+ GET /favicon.ico 200 in 514ms
+ ✓ Compiled /api/admin/auth/login in 74ms (215 modules)
+📂 Loaded 3 users from secure storage
+🔐 Initializing secure authentication service...
+✅ Secure Authentication Service initialized
+🔒 Using bcrypt password hashing and secure user management
+⚠️  Please check console for initial admin credentials
+CORS: POST /api/admin/auth/login from origin: http://localhost:3004
+📥 Login request body: { email: 'citylife32@outlook.com', password: 'VSRAdmin2025!' }
+Admin login attempt from IP: 127.0.0.1, Email: citylife32@outlook.com
+💾 Users saved to secure storage
+CORS: POST /api/admin/analytics from origin: none
+📊 Analytics API received: {
+  action: 'login_attempt',
+  data: {
+    loginType: 'admin',
+    success: true,
+    timestamp: '2025-08-06T18:48:47.760Z'
+  }
+}
+ POST /api/admin/analytics 200 in 8ms
+Admin login: citylife32@outlook.com at 2025-08-06T18:48:47.778Z
+ POST /api/admin/auth/login 500 in 289ms
+CORS: POST /api/admin/analytics from origin: http://localhost:3004
+📊 Analytics API received: {
+  action: 'login_attempt',
+  data: {
+    loginType: 'admin',
+    success: false,
+    path: '/portal/admin/login',
+    timestamp: '2025-08-06T18:48:47.978Z',
+    deviceType: 'desktop'
+  }
+}
+ POST /api/admin/analytics 200 in 5ms
+[?25h

@@ -18,7 +18,8 @@ import {
   FaIdCard,
   FaSnowflake,
   FaEnvelope,
-  FaBell
+  FaBell,
+  FaUserCircle
 } from 'react-icons/fa';
 import { isFeatureEnabled, getCurrentVersion } from '@/utils/version';
 import NotificationBubble from '@/components/admin/NotificationBubble';
@@ -40,6 +41,7 @@ export default function AdminDashboard() {
     quoteRequests: 0,
     clientUpdates: 0,
     updateRequests: 0,
+    jobApplications: 0,
     employeeApprovals: 0,
     systemUpdates: 0
   });
@@ -55,14 +57,9 @@ export default function AdminDashboard() {
   }, []);
 
   const loadSystemHealth = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch('/api/admin/health', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of token
       });
 
       if (response.ok) {
@@ -75,14 +72,9 @@ export default function AdminDashboard() {
   };
 
   const loadServiceStatus = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch('/api/admin/service-status', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of token
       });
 
       if (response.ok) {
@@ -95,26 +87,25 @@ export default function AdminDashboard() {
   };
 
   const loadAnalyticsData = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       // Load quote requests
       const quoteResponse = await fetch('/api/admin/quote-requests', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of token
       });
 
       // Load update requests
       const updateResponse = await fetch('/api/admin/update-requests', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of token
+      });
+
+      // Load job applications
+      const jobApplicationsResponse = await fetch('/api/admin/job-applications', {
+        credentials: 'include' // Use cookies instead of token
       });
 
       let quoteRequestsCount = 0;
       let updateRequestsCount = 0;
+      let jobApplicationsCount = 0;
 
       if (quoteResponse.ok) {
         const quoteData = await quoteResponse.json();
@@ -126,11 +117,17 @@ export default function AdminDashboard() {
         updateRequestsCount = updateData.data?.summary?.pending || 0;
       }
 
+      if (jobApplicationsResponse.ok) {
+        const jobApplicationsData = await jobApplicationsResponse.json();
+        jobApplicationsCount = jobApplicationsData.data?.summary?.pending || 0;
+      }
+
       // Update notifications with real data
       setNotifications(prev => ({
         ...prev,
         quoteRequests: quoteRequestsCount,
         updateRequests: updateRequestsCount,
+        jobApplications: jobApplicationsCount,
         clientUpdates: 0 // Can be expanded later
       }));
 
@@ -141,6 +138,7 @@ export default function AdminDashboard() {
         ...prev,
         quoteRequests: 2,
         updateRequests: 3,
+        jobApplications: 1,
         clientUpdates: 0
       }));
     }
@@ -185,17 +183,10 @@ export default function AdminDashboard() {
   };
 
   const checkAdminAuth = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      router.push('/portal/admin/login');
-      return;
-    }
-
     try {
+      // Use cookie-based authentication (no token needed)
       const response = await fetch('/api/admin/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Include cookies for authentication
       });
 
       if (response.ok) {
@@ -245,13 +236,12 @@ export default function AdminDashboard() {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/service-status', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // Use cookies instead of token
         body: JSON.stringify({ action: 'toggle_service' })
       });
 
@@ -286,13 +276,12 @@ export default function AdminDashboard() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/service-status', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // Use cookies instead of token
         body: JSON.stringify({ 
           action: 'toggle_module', 
           module: moduleName 
@@ -337,14 +326,31 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gray-100">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header with Profile Button */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+              {admin && (
+                <p className="text-gray-600">Welcome back, {admin.firstName} {admin.lastName}</p>
+              )}
+            </div>
+            <Link
+              href="/portal/admin/profile"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <FaUserCircle className="h-5 w-5 mr-2" />
+              Profile
+            </Link>
+          </div>
+
           {/* Notification Summary Bar */}
-          {(notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.employeeApprovals) > 0 && (
+          {(notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.jobApplications + notifications.employeeApprovals) > 0 && (
             <div className="bg-red-600 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-white">
                   <FaBell className="h-5 w-5 mr-3" />
                   <span className="font-medium">
-                    You have {notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.employeeApprovals} pending notifications
+                    You have {notifications.quoteRequests + notifications.clientUpdates + notifications.updateRequests + notifications.jobApplications + notifications.employeeApprovals} pending notifications
                   </span>
                 </div>
                 <div className="flex space-x-2">
@@ -361,6 +367,11 @@ export default function AdminDashboard() {
                   {notifications.updateRequests > 0 && (
                     <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
                       {notifications.updateRequests} update requests
+                    </span>
+                  )}
+                  {notifications.jobApplications > 0 && (
+                    <span className="bg-white bg-opacity-20 text-white px-2 py-1 rounded text-xs">
+                      {notifications.jobApplications} applications
                     </span>
                   )}
                   {notifications.employeeApprovals > 0 && (
@@ -642,6 +653,20 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <NotificationBubble count={notifications.updateRequests} color="orange" size="sm" />
+                  </button>
+                  
+                  <button 
+                    className="w-full flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                    onClick={() => router.push('/portal/admin/job-applications')}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                      <div className="text-left">
+                        <p className="text-white text-sm">Job applications</p>
+                        <p className="text-gray-400 text-xs">{notifications.jobApplications} pending</p>
+                      </div>
+                    </div>
+                    <NotificationBubble count={notifications.jobApplications} color="purple" size="sm" />
                   </button>
                   
                   {isFeatureEnabled('client-management') && (

@@ -7,6 +7,7 @@ import nodemailer from 'nodemailer';
 import { withSecurity, validateContentType, validateRequestSize } from '@/lib/middleware';
 import { validateFileUpload, generateSecureFilename, secureLog, SECURITY_CONFIG } from '@/lib/security';
 import { validateQuoteData, type QuoteData } from '@/lib/validation';
+import { getRecipientsString } from '@/lib/email-config';
 
 export const config = {
   api: {
@@ -53,11 +54,15 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
     multiples: true,
     maxFileSize: SECURITY_CONFIG.MAX_FILE_SIZE,
     maxTotalFileSize: SECURITY_CONFIG.MAX_TOTAL_UPLOAD_SIZE,
-    // SECURITY: Restrict to image types only for project photos
+    // SECURITY: Allow images and documents for project files
     filter: (part) => {
       if (part.name !== 'photos') return true;
       const mimetype = part.mimetype || '';
-      return SECURITY_CONFIG.ALLOWED_IMAGE_TYPES.some(type => type === mimetype);
+      const allowedTypes = [
+        ...SECURITY_CONFIG.ALLOWED_IMAGE_TYPES,
+        ...SECURITY_CONFIG.ALLOWED_DOCUMENT_TYPES
+      ];
+      return allowedTypes.some(type => type === mimetype);
     }
   });
 
@@ -84,6 +89,8 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
     // Process uploaded photos (optional)
     const photos = files.photos;
     const photoFiles = Array.isArray(photos) ? photos : photos ? [photos] : [];
+    
+    secureLog('info', 'Processing file uploads', { fileCount: photoFiles.length });
     
     const validatedAttachments: Array<{ filename: string; path: string; contentType: string }> = [];
     
@@ -168,7 +175,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
       // SECURITY: Use sanitized data for email content
       const emailContent = {
         from: process.env.EMAIL_FROM,
-        to: 'marcus@vsrsnow.com, zach@vsrsnow.com',
+        to: getRecipientsString('quotes'),
         // SECURITY: Prevent email injection by using template
         subject: 'New Quote Request Received',
         text: `A new quote request has been received:\n\n` +
@@ -178,7 +185,7 @@ async function quoteHandler(req: NextApiRequest, res: NextApiResponse) {
               `Service Class: ${validatedData.serviceClass || 'Not specified'}\n` +
               `Service: ${validatedData.service}\n\n` +
               `Project Details:\n${validatedData.details}\n\n` +
-              `Photos attached: ${validatedAttachments.length}\n` +
+              `Files attached: ${validatedAttachments.length}\n` +
               `Request received at: ${new Date().toISOString()}`,
         attachments: validatedAttachments,
       };

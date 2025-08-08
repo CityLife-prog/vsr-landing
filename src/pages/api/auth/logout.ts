@@ -19,7 +19,7 @@ async function logoutHandler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Get authentication from cookies
-    const authResult = secureCookieManager.getAuthFromCookies(req);
+    const authResult = await secureCookieManager.getAuthFromCookies(req);
     
     if (authResult.success && authResult.sessionId) {
       // Logout from the authentication service

@@ -37,11 +37,19 @@ interface LoginResult {
   message?: string;
   requiresPasswordReset?: boolean;
   requiresPasswordChange?: boolean;
+  sessionId?: string;
 }
 
 export class SimpleAuthService {
-  private readonly JWT_SECRET = process.env.JWT_SECRET || 'secure-jwt-secret-key';
+  private readonly JWT_SECRET = (() => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+    return secret;
+  })();
   private activeSessions = new Map<string, { userId: string; sessionId: string; createdAt: Date }>();
+  private resetTokens = new Map<string, { email: string; createdAt: number }>();
   
   constructor() {
     // Initialize secure user manager
@@ -59,15 +67,24 @@ export class SimpleAuthService {
   }
 
   /**
-   * Clean up expired sessions
+   * Clean up expired sessions and reset tokens
    */
   private cleanupExpiredSessions(): void {
-    const now = new Date();
+    const now = Date.now();
     const sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
+    const resetTokenTimeout = 60 * 60 * 1000; // 1 hour
     
+    // Clean up expired sessions
     for (const [token, session] of this.activeSessions.entries()) {
-      if (now.getTime() - session.createdAt.getTime() > sessionTimeout) {
+      if (now - session.createdAt.getTime() > sessionTimeout) {
         this.activeSessions.delete(token);
+      }
+    }
+    
+    // Clean up expired reset tokens
+    for (const [token, resetData] of this.resetTokens.entries()) {
+      if (now - resetData.createdAt > resetTokenTimeout) {
+        this.resetTokens.delete(token);
       }
     }
   }
@@ -128,7 +145,8 @@ export class SimpleAuthService {
           projectIds: user.projectIds
         },
         message: authResult.message || 'Login successful',
-        requiresPasswordChange: authResult.requiresPasswordChange || false
+        requiresPasswordChange: authResult.requiresPasswordChange || false,
+        sessionId: sessionId
       };
     } catch (error) {
       console.error('Login error:', error);
@@ -281,8 +299,12 @@ export class SimpleAuthService {
       // Generate secure reset token
       const resetToken = passwordSecurity.generateSecurePassword(32);
       
-      // In a full implementation, you would store this token in the secure user manager
-      // For now, we'll use a simplified approach
+      // Store token with email and expiration
+      this.resetTokens.set(resetToken, {
+        email: email,
+        createdAt: Date.now()
+      });
+      
       console.log(`🔑 Generated secure reset token for ${email}: ${resetToken}`);
       console.log(`⏰ Token expires in 1 hour`);
 
@@ -310,9 +332,6 @@ export class SimpleAuthService {
     try {
       console.log('🔍 Secure password reset with token');
       
-      // In a full implementation, you would validate the token through the secure user manager
-      // For now, we'll use a simplified approach but with secure password validation
-      
       // Validate new password using secure password manager
       const passwordValidation = passwordSecurity.validatePasswordStrength(newPassword);
       
@@ -323,17 +342,103 @@ export class SimpleAuthService {
         };
       }
 
-      // This is a simplified implementation - in production you would:
-      // 1. Validate the token through the secure user manager
-      // 2. Find the user associated with the token
-      // 3. Update the password using secure hashing
+      // Check if token exists and is valid
+      const tokenData = this.resetTokens.get(token);
+      if (!tokenData) {
+        return {
+          success: false,
+          message: 'Invalid or expired reset token'
+        };
+      }
+
+      // Check if token has expired (1 hour expiry)
+      const tokenAge = Date.now() - tokenData.createdAt;
+      const ONE_HOUR = 60 * 60 * 1000;
+      if (tokenAge > ONE_HOUR) {
+        this.resetTokens.delete(token);
+        return {
+          success: false,
+          message: 'Reset token has expired. Please request a new password reset.'
+        };
+      }
+
+      // Find user by email
+      const user = secureUserManager.getUserByEmail(tokenData.email);
+      if (!user) {
+        this.resetTokens.delete(token);
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+
+      // Temporarily set requirePasswordChange to bypass current password check
+      const originalRequirePasswordChange = user.requirePasswordChange;
+      user.requirePasswordChange = true;
       
-      console.log('⚠️  Password reset token validation not fully implemented with secure user manager');
-      console.log('⚠️  This is a placeholder - implement full token validation in production');
+      // Use secure user manager to change password
+      const changeResult = await secureUserManager.changePassword(
+        user.id,
+        '', // No current password needed for reset
+        newPassword
+      );
       
+      // Reset the requirePasswordChange flag to its original state
+      user.requirePasswordChange = originalRequirePasswordChange || false;
+
+      if (!changeResult.success) {
+        return {
+          success: false,
+          message: changeResult.message || 'Password reset failed'
+        };
+      }
+
+      // Remove the used token
+      this.resetTokens.delete(token);
+      
+      // Invalidate all existing sessions for this user
+      secureUserManager.logoutAllSessions(user.id);
+      
+      // Generate new token for the user
+      const accessToken = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName
+        },
+        this.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      // Create new session
+      const sessionId = uuidv4();
+      
+      // Store new session mapping
+      this.activeSessions.set(accessToken, {
+        userId: user.id,
+        sessionId,
+        createdAt: new Date()
+      });
+
+      console.log(`✅ Password reset successful for user: ${user.email}`);
+
       return {
-        success: false,
-        message: 'Password reset functionality is being upgraded to use secure authentication. Please contact administrator.'
+        success: true,
+        token: accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          status: user.status,
+          phone: user.phone,
+          employeeId: user.employeeId,
+          projectIds: user.projectIds
+        },
+        message: 'Password reset successfully'
       };
       
     } catch (error) {

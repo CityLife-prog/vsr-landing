@@ -21,7 +21,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Authenticate user with secure cookies
-    const authResult = secureCookieManager.getAuthFromCookies(req);
+    const authResult = await secureCookieManager.getAuthFromCookies(req);
+    
+    console.log('🔐 Cookie auth result:', {
+      success: authResult.success,
+      message: authResult.message,
+      hasCookies: !!req.headers.cookie
+    });
     
     if (!authResult.success) {
       return res.status(401).json({
@@ -32,7 +38,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Validate CSRF token
-    if (!secureCookieManager.validateCSRFToken(req)) {
+    const csrfValid = secureCookieManager.validateCSRFToken(req);
+    console.log('🔐 CSRF validation result:', {
+      valid: csrfValid,
+      headerToken: req.headers['x-csrf-token'],
+      bodyToken: req.body?.csrfToken
+    });
+    
+    if (!csrfValid) {
       return res.status(403).json({
         success: false,
         message: 'CSRF validation failed',
@@ -68,7 +81,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Get user email from session (more secure than client-provided email)
     const userEmail = authResult.user?.email;
+    console.log('🔐 Session user info:', {
+      hasUser: !!authResult.user,
+      email: userEmail,
+      sessionId: authResult.sessionId
+    });
+    
     if (!userEmail) {
+      console.log('❌ User email not found in session');
       return res.status(401).json({
         success: false,
         message: 'User email not found in session',
@@ -80,7 +100,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log(`Password change attempt for ${userEmail} from IP: ${clientIP} at ${new Date().toISOString()}`);
 
+    console.log(`🔐 Calling changePassword for ${userEmail}`);
     const result = await simpleAuthService.changePassword(userEmail, currentPassword, newPassword);
+    console.log('🔐 Password change result:', {
+      success: result.success,
+      message: result.message
+    });
 
     if (result.success) {
       console.log(`Successful password change for ${userEmail} at ${new Date().toISOString()}`);

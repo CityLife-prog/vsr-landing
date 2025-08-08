@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy | VSR Construction</title>
+        <title>Privacy Policy | VSR LLC</title>
       </Head>
 
       <section className="min-h-screen bg-gray-900 text-white py-16 px-6">

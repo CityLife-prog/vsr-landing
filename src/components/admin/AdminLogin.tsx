@@ -41,17 +41,17 @@ const AdminLogin: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Handle Remember Me functionality
+        // Handle Remember Me functionality for secure cookies
         if (rememberMe) {
           localStorage.setItem('rememberedAdminEmail', email);
-          // Set longer token expiry for remember me
-          localStorage.setItem('accessToken', data.token);
           localStorage.setItem('rememberMeToken', 'true');
         } else {
           localStorage.removeItem('rememberedAdminEmail');
-          localStorage.setItem('accessToken', data.token);
           localStorage.removeItem('rememberMeToken');
         }
+        
+        // Clear any old token-based storage since we now use secure cookies
+        localStorage.removeItem('accessToken');
         
         if (data.requiresPasswordChange || data.requiresPasswordReset) {
           router.push(`/portal/admin/change-password?email=${encodeURIComponent(email)}&forced=true`);

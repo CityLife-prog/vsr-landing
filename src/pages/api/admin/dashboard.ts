@@ -4,26 +4,23 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { simpleAuthService } from '../../../services/SimpleAuthService';
-import jwt from 'jsonwebtoken';
+import { secureCookieManager } from '../../../lib/secure-cookie-auth';
+import { withSecurity } from '../../../middleware/cors';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   try {
-    // Check authentication
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    // Check authentication using secure cookies
+    const authResult = await secureCookieManager.getAuthFromCookies(req);
+    if (!authResult.success || !authResult.user || authResult.user.role !== 'admin') {
+      return res.status(401).json({ 
+        error: 'Authentication required or insufficient permissions',
+        message: authResult.message
+      });
     }
 
-    const token = authHeader.substring(7);
-    
-    // Verify token using simple auth service
-    const user = await simpleAuthService.verifyToken(token);
-    if (!user || user.role !== 'admin') {
-      return res.status(401).json({ error: 'Invalid or expired token' });
-    }
+    const user = authResult.user;
 
     switch (method) {
       case 'GET':
@@ -60,3 +57,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 }
+
+export default withSecurity(handler);

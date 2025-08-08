@@ -6,8 +6,8 @@ export default function TermsAndConditions() {
   return (
     <>
       <Head>
-        <title>Terms and Conditions | VSR Construction</title>
-        <meta name="description" content="Terms and conditions for VSR Construction services" />
+        <title>Terms and Conditions | VSR LLC</title>
+        <meta name="description" content="Terms and conditions for VSR LLC services" />
         <meta name="robots" content="index, follow" />
       </Head>
 
@@ -28,19 +28,19 @@ export default function TermsAndConditions() {
 
           <h2 className="text-2xl font-semibold mt-8 mb-2">1. Acceptance of Terms</h2>
           <p className="mb-6">
-            By accessing and using the website, services, or requesting quotes from VSR Construction LLC ("VSR," "Company," "we," "our," or "us"), 
+            By accessing and using the website, services, or requesting quotes from VSR LLC ("VSR," "Company," "we," "our," or "us"), 
             you ("Client," "Customer," or "you") accept and agree to be bound by these terms and conditions. 
             If you do not agree to these terms, please do not use our services or website.
           </p>
 
           <h2 className="text-2xl font-semibold mt-8 mb-2">2. Company Information</h2>
           <p className="mb-6">
-            VSR Construction LLC is a limited liability company operating in Colorado, providing construction, 
+            VSR LLC is a limited liability company operating in Colorado, providing construction, 
             maintenance, and related services to commercial and residential clients.
           </p>
           <div className="mb-6 bg-gray-800 p-4 rounded">
             <p className="text-white">
-              <strong>VSR Construction LLC</strong><br />
+              <strong>VSR LLC</strong><br />
               Business Operations: Colorado<br />
               Email: <a href="mailto:marcus@vsrsnow.com" className="underline text-blue-400 hover:text-blue-300">marcus@vsrsnow.com</a><br />
               Phone: <a href="tel:+17208385807" className="underline text-blue-400 hover:text-blue-300">(720) 838-5807</a>
@@ -49,7 +49,7 @@ export default function TermsAndConditions() {
 
           <h2 className="text-2xl font-semibold mt-8 mb-2">3. Services Provided</h2>
           <p className="mb-4 text-gray-300">
-            VSR Construction LLC provides the following professional services:
+            VSR LLC provides the following professional services:
           </p>
           
           <h3 className="text-lg font-medium mt-4 mb-2 text-gray-300">Commercial Services:</h3>
@@ -122,7 +122,7 @@ export default function TermsAndConditions() {
           <h2 className="text-2xl font-semibold mt-8 mb-2">7. Insurance, Liability, and Limitations</h2>
           <h3 className="text-lg font-medium mt-4 mb-2 text-gray-300">Insurance Coverage:</h3>
           <ul className="list-disc pl-6 mb-4 text-gray-300">
-            <li>VSR Construction LLC maintains comprehensive general liability insurance</li>
+            <li>VSR LLC maintains comprehensive general liability insurance</li>
             <li>Workers' compensation insurance covers all employees</li>
             <li>Equipment and vehicle insurance protects against property damage</li>
             <li>Certificate of insurance available upon request</li>
@@ -211,7 +211,7 @@ export default function TermsAndConditions() {
 
           <h2 className="text-2xl font-semibold mt-8 mb-2">12. Privacy and Data Protection</h2>
           <p className="mb-4 text-gray-300">
-            VSR Construction is committed to protecting your personal information and privacy:
+            VSR LLC is committed to protecting your personal information and privacy:
           </p>
           <ul className="list-disc pl-6 mb-6 text-gray-300">
             <li><strong>Data Collection:</strong> We collect only information necessary to provide services and communicate with clients</li>
@@ -259,7 +259,7 @@ export default function TermsAndConditions() {
 
           <h2 className="text-2xl font-semibold mt-8 mb-2">15. Severability and Entire Agreement</h2>
           <p className="mb-4 text-gray-300">
-            These terms constitute the entire agreement between VSR Construction LLC and the client:
+            These terms constitute the entire agreement between VSR LLC and the client:
           </p>
           <ul className="list-disc pl-6 mb-6 text-gray-300">
             <li><strong>Severability:</strong> If any provision is found unenforceable, remaining terms continue in full effect</li>
@@ -274,7 +274,7 @@ export default function TermsAndConditions() {
           </p>
           <div className="mb-8 bg-gray-800 p-4 rounded">
             <p className="text-white">
-              <strong>VSR Construction LLC</strong><br />
+              <strong>VSR LLC</strong><br />
               Primary Contact: <a href="mailto:marcus@vsrsnow.com" className="underline text-blue-400 hover:text-blue-300">marcus@vsrsnow.com</a><br />
               Phone: <a href="tel:+17208385807" className="underline text-blue-400 hover:text-blue-300">(720) 838-5807</a><br />
               Legal/Terms Questions: <a href="mailto:citylife32@outlook.com?subject=Terms and Conditions Inquiry" className="underline text-blue-400 hover:text-blue-300">citylife32@outlook.com</a><br />

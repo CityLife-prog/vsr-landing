@@ -35,8 +35,8 @@ export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
   // REQUIRED (NIST 800-63B compliant)
   {
     id: 'minLength',
-    description: 'At least 12 characters long',
-    validator: (password: string) => password.length >= 12,
+    description: 'At least 8 characters long',
+    validator: (password: string) => password.length >= 8,
     severity: 'required'
   },
   {
@@ -200,7 +200,7 @@ function generatePasswordSuggestions(failed: PasswordRequirement[], password: st
   failed.forEach(requirement => {
     switch (requirement.id) {
       case 'minLength':
-        suggestions.push(`Add ${12 - password.length} more characters`);
+        suggestions.push(`Add ${8 - password.length} more characters`);
         break;
       case 'maxLength':
         suggestions.push('Password is too long, please shorten it');

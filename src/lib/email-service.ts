@@ -4,6 +4,7 @@
 import nodemailer from 'nodemailer';
 import { logger } from './logger';
 import { metrics } from './monitoring';
+import { getRecipientsForType, validateEmailConfig, logEmailConfig } from './email-config';
 
 /**
  * Email configuration interface

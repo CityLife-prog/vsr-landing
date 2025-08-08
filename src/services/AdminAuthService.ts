@@ -41,7 +41,13 @@ interface PasswordValidation {
 
 export class AdminAuthService {
   private credentials: Map<string, AdminCredentials> = new Map();
-  private readonly JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+  private readonly JWT_SECRET = (() => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+    return secret;
+  })();
   private readonly DEFAULT_PASSWORD = 'VSRAdmin2025!';
   private readonly SALT_ROUNDS = 12;
   private readonly MAX_LOGIN_ATTEMPTS = 5;

@@ -5,14 +5,22 @@ import crypto from 'crypto';
 export const SECURITY_CONFIG = {
   // Allowed file types for different upload contexts
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  ALLOWED_DOCUMENT_TYPES: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'text/csv'
+  ],
   
   // File size limits (in bytes)
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB - reduced from 10MB
   MAX_TOTAL_UPLOAD_SIZE: 25 * 1024 * 1024, // 25MB total
   
   // File name restrictions
-  ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.doc', '.docx'],
+  ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv'],
   BLOCKED_EXTENSIONS: ['.exe', '.bat', '.cmd', '.scr', '.pif', '.com', '.jar', '.js', '.php', '.asp', '.jsp'],
   
   // Rate limiting

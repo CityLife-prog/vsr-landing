@@ -4,6 +4,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { simpleAuthService } from '@/services/SimpleAuthService';
+import { secureCookieManager } from '../../../lib/secure-cookie-auth';
 import fs from 'fs';
 import path from 'path';
 
@@ -74,35 +75,20 @@ function saveQuoteRequestsToFile(requests: QuoteRequest[]) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Verify admin authentication
+    // Check if this is a form submission (POST without auth header for new quote requests)
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
-    }
-
-    const token = authHeader.substring(7);
+    const isFormSubmission = req.method === 'POST' && !authHeader && req.body && req.body.fullName;
     
-    try {
-      // Allow system token for internal API calls
-      if (token === 'system_token') {
-        // Internal system call - allowed
-      } else {
-        const user = await simpleAuthService.verifyToken(token);
-        if (!user || user.role !== 'admin') {
-          return res.status(403).json({
-            success: false,
-            message: 'Admin access required'
-          });
-        }
+    if (!isFormSubmission) {
+      // Verify admin authentication using cookies
+      const authResult = await secureCookieManager.getAuthFromCookies(req);
+      if (!authResult.success || !authResult.user || authResult.user.role !== 'admin') {
+        return res.status(401).json({ 
+          success: false,
+          error: 'Authentication required or insufficient permissions',
+          message: authResult.message
+        });
       }
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token'
-      });
     }
 
     switch (req.method) {
@@ -275,8 +261,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
         }
 
+      case 'DELETE':
+        // Delete specific quote request
+        const { id: deleteId } = req.query;
+
+        if (!deleteId) {
+          return res.status(400).json({
+            success: false,
+            message: 'Quote request ID required for deletion'
+          });
+        }
+
+        const deleteIndex = quoteRequests.findIndex(r => r.id === deleteId);
+        if (deleteIndex === -1) {
+          return res.status(404).json({
+            success: false,
+            message: 'Quote request not found'
+          });
+        }
+
+        // Remove the request from the array
+        const deletedRequest = quoteRequests.splice(deleteIndex, 1)[0];
+        saveQuoteRequestsToFile(quoteRequests);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Quote request deleted successfully',
+          data: {
+            deleted: deletedRequest,
+            remaining: quoteRequests.length
+          }
+        });
+
       default:
-        res.setHeader('Allow', ['GET', 'PATCH', 'POST']);
+        res.setHeader('Allow', ['GET', 'PATCH', 'POST', 'DELETE']);
         return res.status(405).json({
           success: false,
           message: 'Method not allowed'

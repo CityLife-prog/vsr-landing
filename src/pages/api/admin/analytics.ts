@@ -6,6 +6,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withSecurity } from '../../../middleware/cors';
 import { withServiceStatusCheck } from '../../../middleware/maintenanceMode';
+import { secureCookieManager } from '../../../lib/secure-cookie-auth';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
@@ -185,21 +186,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     // For GET requests (viewing analytics), require authentication
     if (req.method === 'GET') {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Missing or invalid authorization header' });
-      }
-
-      const token = authHeader.substring(7);
-      
-      try {
-        const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
-        console.log('🔑 JWT verification attempt, secret exists:', !!process.env.JWT_SECRET);
-        jwt.verify(token, jwtSecret);
-        console.log('✅ JWT verified successfully');
-      } catch (jwtError) {
-        console.error('❌ JWT verification failed:', jwtError);
-        return res.status(401).json({ error: 'Invalid or expired token' });
+      // Use secure cookie authentication instead of JWT tokens
+      const authResult = await secureCookieManager.getAuthFromCookies(req);
+      if (!authResult.success || !authResult.user || authResult.user.role !== 'admin') {
+        return res.status(401).json({ 
+          error: 'Authentication required or insufficient permissions',
+          message: authResult.message
+        });
       }
     }
 

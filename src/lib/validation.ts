@@ -53,13 +53,9 @@ export function validateApplicationData(fields: Record<string, unknown>, files: 
     data.phone = phoneValidation.sanitized;
   }
 
-  // Validate experience
+  // Validate experience (optional)
   const experience = sanitizeText(Array.isArray(fields.experience) ? fields.experience[0] : fields.experience);
-  if (!experience || experience.length < 10) {
-    errors.push('Experience description must be at least 10 characters long');
-  } else {
-    data.experience = experience;
-  }
+  data.experience = experience || '';
 
   // Handle resume file
   let resumeFile: File | { filepath: string; originalFilename: string; mimetype: string; size: number } | undefined = undefined;
@@ -135,28 +131,35 @@ export function validateQuoteData(fields: Record<string, unknown>, files: Record
 
   // Validate service
   const allowedServices = [
-    'Snow Removal',
-    'Landscaping / Hardscaping',
-    'Concrete / Asphalt Repairs',
-    'Demolition',
-    'Painting',
-    'Other'
+    'snow-ice-removal',
+    'landscaping',
+    'concrete-asphalt',
+    'demolition',
+    'painting',
+    'other'
   ];
+  
+  // Service display names mapping
+  const serviceDisplayNames: Record<string, string> = {
+    'snow-ice-removal': 'Snow and Ice Removal',
+    'landscaping': 'Landscaping / Hardscaping',
+    'concrete-asphalt': 'Concrete / Asphalt Repairs',
+    'demolition': 'Demolition',
+    'painting': 'Painting',
+    'other': 'Other'
+  };
   
   const service = sanitizeText(Array.isArray(fields.service) ? fields.service[0] : fields.service);
   if (!service || !allowedServices.includes(service)) {
     errors.push('Please select a valid service');
   } else {
-    data.service = service;
+    // Store the display name for email content
+    data.service = serviceDisplayNames[service] || service;
   }
 
-  // Validate details
+  // Validate details (optional)
   const details = sanitizeText(Array.isArray(fields.details) ? fields.details[0] : fields.details);
-  if (!details || details.length < 10) {
-    errors.push('Project details must be at least 10 characters long');
-  } else {
-    data.details = details;
-  }
+  data.details = details || '';
 
   // Handle photo files
   let photoFiles: File[] | { filepath: string; originalFilename: string; mimetype: string; size: number }[] = [];

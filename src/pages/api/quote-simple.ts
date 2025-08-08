@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import { withServiceStatusCheck } from '../../middleware/maintenanceMode';
+import { getRecipientsString } from '@/lib/email-config';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -76,11 +77,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Send email based on form type
     if (formType === 'vsr_team_update') {
-      // VSR Team Update email - Use TEST_EMAIL_RECIPIENT if set, otherwise production emails
-      const updateRecipient = process.env.TEST_EMAIL_RECIPIENT || 'marcus@vsrsnow.com';
+      // VSR Team Update email - Use admin recipients
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
-        to: updateRecipient,
+        to: getRecipientsString('admin'),
         subject: `VSR Team Update - ${contractID || 'No Contract ID'}`,
         text: `VSR Team Update received:
 
@@ -99,11 +99,10 @@ Files Attached: ${hasFiles ? `Yes (${fileCount} files)` : 'No'}
 Submitted at: ${new Date().toISOString()}`,
       });
     } else {
-      // Regular quote email - Use TEST_EMAIL_RECIPIENT if set, otherwise production emails
-      const quoteRecipients = process.env.TEST_EMAIL_RECIPIENT || 'marcus@vsrsnow.com, zach@vsrsnow.com';
+      // Regular quote email - Use quote recipients
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
-        to: quoteRecipients,
+        to: getRecipientsString('quotes'),
         subject: 'New Quote Request',
         text: `New quote request received:
 

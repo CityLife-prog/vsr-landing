@@ -47,7 +47,9 @@ export class EnhancedAdminAuthService {
 
   private async initializeDefaultAdmins(): Promise<void> {
     for (const adminConfig of DEFAULT_ADMIN_USERS) {
-      const hashedPassword = await bcrypt.hash(adminConfig.defaultPassword, 12);
+      // Generate secure random password for each admin
+      const temporaryPassword = this.generateSecurePassword();
+      const hashedPassword = await bcrypt.hash(temporaryPassword, 12);
       
       const admin: AdminUser = {
         id: this.generateId(),
@@ -348,6 +350,16 @@ export class EnhancedAdminAuthService {
 
   private generateId(): string {
     return crypto.randomBytes(16).toString('hex');
+  }
+
+  private generateSecurePassword(): string {
+    // Generate a secure random password with at least 16 characters
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 16; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
   }
 
   // Get admin by email (for testing)

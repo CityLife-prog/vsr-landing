@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { FaEdit, FaPhoneAlt, FaQuestionCircle } from 'react-icons/fa';
+import { FaEdit, FaPhoneAlt, FaQuestionCircle, FaClipboardList } from 'react-icons/fa';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ClientUpdateButton() {
@@ -49,22 +49,33 @@ export default function ClientUpdateButton() {
             
             <button
               onClick={() => {
+                router.push('/quote');
+                setIsDropdownOpen(false);
+              }}
+              className="flex items-center w-full text-left px-4 py-2 hover:bg-gray-700 text-sm text-white"
+            >
+              <FaClipboardList className="mr-3" size={12} />
+              {t('help.request_quote', 'Request a Quote')}
+            </button>
+            
+            <button
+              onClick={() => {
                 router.push('/quote#update-vsr-team');
                 setIsDropdownOpen(false);
               }}
               className="flex items-center w-full text-left px-4 py-2 hover:bg-gray-700 text-sm text-white"
             >
               <FaPhoneAlt className="mr-3" size={12} />
-              {t('help.contact_team', 'Contact VSR Team')}
+              {t('help.update_team', 'Update the VSR team')}
             </button>
             
             <a
-              href="mailto:citylife32@outlook.com?subject=Need Help - VSR Support"
+              href="mailto:citylife32@outlook.com?subject=Accessibility Issues - VSR Support"
               onClick={() => setIsDropdownOpen(false)}
               className="flex items-center w-full text-left px-4 py-2 hover:bg-gray-700 text-sm text-white"
             >
               <FaQuestionCircle className="mr-3" size={12} />
-              {t('help.need_help', 'Need Help?')}
+              {t('help.accessibility_issues', 'Accessibility issues?')}
             </a>
             
             {/* Arrow pointing to button */}

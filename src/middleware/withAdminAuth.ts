@@ -31,7 +31,12 @@ export function withAdminAuth(handler: AdminApiHandler) {
       const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
       // Verify JWT token
-      const secret = process.env.JWT_SECRET || 'your-secret-key';
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('JWT_SECRET environment variable is not configured');
+        return res.status(500).json({ error: 'Server configuration error' });
+      }
+      
       let decoded: any;
       
       try {

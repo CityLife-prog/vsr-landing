@@ -7,6 +7,7 @@ import { IncomingForm } from 'formidable';
 import { withSecurity, validateContentType, validateRequestSize } from '@/lib/middleware';
 import { validateFileUpload, generateSecureFilename, secureLog, SECURITY_CONFIG } from '@/lib/security';
 import { validateApplicationData, type ApplicationData } from '@/lib/validation';
+import { getRecipientsString } from '@/lib/email-config';
 
 export const config = {
   api: {
@@ -139,7 +140,7 @@ async function applyHandler(req: NextApiRequest, res: NextApiResponse) {
       // SECURITY: Use sanitized data for email content
       const emailContent = {
         from: process.env.EMAIL_FROM,
-        to: process.env.TEST_EMAIL_RECIPIENT || 'marcus@vsrsnow.com',
+        to: getRecipientsString('applications'),
         // SECURITY: Prevent email injection by using template
         subject: 'New Job Application Received',
         text: `A new job application has been received:\n\n` +

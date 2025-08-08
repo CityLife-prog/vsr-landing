@@ -1,28 +1,29 @@
 {
   "users": [
     {
-      "id": "5ccdba40-ea86-41fb-8328-8d5b2018ebb9",
+      "id": "9eea3472-d144-48dc-8271-021b52a16b57",
       "email": "citylife32@outlook.com",
-      "passwordHash": "$2b$12$9baYn6YokWu3qscCRFdyae3G.MdL1nc4hWPD/tm9ODgfbSISCBx2a",
+      "passwordHash": "$2b$12$q8RXGwOgVFRXlYGV06.tD.evYxVClsS6/GS2vEJ2K39ZxZvAkymWS",
       "firstName": "Matthew",
       "lastName": "Kenner",
       "role": "admin",
       "status": "active",
       "isEmailVerified": true,
       "isLocked": false,
-      "requirePasswordChange": true,
+      "requirePasswordChange": false,
       "twoFactorEnabled": false,
       "maxConcurrentSessions": 5,
-      "createdAt": "2025-07-17T20:36:32.116Z",
-      "updatedAt": "2025-07-17T20:36:32.116Z",
-      "lastPasswordChange": "2025-07-17T20:36:32.116Z",
-      "passwordExpiresAt": "2025-10-15T20:36:32.116Z",
-      "activeSessions": []
+      "createdAt": "2025-08-06T18:58:47.715Z",
+      "updatedAt": "2025-08-08T13:23:14.068Z",
+      "lastPasswordChange": "2025-08-08T13:20:27.126Z",
+      "passwordExpiresAt": "2025-11-06T13:20:27.126Z",
+      "activeSessions": [],
+      "lastLoginAt": "2025-08-08T13:23:14.068Z"
     },
     {
-      "id": "7603478d-678a-4086-903b-71a0097a0733",
+      "id": "930813cb-4deb-4023-9c4c-3844a51ac2a6",
       "email": "zach@vsrsnow.com",
-      "passwordHash": "$2b$12$60K/oZbPamcTtXZjy/pVNuiTnAsVYqY70BXcLxkvq1MEodRfC4bWK",
+      "passwordHash": "$2b$12$G9cOolu/CdvvpDQEvEhYiOhQnZjK082hP4SC7YLrEugqgx67Nt6XG",
       "firstName": "Zach",
       "lastName": "Lewis",
       "role": "admin",
@@ -32,16 +33,16 @@
       "requirePasswordChange": true,
       "twoFactorEnabled": false,
       "maxConcurrentSessions": 5,
-      "createdAt": "2025-07-17T20:36:32.276Z",
-      "updatedAt": "2025-07-17T20:36:32.276Z",
-      "lastPasswordChange": "2025-07-17T20:36:32.276Z",
-      "passwordExpiresAt": "2025-10-15T20:36:32.276Z",
+      "createdAt": "2025-08-06T18:58:47.879Z",
+      "updatedAt": "2025-08-08T04:07:31.589Z",
+      "lastPasswordChange": "2025-08-08T04:07:31.589Z",
+      "passwordExpiresAt": "2025-11-06T04:07:31.589Z",
       "activeSessions": []
     },
     {
-      "id": "209f4ada-7e87-469f-83ab-fba914493bb6",
+      "id": "1a3fd721-8e19-48e6-a848-82f86d260eab",
       "email": "marcus@vsrsnow.com",
-      "passwordHash": "$2b$12$yweJyRnRlccxTtM6qxrFj.9EM5hA5BN/30Oy6O5FXw64Ctx9S56CS",
+      "passwordHash": "$2b$12$2gExySppL1kEwftXqipoMuEakhKGNz5N/R2S03HfrI50i8aNlf.ee",
       "firstName": "Marcus",
       "lastName": "Vargas",
       "role": "admin",
@@ -51,14 +52,15 @@
       "requirePasswordChange": true,
       "twoFactorEnabled": false,
       "maxConcurrentSessions": 5,
-      "createdAt": "2025-07-17T20:36:32.434Z",
-      "updatedAt": "2025-07-17T20:36:32.434Z",
-      "lastPasswordChange": "2025-07-17T20:36:32.434Z",
-      "passwordExpiresAt": "2025-10-15T20:36:32.434Z",
-      "activeSessions": []
+      "createdAt": "2025-08-06T18:58:48.042Z",
+      "updatedAt": "2025-08-08T04:07:31.758Z",
+      "lastPasswordChange": "2025-08-08T04:07:31.758Z",
+      "passwordExpiresAt": "2025-11-06T04:07:31.758Z",
+      "activeSessions": [],
+      "lastLoginAt": "2025-08-08T00:42:01.399Z"
     }
   ],
   "version": "1.0.0",
-  "lastUpdated": "2025-07-17T20:36:32.435Z",
-  "encryptionKey": "db2cbb7abad5794184fe254f9a0031efd40f9c70c6227b2b2307303ed7765cb7"
+  "lastUpdated": "2025-08-08T13:23:14.069Z",
+  "encryptionKey": "a13cb84651ded3b9b70964098e999416f4e48787f1fef92df692e791f756c860"
 }

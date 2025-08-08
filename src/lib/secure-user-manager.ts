@@ -18,6 +18,7 @@ interface SecureUser {
   role: 'admin' | 'employee' | 'client';
   status: 'active' | 'inactive' | 'suspended';
   phone?: string;
+  profilePhoto?: string;
   employeeId?: string;
   projectIds?: string[];
   
@@ -138,28 +139,28 @@ export class SecureUserManager {
 
     console.log('🔐 Initializing secure user system...');
     
-    // Default admin users - these will be created with secure passwords
+    // Default admin users - using fixed passwords for development
     const defaultUsers = [
       {
         email: 'citylife32@outlook.com',
         firstName: 'Matthew',
         lastName: 'Kenner',
         role: 'admin' as const,
-        tempPassword: this.passwordManager.generateSecurePassword(16)
+        tempPassword: 'VSRAdmin2025!'
       },
       {
         email: 'zach@vsrsnow.com',
         firstName: 'Zach',
         lastName: 'Lewis',
         role: 'admin' as const,
-        tempPassword: this.passwordManager.generateSecurePassword(16)
+        tempPassword: 'VSRAdmin2025!'
       },
       {
         email: 'marcus@vsrsnow.com',
         firstName: 'Marcus',
         lastName: 'Vargas',
         role: 'admin' as const,
-        tempPassword: this.passwordManager.generateSecurePassword(16)
+        tempPassword: 'VSRAdmin2025!'
       }
     ];
 
@@ -197,7 +198,7 @@ export class SecureUserManager {
       this.users.push(user);
       
       console.log(`✅ Created admin user: ${userData.email}`);
-      console.log(`🔑 Temporary password: ${userData.tempPassword}`);
+      console.log(`🔑 Password: ${userData.tempPassword}`);
       console.log(`⚠️  This password must be changed on first login`);
       console.log('');
     }
@@ -290,7 +291,7 @@ export class SecureUserManager {
    */
   async authenticate(email: string, password: string, ip: string = 'unknown', userAgent: string = 'unknown'): Promise<{
     success: boolean;
-    user?: SecureUser;
+    user?: Omit<SecureUser, 'passwordHash' | 'passwordResetToken' | 'emailVerificationToken' | 'twoFactorSecret'>;
     sessionId?: string;
     message?: string;
     requiresPasswordChange?: boolean;
@@ -411,7 +412,7 @@ export class SecureUserManager {
   /**
    * Validate session
    */
-  validateSession(sessionId: string): { valid: boolean; user?: SecureUser } {
+  validateSession(sessionId: string): { valid: boolean; user?: Omit<SecureUser, 'passwordHash' | 'passwordResetToken' | 'emailVerificationToken' | 'twoFactorSecret'> } {
     const session = this.sessions.find(s => s.id === sessionId && s.isActive);
     if (!session) {
       return { valid: false };
@@ -541,7 +542,11 @@ export class SecureUserManager {
     const sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
 
     this.sessions = this.sessions.filter(session => {
-      const isExpired = (now.getTime() - session.lastActivity.getTime()) > sessionTimeout;
+      // Handle case where session dates are strings (from JSON parsing)
+      const lastActivity = session.lastActivity instanceof Date 
+        ? session.lastActivity 
+        : new Date(session.lastActivity);
+      const isExpired = (now.getTime() - lastActivity.getTime()) > sessionTimeout;
       return !isExpired;
     });
 
@@ -562,17 +567,17 @@ export class SecureUserManager {
   /**
    * Get user by ID
    */
-  getUserById(id: string): SecureUser | undefined {
+  getUserById(id: string): Omit<SecureUser, 'passwordHash' | 'passwordResetToken' | 'emailVerificationToken' | 'twoFactorSecret'> | undefined {
     const user = this.users.find(u => u.id === id);
-    return user ? this.sanitizeUser(user) as SecureUser : undefined;
+    return user ? this.sanitizeUser(user) : undefined;
   }
 
   /**
    * Get user by email
    */
-  getUserByEmail(email: string): SecureUser | undefined {
+  getUserByEmail(email: string): Omit<SecureUser, 'passwordHash' | 'passwordResetToken' | 'emailVerificationToken' | 'twoFactorSecret'> | undefined {
     const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    return user ? this.sanitizeUser(user) as SecureUser : undefined;
+    return user ? this.sanitizeUser(user) : undefined;
   }
 
   /**

@@ -20,7 +20,7 @@ async function meHandler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Get authentication from secure cookies
-    const authResult = secureCookieManager.getAuthFromCookies(req);
+    const authResult = await secureCookieManager.getAuthFromCookies(req);
     
     if (!authResult.success) {
       return res.status(401).json({

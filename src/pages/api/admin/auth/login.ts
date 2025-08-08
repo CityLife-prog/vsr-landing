@@ -20,8 +20,42 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    console.log('📥 Login request body:', req.body);
-    const { email, password, rememberMe } = req.body;
+    // Manually read and parse JSON body
+    let body: any = {};
+    
+    if (req.body) {
+      // Body already parsed by Next.js
+      body = req.body;
+    } else {
+      // Parse raw body manually
+      const rawBody = await new Promise<string>((resolve) => {
+        let data = '';
+        req.on('data', (chunk) => {
+          data += chunk;
+        });
+        req.on('end', () => {
+          resolve(data);
+        });
+      });
+
+      if (rawBody) {
+        console.log('🔍 Raw body received:', rawBody);
+        try {
+          body = JSON.parse(rawBody);
+        } catch (parseError) {
+          console.error('🚨 JSON parse error:', parseError);
+          console.error('🚨 Raw body that failed to parse:', JSON.stringify(rawBody));
+          return res.status(400).json({ 
+            success: false, 
+            message: 'Invalid JSON format.',
+            error: 'INVALID_JSON'
+          });
+        }
+      }
+    }
+    
+    console.log('📥 Login request body:', body);
+    const { email, password, rememberMe } = body;
 
     // Input validation
     if (!email || !password) {
@@ -78,7 +112,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       secureCookieManager.setAuthCookies(res, {
         accessToken: result.token!,
         refreshToken: result.token!, // In production, use separate refresh token
-        sessionId: `session_${Date.now()}_${Math.random()}`
+        sessionId: result.sessionId!
       });
       
       // Return result without exposing the token
@@ -118,6 +152,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       error: 'SERVER_ERROR'
     });
   }
+}
+
+// API route configuration
+export const config = {
+  api: {
+    bodyParser: false, // Disable automatic body parsing
+  },
 }
 
 export default withAuthRateLimit(withSecurity(handler));

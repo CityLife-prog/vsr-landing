@@ -4,6 +4,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { simpleAuthService } from '@/services/SimpleAuthService';
+import { secureCookieManager } from '../../../lib/secure-cookie-auth';
 
 // v2 data structure for update requests (priority column removed)
 interface UpdateRequest {
@@ -28,35 +29,20 @@ let updateRequests: UpdateRequest[] = [];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Verify admin authentication
+    // Check if this is a form submission (POST without auth header for new update requests)
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
-    }
-
-    const token = authHeader.substring(7);
+    const isFormSubmission = req.method === 'POST' && !authHeader && req.body && req.body.customerName;
     
-    try {
-      // Allow system token for internal API calls
-      if (token === 'system_token') {
-        // Internal system call - allowed
-      } else {
-        const user = await simpleAuthService.verifyToken(token);
-        if (!user || user.role !== 'admin') {
-          return res.status(403).json({
-            success: false,
-            message: 'Admin access required'
-          });
-        }
+    if (!isFormSubmission) {
+      // Verify admin authentication using cookies
+      const authResult = await secureCookieManager.getAuthFromCookies(req);
+      if (!authResult.success || !authResult.user || authResult.user.role !== 'admin') {
+        return res.status(401).json({ 
+          success: false,
+          error: 'Authentication required or insufficient permissions',
+          message: authResult.message
+        });
       }
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token'
-      });
     }
 
     switch (req.method) {

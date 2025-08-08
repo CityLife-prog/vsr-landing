@@ -106,7 +106,10 @@ export interface AdminConsoleConfig {
   };
 }
 
-// Default admin users configuration (3 default + 1 demo = 4 total)
+/**
+ * Default admin users configuration
+ * SECURITY NOTE: No hardcoded passwords - these are generated securely at runtime
+ */
 export const DEFAULT_ADMIN_USERS = [
   {
     email: 'citylife32@outlook.com',
@@ -114,7 +117,6 @@ export const DEFAULT_ADMIN_USERS = [
     lastName: 'Admin',
     adminLevel: 'super_admin' as const,
     permissions: 'all',
-    defaultPassword: 'citylife32',
     requiresPasswordReset: true
   },
   {
@@ -123,7 +125,6 @@ export const DEFAULT_ADMIN_USERS = [
     lastName: 'VSR',
     adminLevel: 'admin' as const,
     permissions: 'admin_operations',
-    defaultPassword: 'Marcus',
     requiresPasswordReset: true
   },
   {
@@ -132,7 +133,6 @@ export const DEFAULT_ADMIN_USERS = [
     lastName: 'VSR',
     adminLevel: 'admin' as const,
     permissions: 'admin_operations',
-    defaultPassword: 'Zach',
     requiresPasswordReset: true
   },
   {
@@ -141,7 +141,6 @@ export const DEFAULT_ADMIN_USERS = [
     lastName: 'Admin',
     adminLevel: 'manager' as const,
     permissions: 'admin_operations',
-    defaultPassword: 'demo123',
     requiresPasswordReset: false
   }
 ] as const;

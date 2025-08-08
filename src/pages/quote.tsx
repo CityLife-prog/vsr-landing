@@ -76,27 +76,16 @@ export default function QuotePage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Extract form values
-    const fullName = formData.get('fullName') as string;
-    const email = formData.get('email') as string;
-    const phone = formData.get('phone') as string;
-    const service = formData.get('service') as string;
-    const details = formData.get('details') as string;
+    // Add selected files to FormData
+    selectedFiles.forEach((file, index) => {
+      formData.append('photos', file);
+    });
 
     try {
-      console.log('Submitting form...');
-      const res = await fetch('/api/quote-simple', {
+      console.log('Submitting form with files...', selectedFiles.length, 'files');
+      const res = await fetch('/api/quote', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          phone,
-          service,
-          details
-        }),
+        body: formData, // Send FormData directly (don't set Content-Type header)
       });
 
       const result = await res.json();
@@ -243,12 +232,14 @@ export default function QuotePage() {
                   rows={4}
                   placeholder={t('quote.form.details_placeholder', 'Describe your project...')}
                   className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
-                  required
                 ></textarea>
               </div>
 
               <div>
-                <label className="block mb-2 text-sm font-medium">{t('quote.form.photos', 'Upload Files or Photos (optional)')}</label>
+                <label className="block mb-2 text-sm font-medium">{t('quote.form.photos', 'Upload Files (optional)')}</label>
+                <p className="text-xs text-gray-400 mb-2">
+                  Supported formats: Images (JPG, PNG, GIF, WebP), Documents (PDF, DOC, DOCX, XLS, XLSX), Text files (TXT, CSV) - Max 5MB per file
+                </p>
 
                 <input
                   type="file"
@@ -349,98 +340,33 @@ export default function QuotePage() {
             </p>
             
             <form 
-              action="/api/quote" 
+              action="/api/quote-update" 
               method="POST" 
               encType="multipart/form-data"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                const formData = new FormData();
-                formData.append('formType', 'update');
-                formData.append('contractID', contractID);
-                formData.append('fullName', updateFullName);
-                formData.append('email', updateEmail);
-                formData.append('phone', updatePhone);
-                formData.append('jobDescription', updateJobDescription);
-                formData.append('reasonForContact', (e.target as any).reasonForContact.value);
-                formData.append('notes', updateNotes);
                 
+                const form = e.currentTarget;
+                const formData = new FormData(form);
+                
+                // Add files to FormData
                 updateSelectedFiles.forEach((file, index) => {
                   formData.append(`updateFile${index}`, file);
                 });
-                
-                // Get reason for contact value safely
-                const reasonForContact = (e.target as HTMLFormElement).reasonForContact?.value || '';
-                
-                // Save to update requests database first
-                const updateRequestData = {
-                  contractId: contractID || 'No Contract ID',
-                  customerName: updateFullName,
-                  email: updateEmail,
-                  phone: updatePhone,
-                  reasonForContact: reasonForContact,
-                  jobDescription: updateJobDescription,
-                  notes: updateNotes,
-                  files: updateSelectedFiles.map(file => file.name)
-                };
 
-                console.log('Submitting update request:', updateRequestData);
-
-                // Save to database and send email
-                fetch('/api/admin/update-requests', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer system_token'
-                  },
-                  body: JSON.stringify(updateRequestData)
-                }).then(async dbResponse => {
-                  console.log('Database response status:', dbResponse.status);
-                  
-                  if (!dbResponse.ok) {
-                    const errorData = await dbResponse.json();
-                    console.error('Database error:', errorData);
-                    throw new Error(errorData.message || 'Failed to save update request');
-                  }
-                  
-                  const dbData = await dbResponse.json();
-                  console.log('Update request saved to database:', dbData);
-                  
-                  // Then send email via quote-simple API (no files)
-                  const emailData = {
-                    formType: 'vsr_team_update',
-                    contractID: contractID || 'No Contract ID',
-                    fullName: updateFullName,
-                    email: updateEmail,
-                    phone: updatePhone,
-                    reasonForContact: reasonForContact,
-                    jobDescription: updateJobDescription,
-                    notes: updateNotes,
-                    hasFiles: updateSelectedFiles.length > 0,
-                    fileCount: updateSelectedFiles.length
-                  };
-                  
-                  return fetch('/api/quote-simple', {
+                try {
+                  console.log('Submitting update with files...', updateSelectedFiles.length, 'files');
+                  const res = await fetch('/api/quote-update', {
                     method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(emailData)
+                    body: formData,
                   });
-                }).then(async response => {
-                  console.log('Email response status:', response.status);
-                  
-                  if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('Email error:', errorData);
-                    throw new Error(errorData.message || 'Failed to send update email');
-                  }
-                  
-                  return response.json();
-                }).then(data => {
-                  console.log('Email response:', data);
-                  if (data.success) {
+
+                  const result = await res.json();
+                  console.log('Update response:', result);
+
+                  if (result.success) {
                     setUpdateStatusMessage(t('quote.update_form.success', 'Update sent successfully! We\'ll be in touch soon.'));
-                    (e.target as HTMLFormElement).reset();
+                    form.reset();
                     setUpdateSelectedFiles([]);
                     setContractID('');
                     setContractData(null);
@@ -452,10 +378,12 @@ export default function QuotePage() {
                   } else {
                     setUpdateStatusMessage(t('quote.update_form.error', 'Error sending update. Please try again.'));
                   }
-                }).catch(error => {
-                  console.error('Update request error:', error);
+                  setTimeout(() => setUpdateStatusMessage(''), 5000);
+                } catch (error) {
+                  console.error('Update submit error:', error);
                   setUpdateStatusMessage(t('quote.update_form.error', 'Error sending update. Please try again.'));
-                });
+                  setTimeout(() => setUpdateStatusMessage(''), 5000);
+                }
               }}
               className="space-y-6"
             >
@@ -483,7 +411,6 @@ export default function QuotePage() {
                   value={updateJobDescription}
                   onChange={(e) => setUpdateJobDescription(e.target.value)}
                   className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
-                  required
                 ></textarea>
               </div>
 
@@ -551,12 +478,14 @@ export default function QuotePage() {
                   value={updateNotes}
                   onChange={(e) => setUpdateNotes(e.target.value)}
                   className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
-                  required
                 ></textarea>
               </div>
 
               <div>
-                <label className="block mb-2 text-sm font-medium">{t('quote.form.photos', 'Upload Files or Photos (optional)')}</label>
+                <label className="block mb-2 text-sm font-medium">{t('quote.form.photos', 'Upload Files (optional)')}</label>
+                <p className="text-xs text-gray-400 mb-2">
+                  Supported formats: Images (JPG, PNG, GIF, WebP), Documents (PDF, DOC, DOCX, XLS, XLSX), Text files (TXT, CSV) - Max 5MB per file
+                </p>
                 <input
                   type="file"
                   id="updatePhotoInput"

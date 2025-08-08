@@ -20,7 +20,7 @@ const ForgotPasswordPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/admin/auth/request-reset', {
+      const response = await fetch('/api/admin/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

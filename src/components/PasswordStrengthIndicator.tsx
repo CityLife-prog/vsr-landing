@@ -1,26 +1,13 @@
 /**
  * Password Strength Indicator Component
  * Real-time visual feedback for password complexity
+ * Client-side only implementation using passwordValidation utility
  */
 
 import React, { useEffect, useState } from 'react';
-import { passwordSecurity } from '../lib/password-security';
-import { FaEye, FaEyeSlash, FaRefresh, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { validatePassword, generateSecurePassword, PasswordValidationResult } from '../utils/passwordValidation';
+import { FaEye, FaEyeSlash, FaSync, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { FaInfoCircle as FaInfo } from 'react-icons/fa';
-
-// Define validation result interface locally
-interface PasswordValidationResult {
-  isValid: boolean;
-  score: number;
-  errors: string[];
-  warnings: string[];
-  suggestions: string[];
-  strength: 'very-weak' | 'weak' | 'fair' | 'good' | 'strong' | 'very-strong';
-  requirements: {
-    met: { id: string; description: string; severity: 'required' | 'recommended' }[];
-    failed: { id: string; description: string; severity: 'required' | 'recommended' }[];
-  };
-}
 
 interface PasswordStrengthIndicatorProps {
   password: string;
@@ -45,41 +32,12 @@ export default function PasswordStrengthIndicator({
 
   useEffect(() => {
     if (password) {
-      const result = passwordSecurity.validatePasswordStrength(password);
-      // Convert to expected format
-      const formattedResult: PasswordValidationResult = {
-        isValid: result.isValid,
-        score: result.score,
-        errors: result.errors,
-        warnings: result.warnings,
-        suggestions: result.suggestions,
-        strength: getStrengthLevel(result.score),
-        requirements: {
-          met: result.isValid ? [
-            { id: 'length', description: 'Minimum length requirement', severity: 'required' as const },
-            { id: 'complexity', description: 'Character complexity requirement', severity: 'required' as const }
-          ] : [],
-          failed: result.errors.map((error, index) => ({
-            id: `error-${index}`,
-            description: error,
-            severity: 'required' as const
-          }))
-        }
-      };
-      setValidation(formattedResult);
+      const result = validatePassword(password);
+      setValidation(result);
     } else {
       setValidation(null);
     }
   }, [password]);
-
-  const getStrengthLevel = (score: number): 'very-weak' | 'weak' | 'fair' | 'good' | 'strong' | 'very-strong' => {
-    if (score < 20) return 'very-weak';
-    if (score < 40) return 'weak';
-    if (score < 60) return 'fair';
-    if (score < 80) return 'good';
-    if (score < 95) return 'strong';
-    return 'very-strong';
-  };
 
   const getStrengthColor = (strength: string) => {
     switch (strength) {
@@ -106,17 +64,17 @@ export default function PasswordStrengthIndicator({
   };
 
   const generatePassword = () => {
-    const newPassword = passwordSecurity.generateSecurePassword(16);
+    const newPassword = generateSecurePassword(16);
     onPasswordChange(newPassword);
   };
 
   const estimateCrackTime = (password: string): string => {
-    const score = passwordSecurity.validatePasswordStrength(password).score;
-    if (score < 20) return '< 1 second';
-    if (score < 40) return '< 1 minute';
-    if (score < 60) return '< 1 hour';
-    if (score < 80) return '< 1 day';
-    if (score < 95) return '< 1 year';
+    const result = validatePassword(password);
+    if (result.score < 20) return '< 1 second';
+    if (result.score < 40) return '< 1 minute';
+    if (result.score < 60) return '< 1 hour';
+    if (result.score < 80) return '< 1 day';
+    if (result.score < 95) return '< 1 year';
     return '> 100 years';
   };
 
@@ -150,7 +108,7 @@ export default function PasswordStrengthIndicator({
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-400 transition-colors"
             title="Generate secure password"
           >
-            <FaRefresh />
+            <FaSync />
           </button>
         )}
       </div>

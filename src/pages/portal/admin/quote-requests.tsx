@@ -86,17 +86,9 @@ export default function QuoteRequestsPage() {
   }, [filterStatus]);
 
   const checkAdminAuth = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      router.push('/portal/admin/login');
-      return;
-    }
-
     try {
       const response = await fetch('/api/admin/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of tokens
       });
 
       if (!response.ok) {
@@ -108,23 +100,22 @@ export default function QuoteRequestsPage() {
     }
   };
 
-  const loadCurrentAdmin = () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
+  const loadCurrentAdmin = async () => {
     try {
-      const payload = token.split('.')[1];
-      const decoded = JSON.parse(atob(payload));
-      setCurrentAdmin(decoded);
+      const response = await fetch('/api/admin/dashboard', {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentAdmin(data.admin);
+      }
     } catch (error) {
-      console.error('Failed to decode token:', error);
+      console.error('Failed to load admin info:', error);
     }
   };
 
   const loadQuoteRequests = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       setLoading(true);
       
@@ -141,9 +132,7 @@ export default function QuoteRequestsPage() {
       }
       
       const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Use cookies instead of tokens
       });
 
       if (response.ok) {
@@ -183,21 +172,18 @@ export default function QuoteRequestsPage() {
   };
 
   const handleSendQuote = async (requestId: string, amount: number, notes?: string) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch(`/api/admin/quote-requests?id=${requestId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           status: 'quoted',
           adminNotes: notes,
           quotedAmount: amount,
-          updatedBy: localStorage.getItem('userEmail') || 'Admin'
+          updatedBy: currentAdmin?.email || 'Admin'
         })
       });
 
@@ -216,20 +202,17 @@ export default function QuoteRequestsPage() {
   const handleBulkAction = async (status: string) => {
     if (selectedRequests.length === 0) return;
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch('/api/admin/quote-requests', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           requestIds: selectedRequests,
           bulkStatus: status,
-          updatedBy: localStorage.getItem('userEmail') || 'Admin'
+          updatedBy: currentAdmin?.email || 'Admin'
         })
       });
 
@@ -243,19 +226,16 @@ export default function QuoteRequestsPage() {
   };
 
   const handleStatusChange = async (requestId: string, newStatus: string) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch(`/api/admin/quote-requests?id=${requestId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ 
           status: newStatus,
-          updatedBy: localStorage.getItem('userEmail') || 'Admin'
+          updatedBy: currentAdmin?.email || 'Admin'
         })
       });
 
@@ -272,16 +252,13 @@ export default function QuoteRequestsPage() {
       return;
     }
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       const response = await fetch(`/api/admin/quote-requests?id=${requestId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -296,9 +273,6 @@ export default function QuoteRequestsPage() {
   };
 
   const handleQuickAction = async (requestId: string, action: string) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     let newStatus = '';
     switch (action) {
       case 'pending':
@@ -330,9 +304,9 @@ export default function QuoteRequestsPage() {
       const response = await fetch(`/api/admin/quote-requests?id=${requestId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ 
           status: newStatus,
           updatedBy: currentAdmin?.email || 'Admin'
@@ -352,17 +326,14 @@ export default function QuoteRequestsPage() {
       return;
     }
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
     try {
       for (const requestId of selectedRequests) {
         await fetch(`/api/admin/quote-requests?id=${requestId}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include'
         });
       }
       
@@ -592,15 +563,13 @@ export default function QuoteRequestsPage() {
                       <FaBan className="mr-1" />
                       Declined {selectedRequests.length}
                     </button>
-                    {currentAdmin?.email === 'citylife32@outlook.com' && (
-                      <button
-                        onClick={() => handleBulkDelete()}
-                        className="bg-gray-800 hover:bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-medium flex items-center"
-                      >
-                        <FaTrash className="mr-1" />
-                        Delete {selectedRequests.length}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleBulkDelete()}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium flex items-center"
+                    >
+                      <FaTrash className="mr-1" />
+                      Delete {selectedRequests.length}
+                    </button>
                   </div>
                 )}
               </div>
@@ -789,16 +758,14 @@ export default function QuoteRequestsPage() {
                               <FaEye className="h-4 w-4" />
                             </button>
 
-                            {/* Delete button - only for super admin */}
-                            {currentAdmin?.email === 'citylife32@outlook.com' && (
-                              <button
-                                onClick={() => handleDeleteRequest(request.id)}
-                                className="text-red-600 hover:text-red-900 p-1"
-                                title="Delete Request (Super Admin Only)"
-                              >
-                                <FaTrash className="h-4 w-4" />
-                              </button>
-                            )}
+                            {/* Delete button - available to all admin users */}
+                            <button
+                              onClick={() => handleDeleteRequest(request.id)}
+                              className="text-red-600 hover:text-red-900 p-1"
+                              title="Delete Request"
+                            >
+                              <FaTrash className="h-4 w-4" />
+                            </button>
                           </div>
                         </td>
                       </tr>

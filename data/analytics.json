@@ -1,38 +1,33 @@
 {
   "overview": {
-    "totalVisitors": 5,
-    "visitorChange": 25,
-    "pageViews": 32,
-    "pageViewChange": 3.225806451612903,
-    "quoteRequests": 1,
+    "totalVisitors": 2,
+    "visitorChange": 100,
+    "pageViews": 7,
+    "pageViewChange": 16.666666666666664,
+    "quoteRequests": 0,
     "quoteRequestChange": 0,
-    "conversionRate": 20,
-    "conversionRateChange": -20,
-    "totalLoginAttempts": 50,
-    "successfulLogins": 34,
-    "loginSuccessRate": 68
+    "conversionRate": 0,
+    "conversionRateChange": 0,
+    "totalLoginAttempts": 27,
+    "successfulLogins": 12,
+    "loginSuccessRate": 44.44444444444444
   },
   "topPages": [
     {
-      "path": "/",
-      "views": 28,
-      "percentage": 87.5
-    },
-    {
       "path": "/quote",
-      "views": 3,
-      "percentage": 9.375
+      "views": 1,
+      "percentage": 14.285714285714285
     },
     {
-      "path": "/apply",
-      "views": 1,
-      "percentage": 3.125
+      "path": "/",
+      "views": 6,
+      "percentage": 85.71428571428571
     }
   ],
   "trafficSources": [
     {
       "source": "Direct",
-      "visitors": 5,
+      "visitors": 2,
       "percentage": 100
     },
     {
@@ -74,16 +69,16 @@
   "loginAttempts": [
     {
       "loginType": "admin",
-      "attempts": 50,
-      "successful": 34,
-      "successRate": 68
+      "attempts": 27,
+      "successful": 12,
+      "successRate": 44.44444444444444
     }
   ],
   "historical": {
-    "totalVisitors": 4,
-    "pageViews": 31,
-    "quoteRequests": 1,
-    "conversionRate": 25,
-    "lastUpdateDate": "Fri Aug 01 2025"
+    "totalVisitors": 1,
+    "pageViews": 6,
+    "quoteRequests": 0,
+    "conversionRate": 0,
+    "lastUpdateDate": "Fri Aug 08 2025"
   }
 }

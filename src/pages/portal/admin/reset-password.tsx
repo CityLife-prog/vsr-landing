@@ -55,6 +55,7 @@ const ResetPasswordPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Enable cookies
         body: JSON.stringify({ token, newPassword: password }),
       });
 
@@ -62,8 +63,8 @@ const ResetPasswordPage: React.FC = () => {
 
       if (data.success) {
         setSuccess(true);
-        // Store token and redirect after a short delay
-        localStorage.setItem('accessToken', data.token);
+        // Authentication cookies are set automatically by the server
+        // Redirect after a short delay
         setTimeout(() => {
           router.push('/portal/admin/dashboard');
         }, 2000);
