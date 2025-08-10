@@ -4,6 +4,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  env: {
+    // Ensure version is available at build time
+    NEXT_PUBLIC_VERSION: process.env.NEXT_PUBLIC_VERSION || '2',
+  },
   i18n: {
     locales: ['en', 'es'],
     defaultLocale: 'en',
