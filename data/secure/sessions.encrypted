@@ -1,117 +1,18 @@
 [
   {
-    "id": "a145c4f6-8d9b-414d-a352-9a3fd3f3fb4b",
+    "id": "13278e2b-3d2c-4db5-94b1-00de777a8dcb",
     "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-07T17:22:48.047Z",
-    "lastActivity": "2025-08-07T17:22:48.047Z",
-    "ip": "127.0.0.1",
-    "userAgent": "curl/8.5.0",
-    "isActive": false
-  },
-  {
-    "id": "26a47702-d0dd-4fff-89c1-6f1a3ee14e11",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-07T23:57:18.884Z",
-    "lastActivity": "2025-08-07T23:57:18.884Z",
+    "createdAt": "2025-08-10T17:39:36.451Z",
+    "lastActivity": "2025-08-10T17:41:49.665Z",
     "ip": "127.0.0.1",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
     "isActive": false
   },
   {
-    "id": "7ad8635d-b674-44b6-ae54-46754291e84b",
+    "id": "544a128c-ab59-48e7-a3f3-53eea14d0109",
     "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-07T23:59:29.108Z",
-    "lastActivity": "2025-08-07T23:59:36.672Z",
-    "ip": "127.0.0.1",
-    "userAgent": "curl/8.5.0",
-    "isActive": false
-  },
-  {
-    "id": "c70f6d2c-507e-4099-a551-fe90b02bb1ef",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-07T23:59:57.447Z",
-    "lastActivity": "2025-08-07T23:59:57.447Z",
-    "ip": "127.0.0.1",
-    "userAgent": "curl/8.5.0",
-    "isActive": true
-  },
-  {
-    "id": "2b89f90f-0d8e-4acc-9881-32e567c8062e",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:01:40.622Z",
-    "lastActivity": "2025-08-08T00:01:40.622Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": true
-  },
-  {
-    "id": "572bd005-0bda-4f9e-ac41-63665f65e074",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:01:55.492Z",
-    "lastActivity": "2025-08-08T00:02:08.503Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": true
-  },
-  {
-    "id": "2df9369c-c646-4553-992e-a239f69fe31e",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:02:21.678Z",
-    "lastActivity": "2025-08-08T00:04:46.707Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": true
-  },
-  {
-    "id": "6c898a75-bcf2-4023-9e39-00db683f4ab2",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:03:42.010Z",
-    "lastActivity": "2025-08-08T00:03:42.010Z",
-    "ip": "127.0.0.1",
-    "userAgent": "curl/8.5.0",
-    "isActive": true
-  },
-  {
-    "id": "d54aabd8-c183-4a99-8923-3a99b1a7ee34",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:04:50.303Z",
-    "lastActivity": "2025-08-08T00:04:54.219Z",
-    "ip": "127.0.0.1",
-    "userAgent": "curl/8.5.0",
-    "isActive": true
-  },
-  {
-    "id": "2a31a5f2-200a-48ba-afc6-d40f092046e7",
-    "userId": "9eea3472-d144-48dc-8271-021b52a16b57",
-    "createdAt": "2025-08-08T00:05:39.036Z",
-    "lastActivity": "2025-08-08T00:19:46.684Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": true
-  },
-  {
-    "id": "28d68cba-48c8-4d04-9aee-7f2a8e2bc904",
-    "userId": "1a3fd721-8e19-48e6-a848-82f86d260eab",
-    "createdAt": "2025-08-08T00:36:53.533Z",
-    "lastActivity": "2025-08-08T00:37:08.196Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": false
-  },
-  {
-    "id": "1663b440-f3d5-4a13-aa32-9818feccaac2",
-    "userId": "1a3fd721-8e19-48e6-a848-82f86d260eab",
-    "createdAt": "2025-08-08T00:37:32.166Z",
-    "lastActivity": "2025-08-08T00:41:52.307Z",
-    "ip": "127.0.0.1",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
-    "isActive": true
-  },
-  {
-    "id": "79772f67-5ddc-42d8-9c58-8b88548357c2",
-    "userId": "1a3fd721-8e19-48e6-a848-82f86d260eab",
-    "createdAt": "2025-08-08T00:42:01.400Z",
-    "lastActivity": "2025-08-08T00:43:13.254Z",
+    "createdAt": "2025-08-10T17:41:56.626Z",
+    "lastActivity": "2025-08-10T17:46:21.861Z",
     "ip": "127.0.0.1",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
     "isActive": true

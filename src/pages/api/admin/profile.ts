@@ -51,6 +51,23 @@ function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: any) {
   });
 }
 
+// Parse JSON body for PUT requests
+function parseBody(req: NextApiRequest): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
@@ -103,8 +120,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
     } else if (req.method === 'PUT') {
-      // Update profile information
-      const { firstName, lastName, phone, currentPassword, newPassword } = req.body;
+      // Update profile information - parse body manually since bodyParser is disabled
+      const body = await parseBody(req);
+      const { firstName, lastName, phone, currentPassword, newPassword } = body;
 
       // Validate required fields
       if (!firstName || !lastName) {
@@ -144,7 +162,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Update profile in secure user manager
       const { secureUserManager } = await import('../../../lib/secure-user-manager');
-      const updateResult = secureUserManager.updateUser(user.id, {
+      const updateResult = await secureUserManager.updateUser(user.id, {
         firstName,
         lastName,
         phone
@@ -180,7 +198,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Update user profile photo in secure user manager
         const { secureUserManager } = await import('../../../lib/secure-user-manager');
-        const updateResult = secureUserManager.updateUser(user.id, {
+        const updateResult = await secureUserManager.updateUser(user.id, {
           profilePhoto: photoUrl
         });
 

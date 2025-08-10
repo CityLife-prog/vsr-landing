@@ -3,7 +3,7 @@
     {
       "id": "9eea3472-d144-48dc-8271-021b52a16b57",
       "email": "citylife32@outlook.com",
-      "passwordHash": "$2b$12$q8RXGwOgVFRXlYGV06.tD.evYxVClsS6/GS2vEJ2K39ZxZvAkymWS",
+      "passwordHash": "$2b$12$6JpcFZiA9e4ozc.tvztCNecaT2EjsnbJ90xuiNwP.5MfRhPUlwKKO",
       "firstName": "Matthew",
       "lastName": "Kenner",
       "role": "admin",
@@ -14,11 +14,13 @@
       "twoFactorEnabled": false,
       "maxConcurrentSessions": 5,
       "createdAt": "2025-08-06T18:58:47.715Z",
-      "updatedAt": "2025-08-08T13:23:14.068Z",
-      "lastPasswordChange": "2025-08-08T13:20:27.126Z",
-      "passwordExpiresAt": "2025-11-06T13:20:27.126Z",
+      "updatedAt": "2025-08-10T17:41:56.626Z",
+      "lastPasswordChange": "2025-08-10T17:41:50.010Z",
+      "passwordExpiresAt": "2025-11-08T17:41:50.010Z",
       "activeSessions": [],
-      "lastLoginAt": "2025-08-08T13:23:14.068Z"
+      "lastLoginAt": "2025-08-10T17:41:56.626Z",
+      "profilePhoto": "/uploads/profiles/1754847621451.jpg",
+      "phone": "citylife32@outlook.com"
     },
     {
       "id": "930813cb-4deb-4023-9c4c-3844a51ac2a6",
@@ -61,6 +63,6 @@
     }
   ],
   "version": "1.0.0",
-  "lastUpdated": "2025-08-08T13:23:14.069Z",
-  "encryptionKey": "a13cb84651ded3b9b70964098e999416f4e48787f1fef92df692e791f756c860"
+  "lastUpdated": "2025-08-10T17:41:56.626Z",
+  "encryptionKey": "f3b8e1feda278e47dbd45a3382b66807ada56d5a51a06d862d452dde32d83f3c"
 }

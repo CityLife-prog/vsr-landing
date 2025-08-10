@@ -602,6 +602,60 @@ export class SecureUserManager {
     });
     this.saveSessions();
   }
+
+  /**
+   * Update user profile information
+   */
+  async updateUser(userId: string, updates: Partial<Pick<SecureUser, 'firstName' | 'lastName' | 'phone' | 'profilePhoto'>>): Promise<{
+    success: boolean;
+    message?: string;
+    user?: Omit<SecureUser, 'passwordHash' | 'passwordResetToken' | 'emailVerificationToken' | 'twoFactorSecret'>;
+  }> {
+    try {
+      const userIndex = this.users.findIndex(u => u.id === userId);
+      if (userIndex === -1) {
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+
+      const user = this.users[userIndex];
+
+      // Update allowed fields
+      if (updates.firstName !== undefined) {
+        user.firstName = updates.firstName;
+      }
+      if (updates.lastName !== undefined) {
+        user.lastName = updates.lastName;
+      }
+      if (updates.phone !== undefined) {
+        user.phone = updates.phone;
+      }
+      if (updates.profilePhoto !== undefined) {
+        user.profilePhoto = updates.profilePhoto;
+      }
+
+      // Update metadata
+      user.updatedAt = new Date();
+
+      // Save changes
+      await this.saveUsers();
+
+      return {
+        success: true,
+        message: 'User profile updated successfully',
+        user: this.sanitizeUser(user)
+      };
+
+    } catch (error) {
+      console.error('User update error:', error);
+      return {
+        success: false,
+        message: 'Failed to update user profile'
+      };
+    }
+  }
 }
 
 // Export singleton instance

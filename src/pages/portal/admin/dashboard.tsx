@@ -666,7 +666,7 @@ export default function AdminDashboard() {
                         <p className="text-gray-400 text-xs">{notifications.jobApplications} pending</p>
                       </div>
                     </div>
-                    <NotificationBubble count={notifications.jobApplications} color="purple" size="sm" />
+                    <NotificationBubble count={notifications.jobApplications} color="blue" size="sm" />
                   </button>
                   
                   {isFeatureEnabled('client-management') && (

@@ -185,3 +185,80 @@ div[class*="absolute"][class*="bg-white"] {
 .absolute button:hover, .fixed button:hover {
   background-color: #1d4ed8 !important; /* Darker blue on hover */
 }
+
+/* Ensure all buttons have visible styling */
+button:not([class*="bg-"]):not([class*="text-"]) {
+  background-color: #374151 !important; /* Dark gray background */
+  color: #ffffff !important; /* White text */
+  border: 1px solid #6b7280 !important; /* Gray border */
+  padding: 0.5rem 1rem !important; /* Default padding */
+}
+
+button:not([class*="bg-"]):not([class*="text-"]):hover {
+  background-color: #4b5563 !important; /* Lighter gray on hover */
+  border-color: #9ca3af !important; /* Lighter border on hover */
+}
+
+button:not([class*="bg-"]):not([class*="text-"]):disabled {
+  background-color: #1f2937 !important; /* Darker background when disabled */
+  color: #6b7280 !important; /* Gray text when disabled */
+  border-color: #374151 !important; /* Dark border when disabled */
+  cursor: not-allowed !important;
+}
+
+/* Ensure form labels are visible */
+label {
+  color: #ffffff !important;
+}
+
+.admin-form label {
+  color: #1f2937 !important;
+}
+
+/* Ensure all text elements are visible on dark background */
+p, span, div:not([class*="bg-"]):not([class*="text-"]) {
+  color: #ffffff;
+}
+
+/* Make sure error messages are visible */
+.error, [class*="error"], [class*="Error"] {
+  color: #ef4444 !important; /* Red error text */
+}
+
+.success, [class*="success"], [class*="Success"] {
+  color: #10b981 !important; /* Green success text */
+}
+
+/* Ensure modal and dialog content is visible */
+.modal, .dialog, [role="dialog"] {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border: 1px solid #374151 !important;
+}
+
+/* File input styling */
+input[type="file"] {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border: 1px solid #6b7280 !important;
+  padding: 0.5rem !important;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  background-color: #4b5563 !important;
+  color: #ffffff !important;
+  border: 1px solid #6b7280 !important;
+  padding: 0.25rem 0.5rem !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Checkbox and radio button styling */
+input[type="checkbox"], input[type="radio"] {
+  background-color: #374151 !important;
+  border: 1px solid #6b7280 !important;
+}
+
+input[type="checkbox"]:checked, input[type="radio"]:checked {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
